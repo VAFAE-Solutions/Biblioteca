@@ -1,126 +1,177 @@
 package org.example.demo.dao;
 
 import org.example.demo.Database;
+import org.example.demo.model.Emprestimo;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class EmprestimoDAO {
 
-    public boolean registrarEmprestimo(int usuarioId, int livroId) {
-        String sqlExemplar = "SELECT id FROM exemplar WHERE livro_id = ? AND status = 'DISPONIVEL' LIMIT 1";
-        String sqlEmprestimo = "INSERT INTO emprestimo (exemplar_id, usuario_id, data_emprestimo, data_devolucao_prevista, status) VALUES (?, ?, ?, ?, 'ATIVO')";
+    // ✅ Transação aproveitada do projeto dela
+    public boolean inserir(Emprestimo emprestimo) {
+        String sqlEmprestimo = """
+                INSERT INTO emprestimo (exemplar_id, usuario_id, data_emprestimo,
+                data_devolucao_prevista, status) VALUES (?, ?, ?, ?, ?)
+                """;
         String sqlUpdateExemplar = "UPDATE exemplar SET status = 'EMPRESTADO' WHERE id = ?";
 
-        try (Connection conn = Database.getConnection()) {
-            conn.setAutoCommit(false);
-
+        try (Connection con = Database.getConnection()) {
+            con.setAutoCommit(false);
             try {
-                int exemplarId = -1;
+                // INSERT no empréstimo
+                try (PreparedStatement ps = con.prepareStatement(sqlEmprestimo,
+                        Statement.RETURN_GENERATED_KEYS)) {
 
-                try (PreparedStatement stmtEx = conn.prepareStatement(sqlExemplar)) {
-                    stmtEx.setInt(1, livroId);
-                    ResultSet rs = stmtEx.executeQuery();
-                    if (rs.next()) {
-                        exemplarId = rs.getInt("id");
+                    ps.setInt(1, emprestimo.getExemplarId());
+                    ps.setInt(2, emprestimo.getUsuarioId());
+                    ps.setDate(3, Date.valueOf(emprestimo.getDataEmprestimo()));
+                    ps.setDate(4, Date.valueOf(emprestimo.getDataDevolucaoPrevista()));
+                    ps.setString(5, emprestimo.getStatus().name());
+
+                    int rows = ps.executeUpdate();
+                    if (rows > 0) {
+                        ResultSet keys = ps.getGeneratedKeys();
+                        if (keys.next()) {
+                            emprestimo.setId(keys.getInt(1));
+                        }
                     }
                 }
 
-                if (exemplarId == -1) {
-                    System.err.println("Nenhum exemplar disponível para o livro ID: " + livroId);
-                    return false;
+                // UPDATE no exemplar → EMPRESTADO
+                try (PreparedStatement ps = con.prepareStatement(sqlUpdateExemplar)) {
+                    ps.setInt(1, emprestimo.getExemplarId());
+                    ps.executeUpdate();
                 }
 
-                LocalDate hoje = LocalDate.now();
-                LocalDate entrega = hoje.plusDays(7);
-
-                try (PreparedStatement stmtEmp = conn.prepareStatement(sqlEmprestimo)) {
-                    stmtEmp.setInt(1, exemplarId);
-                    stmtEmp.setInt(2, usuarioId);
-                    stmtEmp.setDate(3, Date.valueOf(hoje));
-                    stmtEmp.setDate(4, Date.valueOf(entrega));
-                    stmtEmp.executeUpdate();
-                }
-
-                try (PreparedStatement stmtUp = conn.prepareStatement(sqlUpdateExemplar)) {
-                    stmtUp.setInt(1, exemplarId);
-                    stmtUp.executeUpdate();
-                }
-
-                conn.commit();
+                con.commit();
                 return true;
 
             } catch (SQLException e) {
-                conn.rollback();
-                System.err.println("Erro na transação de empréstimo: " + e.getMessage());
-                return false;
+                con.rollback();
+                throw new RuntimeException("Erro ao registrar empréstimo: " + e.getMessage(), e);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            throw new RuntimeException("Erro de conexão: " + e.getMessage(), e);
         }
     }
 
-    public List<Map<String, String>> listarEmprestimosPorUsuario(int usuarioId) {
-        List<Map<String, String>> lista = new ArrayList<>();
-        String sql = "SELECT e.id, l.titulo, e.data_emprestimo, e.data_devolucao_prevista, e.status " +
-                "FROM emprestimo e " +
-                "JOIN exemplar ex ON e.exemplar_id = ex.id " +
-                "JOIN livros l ON ex.livro_id = l.id " +
-                "WHERE e.usuario_id = ? AND e.status != 'FINALIZADO' " +
-                "ORDER BY e.data_devolucao_prevista ASC";
+    public Emprestimo buscarPorId(int id) {
+        String sql = "SELECT * FROM emprestimo WHERE id = ?";
 
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
-            ResultSet rs = stmt.executeQuery();
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
-                Map<String, String> emp = new HashMap<>();
-                emp.put("id", rs.getString("id"));
-                emp.put("titulo", rs.getString("titulo"));
-                emp.put("data_saida", rs.getString("data_emprestimo"));
-                emp.put("data_entrega", rs.getString("data_devolucao_prevista"));
-                emp.put("status", rs.getString("status"));
-                lista.add(emp);
+            if (rs.next()) {
+                return mapearEmprestimo(rs);
             }
+            return null;
+
         } catch (SQLException e) {
-            System.err.println("Erro ao listar empréstimos: " + e.getMessage());
+            throw new RuntimeException("Erro ao buscar empréstimo por ID: " + e.getMessage(), e);
         }
-        return lista;
     }
 
-    /**
-     * NOVO MÉTODO: Calcula o valor total de multas acumuladas por atraso.
-     * Regra: R$ 2,00 por cada dia de atraso em empréstimos ATIVOS.
-     */
-    public double calcularMultaTotal(int usuarioId) {
-        double total = 0;
-        // DATEDIFF retorna a diferença em dias entre HOJE e a DATA PREVISTA
-        String sql = "SELECT DATEDIFF(CURDATE(), data_devolucao_prevista) AS dias " +
-                "FROM emprestimo " +
-                "WHERE usuario_id = ? AND status != 'FINALIZADO' " +
-                "AND data_devolucao_prevista < CURDATE()";
+    public List<Emprestimo> buscarPorUsuario(int usuarioId) {
+        String sql = "SELECT * FROM emprestimo WHERE usuario_id = ?";
 
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioId);
-            ResultSet rs = stmt.executeQuery();
+            ps.setInt(1, usuarioId);
+            ResultSet rs = ps.executeQuery();
+            List<Emprestimo> emprestimos = new ArrayList<>();
 
             while (rs.next()) {
-                int diasAtraso = rs.getInt("dias");
-                if (diasAtraso > 0) {
-                    total += diasAtraso * 2.00;
-                }
+                emprestimos.add(mapearEmprestimo(rs));
             }
+            return emprestimos;
+
         } catch (SQLException e) {
-            System.err.println("Erro ao calcular multas: " + e.getMessage());
+            throw new RuntimeException("Erro ao buscar empréstimos por usuário: " + e.getMessage(), e);
         }
-        return total;
+    }
+
+    public List<Emprestimo> buscarPorStatus(Emprestimo.Status status) {
+        String sql = "SELECT * FROM emprestimo WHERE status = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, status.name());
+            ResultSet rs = ps.executeQuery();
+            List<Emprestimo> emprestimos = new ArrayList<>();
+
+            while (rs.next()) {
+                emprestimos.add(mapearEmprestimo(rs));
+            }
+            return emprestimos;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar empréstimos por status: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Emprestimo> buscarAtrasados(LocalDate hoje) {
+        String sql = """
+                SELECT * FROM emprestimo
+                WHERE status = 'ATIVO' AND data_devolucao_prevista < ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setDate(1, Date.valueOf(hoje));
+            ResultSet rs = ps.executeQuery();
+            List<Emprestimo> emprestimos = new ArrayList<>();
+
+            while (rs.next()) {
+                emprestimos.add(mapearEmprestimo(rs));
+            }
+            return emprestimos;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar empréstimos atrasados: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean atualizar(Emprestimo emprestimo) {
+        String sql = """
+                UPDATE emprestimo SET status = ?, data_devolucao = ?
+                WHERE id = ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, emprestimo.getStatus().name());
+            ps.setDate(2, emprestimo.getDataDevolucao() != null
+                    ? Date.valueOf(emprestimo.getDataDevolucao()) : null);
+            ps.setInt(3, emprestimo.getId());
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar empréstimo: " + e.getMessage(), e);
+        }
+    }
+
+    private Emprestimo mapearEmprestimo(ResultSet rs) throws SQLException {
+        Date dataDevolucao = rs.getDate("data_devolucao");
+
+        return new Emprestimo(
+                rs.getInt("id"),
+                rs.getInt("exemplar_id"),
+                rs.getInt("usuario_id"),
+                rs.getDate("data_emprestimo").toLocalDate(),
+                rs.getDate("data_devolucao_prevista").toLocalDate(),
+                dataDevolucao != null ? dataDevolucao.toLocalDate() : null,
+                Emprestimo.Status.valueOf(rs.getString("status"))
+        );
     }
 }

@@ -18,17 +18,17 @@
 
 <div class="sidebar-admin">
     <div class="p-4 text-center"><h5>📚 Admin Panel</h5><hr></div>
-    <a href="admin">📊 Dashboard Geral</a>
-    <a href="#">📖 Gerenciar Acervo</a>
+    <a href="${pageContext.request.contextPath}/admin">📊 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/dashboard">📖 Catálogo</a>
     <a href="#">👥 Usuários</a>
     <a href="#">📅 Empréstimos Ativos</a>
-    <a href="logout" class="text-danger mt-5">🚪 Sair</a>
+    <a href="${pageContext.request.contextPath}/logout" class="text-danger mt-5">🚪 Sair</a>
 </div>
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Bem-vindo, ${usuarioLogado.tipo}: ${usuarioLogado.email}</h2>
-        <button class="btn btn-primary">+ Cadastrar Novo Livro</button>
+        <h2>Bem-vindo, ${usuarioLogado.tipo}: ${usuarioLogado.nome}</h2>
+        <a href="#" class="btn btn-primary">+ Cadastrar Novo Livro</a>
     </div>
 
     <div class="row mb-4">
@@ -50,6 +50,7 @@
                     <th>Capa</th>
                     <th>Título / Autor</th>
                     <th>Editora</th>
+                    <th>Gênero</th>
                     <th>Ações</th>
                 </tr>
                 </thead>
@@ -57,10 +58,20 @@
                 <c:forEach var="l" items="${livros}">
                     <tr>
                         <td>${l.id}</td>
-                        <td><img src="${l.capaUrl}" width="40"></td>
-                        <td><strong>${l.titulo}</strong><br><small>${l.autor}</small></td>
-                        <td>${l.editora}</td>
                         <td>
+                            <img src="${not empty l.capaUrl ? l.capaUrl : ''}"
+                                 width="40"
+                                 onerror="this.src='https://via.placeholder.com/40x60?text=?'">
+                        </td>
+                        <td>
+                            <strong>${l.titulo}</strong>
+                            <br><small>${l.autor}</small>
+                        </td>
+                        <td>${l.editora}</td>
+                        <td>${l.genero}</td>
+                        <td>
+                            <a href="${pageContext.request.contextPath}/detalhes?id=${l.id}"
+                               class="btn btn-sm btn-info text-white">Ver</a>
                             <button class="btn btn-sm btn-warning">Editar</button>
                             <button class="btn btn-sm btn-danger">Excluir</button>
                         </td>
@@ -72,5 +83,6 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -1,33 +1,36 @@
 package org.example.demo.controller;
 
-import org.example.demo.dao.LivroDAO;
-import org.example.demo.model.Livro;
+import org.example.demo.model.Usuario;
+import org.example.demo.service.LivroService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
-@WebServlet(name = "AdminServlet", value = "/admin")
+@WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
-    private LivroDAO livroDAO = new LivroDAO();
+
+    private final LivroService livroService = new LivroService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        Map<String, String> usuario = (Map<String, String>) (session != null ? session.getAttribute("usuarioLogado") : null);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        // PROTEÇÃO: Só entra se for ADMIN ou BIBLIOTECARIO
-        if (usuario == null || (!"ADMIN".equals(usuario.get("tipo")) && !"BIBLIOTECARIO".equals(usuario.get("tipo")))) {
-            response.sendRedirect("login.jsp?erro=acesso_negado");
+        HttpSession session = request.getSession(false);
+        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+
+        // Proteção por perfil — só ADMIN e BIBLIOTECARIO
+        if (usuarioLogado.getTipo() != Usuario.Tipo.ADMIN &&
+                usuarioLogado.getTipo() != Usuario.Tipo.BIBLIOTECARIO) {
+            response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
 
-        // Carrega os livros para o admin poder gerenciar (editar/excluir)
-        List<Livro> lista = livroDAO.listarTodos();
-        request.setAttribute("livros", lista);
+        request.setAttribute("livros", livroService.listarTodos());
+        request.setAttribute("usuarioLogado", usuarioLogado);
 
-        request.getRequestDispatcher("admin_dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/admin_dashboard.jsp")
+                .forward(request, response);
     }
 }

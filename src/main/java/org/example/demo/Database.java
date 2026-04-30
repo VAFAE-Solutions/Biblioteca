@@ -6,20 +6,16 @@ import java.sql.SQLException;
 
 public class Database {
 
+    private static final String URL     = "jdbc:mysql://localhost:3306/biblioteca";
+    private static final String USUARIO = "root";
+    private static final String SENHA   = "sua_senha"; // cada membro troca pela senha local
+
     public static Connection getConnection() {
         try {
-            // Carrega o driver do MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Configurações: substitua pelo nome do seu banco e sua senha do Workbench
-            String url = "jdbc:mysql://localhost:3306/biblioteca";
-            String user = "root";
-            String password = "POj0055@to";
-
-            return DriverManager.getConnection(url, user, password);
+            return DriverManager.getConnection(URL, USUARIO, SENHA);
         } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Erro na conexão: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Erro na conexão: " + e.getMessage(), e);
         }
     }
 }

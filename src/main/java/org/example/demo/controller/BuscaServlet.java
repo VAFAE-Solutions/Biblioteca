@@ -1,38 +1,42 @@
 package org.example.demo.controller;
 
-import org.example.demo.dao.LivroDAO;
-import org.example.demo.model.Livro;
+import org.example.demo.service.LivroService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.List;
+import java.util.ArrayList;
 
-@WebServlet(name = "BuscaServlet", value = "/buscar")
+@WebServlet("/buscar")
 public class BuscaServlet extends HttpServlet {
 
-    private LivroDAO livroDAO = new LivroDAO();
+    private final LivroService livroService = new LivroService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Pega o que o usuário digitou no campo de busca (txtBusca)
-        String termo = request.getParameter("txtBusca");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        List<Livro> listaResultados;
+        String termo  = request.getParameter("txtBusca");
+        String filtro = request.getParameter("filtro");
 
-        // 2. Lógica de segurança: se o termo estiver vazio, traz tudo, senão filtra
-        if (termo == null || termo.trim().isEmpty()) {
-            listaResultados = livroDAO.listarTodos();
+        if (termo != null && !termo.trim().isEmpty()) {
+            // Busca com filtro específico ou geral
+            var livros = switch (filtro != null ? filtro : "geral") {
+                case "titulo"  -> livroService.buscarPorTitulo(termo);
+                case "autor"   -> livroService.buscarPorAutor(termo);
+                case "genero"  -> livroService.buscarPorGenero(termo);
+                default        -> livroService.buscarGeral(termo);
+            };
+            request.setAttribute("livros", livros);
         } else {
-            listaResultados = livroDAO.buscarLivros(termo);
+            request.setAttribute("livros", new ArrayList<>());
         }
 
-        // 3. Pendura a lista na "mochila" (request) para o JSP exibir
-        request.setAttribute("livros", listaResultados);
+        request.setAttribute("termoPesquisado", termo);
+        request.setAttribute("filtro", filtro);
 
-        // 4. Manda de volta para o Dashboard com os novos resultados
-        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/dashboard.jsp")
+                .forward(request, response);
     }
 }

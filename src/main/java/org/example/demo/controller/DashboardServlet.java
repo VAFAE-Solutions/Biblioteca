@@ -1,54 +1,38 @@
 package org.example.demo.controller;
 
-import org.example.demo.dao.LivroDAO;
-import org.example.demo.model.Livro;
+import org.example.demo.model.Usuario;
+import org.example.demo.service.LivroService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.List;
 
-@WebServlet(name = "DashboardServlet", value = "/dashboard")
+@WebServlet("/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-    private LivroDAO livroDAO = new LivroDAO();
+    private final LivroService livroService = new LivroService();
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Verifica se existe uma sessão ativa e se o usuário está logado (Segurança)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession(false);
+        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
-        // Ajuste: Verificamos se a sessão existe E se o atributo 'usuarioLogado' não é nulo
-        if (session == null || session.getAttribute("usuarioLogado") == null) {
-            System.out.println(">>> DASHBOARD DEBUG: Acesso negado. Redirecionando para login.");
-            response.sendRedirect("login.jsp?erro=acesso_negado");
-            return; // Interrompe a execução para não carregar o resto
-        }
-
-        // DEBUG para console (ajudará você a ver se o Map está chegando certo)
-        System.out.println(">>> DASHBOARD DEBUG: Usuário Logado: " + session.getAttribute("usuarioLogado"));
-
-        // 2. Captura o termo de busca vindo do formulário (name="txtBusca")
+        // Busca com filtro
         String txtBusca = request.getParameter("txtBusca");
-        List<Livro> lista;
 
-        // 3. Lógica de decisão: Busca filtrada ou Listagem total
         if (txtBusca != null && !txtBusca.trim().isEmpty()) {
-            System.out.println(">>> DASHBOARD DEBUG: Realizando busca por: " + txtBusca);
-            lista = livroDAO.buscarLivros(txtBusca);
+            request.setAttribute("livros", livroService.buscarGeral(txtBusca));
         } else {
-            System.out.println(">>> DASHBOARD DEBUG: Carregando todos os livros.");
-            lista = livroDAO.listarTodos();
+            request.setAttribute("livros", livroService.listarTodos());
         }
 
-        // 4. Envia os dados para o JSP
-        request.setAttribute("livros", lista);
         request.setAttribute("termoPesquisado", txtBusca);
+        request.setAttribute("usuarioLogado", usuarioLogado);
 
-        // 5. Encaminha para o JSP do Dashboard
-        request.getRequestDispatcher("dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/dashboard.jsp")
+                .forward(request, response);
     }
 }

@@ -1,44 +1,67 @@
 package org.example.demo.controller;
 
-import org.example.demo.dao.EmprestimoDAO;
+import org.example.demo.model.Usuario;
+import org.example.demo.service.EmprestimoService;
+import org.example.demo.service.MultaService;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.Map;
 
-@WebServlet(name = "EmprestimoServlet", value = "/reservar")
+@WebServlet("/reservar")
 public class EmprestimoServlet extends HttpServlet {
-    private EmprestimoDAO emprestimoDAO = new EmprestimoDAO();
 
+    private final EmprestimoService emprestimoService = new EmprestimoService();
+    private final MultaService multaService = new MultaService();
+
+    // Exibe confirmação antes de reservar
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        // 1. Recupera o Map do usuário da sessão
-        Map<String, String> usuario = (Map<String, String>) (session != null ? session.getAttribute("usuarioLogado") : null);
         String livroIdParam = request.getParameter("id");
 
-        if (usuario != null && livroIdParam != null) {
-            try {
-                // AJUSTE: Pegamos o ID numérico (PK) que veio do banco, pois a FK de empréstimo usa ID
-                int usuarioId = Integer.parseInt(usuario.get("id"));
-                int livroId = Integer.parseInt(livroIdParam);
+        if (livroIdParam == null || livroIdParam.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/home");
+            return;
+        }
 
-                // 2. Chama o DAO passando os IDs numéricos conforme o seu Script SQL
-                boolean sucesso = emprestimoDAO.registrarEmprestimo(usuarioId, livroId);
+        request.getRequestDispatcher("/livro.jsp")
+                .forward(request, response);
+    }
 
-                if (sucesso) {
-                    response.sendRedirect("detalhes?id=" + livroId + "&reserva=sucesso");
-                } else {
-                    response.sendRedirect("detalhes?id=" + livroId + "&reserva=erro");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.sendRedirect("dashboard?erro=dados_invalidos");
+    // Realiza o empréstimo
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+
+        String exemplarIdParam = request.getParameter("exemplarId");
+        String livroIdParam    = request.getParameter("livroId");
+
+        try {
+            int exemplarId = Integer.parseInt(exemplarIdParam);
+            int livroId    = Integer.parseInt(livroIdParam);
+
+            // Verifica multa pendente
+            if (multaService.usuarioPossuiMultaPendente(usuarioLogado.getId())) {
+                response.sendRedirect(request.getContextPath()
+                        + "/detalhes?id=" + livroId + "&erro=multa_pendente");
+                return;
             }
-        } else {
-            response.sendRedirect("login.jsp");
+
+            emprestimoService.realizarEmprestimo(exemplarId, usuarioLogado.getId());
+            response.sendRedirect(request.getContextPath()
+                    + "/detalhes?id=" + livroId + "&reserva=sucesso");
+
+        } catch (IllegalStateException e) {
+            response.sendRedirect(request.getContextPath()
+                    + "/detalhes?id=" + livroIdParam + "&reserva=erro");
+        } catch (Exception e) {
+            response.sendRedirect(request.getContextPath() + "/dashboard?erro=dados_invalidos");
         }
     }
 }

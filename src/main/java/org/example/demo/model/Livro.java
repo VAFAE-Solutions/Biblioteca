@@ -1,8 +1,9 @@
 package org.example.demo.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Livro {
+
     private int id;
     private String titulo;
     private String autor;
@@ -11,12 +12,29 @@ public class Livro {
     private String genero;
     private String descricao;
     private String sumario;
-    private String capaUrl;
-    private Timestamp createdAt;
+    private String capaUrl;        // mantido para compatibilidade com os JSPs
+    private LocalDateTime createdAt;
 
     public Livro() {}
 
-    // --- ABAIXO ESTÃO OS MÉTODOS QUE FALTAVAM ---
+    public Livro(String titulo, String autor, String editora,
+                 int anoPublicacao, String genero, String descricao, String sumario) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.editora = editora;
+        this.anoPublicacao = anoPublicacao;
+        this.genero = genero;
+        this.descricao = descricao;
+        this.sumario = sumario;
+    }
+
+    public Livro(int id, String titulo, String autor, String editora,
+                 int anoPublicacao, String genero, String descricao,
+                 String sumario, LocalDateTime createdAt) {
+        this(titulo, autor, editora, anoPublicacao, genero, descricao, sumario);
+        this.id = id;
+        this.createdAt = createdAt;
+    }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -45,6 +63,11 @@ public class Livro {
     public String getCapaUrl() { return capaUrl; }
     public void setCapaUrl(String capaUrl) { this.capaUrl = capaUrl; }
 
-    public Timestamp getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    @Override
+    public String toString() {
+        return "Livro{id=" + id + ", titulo=" + titulo + ", autor=" + autor + "}";
+    }
 }
