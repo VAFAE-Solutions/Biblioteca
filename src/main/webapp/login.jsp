@@ -25,7 +25,7 @@
                         Senha incorreta. Tente novamente.
                     </c:when>
                     <c:otherwise>
-                        Usuário não encontrado.
+                        Usuário não encontrado. <a href="${pageContext.request.contextPath}/cadastro.html" style="color: #d32f2f;">Cadastre-se aqui</a>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -48,6 +48,22 @@
             </button>
 
         </form>
+
+        <!-- NOVO: Link para cadastro -->
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+            <p style="color: #666; margin-bottom: 10px;">Não tem uma conta?</p>
+            <a href="${pageContext.request.contextPath}/cadastro.html"
+               style="display: inline-block;
+                      padding: 10px 20px;
+                      background: #f0f2f5;
+                      color: #2d73d5;
+                      text-decoration: none;
+                      border-radius: 8px;
+                      font-weight: bold;
+                      border: 1px solid #2d73d5;">
+                Criar nova conta
+            </a>
+        </div>
 
     </div>
 </div>

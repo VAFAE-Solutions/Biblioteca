@@ -250,3 +250,66 @@ body {
     max-width: 600px;
     line-height: 1.6;
 }
+
+/* ===== CADASTRO ===== */
+
+.cadastro-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.cadastro-container {
+    background: white;
+    padding: 40px;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.cadastro-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: #333;
+}
+
+.link-cadastro {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.link-cadastro a {
+    color: #2d73d5;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-cadastro a:hover {
+    text-decoration: underline;
+}
+
+/* Mensagens de erro/sucesso */
+.mensagem {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.mensagem.erro {
+    background-color: #ffe6e6;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+.mensagem.sucesso {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    border: 1px solid #c8e6c9;
+}
