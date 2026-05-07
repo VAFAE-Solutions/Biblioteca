@@ -10,10 +10,12 @@
 <div class="cadastro-wrapper">
     <div class="cadastro-container">
         <h2>Criar nova conta</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 25px;">Passo 1 de 2 - Dados básicos</p>
 
         <div id="mensagemErro" class="mensagem erro" style="display: none;"></div>
 
-        <form id="formCadastro" action="${pageContext.request.contextPath}/cadastro" method="post">
+        <!-- ACTION CORRIGIDO: aponta para cadastro-2.html -->
+        <form id="formCadastro" action="cadastro-2.html" method="get">
             <div class="form-group">
                 <label>Nome completo</label>
                 <input type="text" name="nome" id="nome" placeholder="Digite seu nome completo" required>
@@ -35,13 +37,13 @@
             </div>
 
             <button type="submit" class="btn-entrar">
-                Cadastrar
+                Próximo →
             </button>
         </form>
 
         <div class="link-cadastro">
             <p>Já tem uma conta?</p>
-            <a href="${pageContext.request.contextPath}/login.jsp">← Fazer login</a>
+            <a href="login.jsp">← Fazer login</a>
         </div>
     </div>
 </div>

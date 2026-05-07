@@ -313,3 +313,15 @@ body {
     color: #388e3c;
     border: 1px solid #c8e6c9;
 }
+
+/* Estilo para textos pequenos de ajuda */
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+}
+
+/* Estilo para o passo do cadastro */
+.cadastro-container p {
+    font-size: 14px;
+}
