@@ -1,9 +1,10 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Complete seu Cadastro - Biblioteca</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
 
@@ -18,20 +19,33 @@
 
             <div class="form-group">
                 <label>RA (Registro Acadêmico) ou CPF</label>
-                <input type="text" name="raCpf" id="raCpf" placeholder="Ex: 12345678 ou 123.456.789-00" required>
+                <input type="text"
+                       name="raCpf"
+                       id="raCpf"
+                       placeholder="Ex: 12345678 ou 123.456.789-00"
+                       required>
                 <small style="color: #666; font-size: 12px;">Digite seu RA se for aluno, ou CPF se for comunidade externa</small>
             </div>
 
             <div class="form-group">
                 <label>Endereço completo</label>
-                <input type="text" name="endereco" id="endereco" placeholder="Rua, número, bairro, cidade - CEP" required>
+                <input type="text"
+                       name="endereco"
+                       id="endereco"
+                       placeholder="Rua, número, bairro, cidade - CEP"
+                       required>
             </div>
 
             <div class="form-group">
                 <label>Telefone</label>
-                <input type="tel" name="telefone" id="telefone" placeholder="(11) 99999-9999" required>
+                <input type="tel"
+                       name="telefone"
+                       id="telefone"
+                       placeholder="(11) 99999-9999"
+                       required>
             </div>
 
+            <!-- Campos ocultos para manter dados do passo 1 -->
             <input type="hidden" name="nome" id="nomeHidden">
             <input type="hidden" name="email" id="emailHidden">
             <input type="hidden" name="senha" id="senhaHidden">
@@ -43,12 +57,13 @@
 
         <div class="link-cadastro">
             <p>Já tem conta?</p>
-            <a href="login.jsp">← Fazer login</a>
+            <a href="${pageContext.request.contextPath}/login.jsp">← Fazer login</a>
         </div>
     </div>
 </div>
 
 <script>
+    // Recuperar os dados do passo 1 que vieram via URL
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -56,11 +71,13 @@
         document.getElementById('emailHidden').value = urlParams.get('email') || '';
         document.getElementById('senhaHidden').value = urlParams.get('senha') || '';
 
+        // Se não tiver dados, redirecionar de volta para o passo 1
         if (!document.getElementById('nomeHidden').value) {
-            window.location.href = 'cadastro.html';
+            window.location.href = '${pageContext.request.contextPath}/cadastro.jsp';
         }
     };
 
+    // Validação do formulário
     document.getElementById('formCadastroPasso2').addEventListener('submit', function(event) {
         const raCpf = document.getElementById('raCpf').value;
         const endereco = document.getElementById('endereco').value;
@@ -68,6 +85,7 @@
 
         document.getElementById('mensagemErro').style.display = 'none';
 
+        // Validar RA/CPF
         let numeros = raCpf.replace(/[^0-9]/g, '');
         if (numeros.length < 8) {
             event.preventDefault();
@@ -76,6 +94,7 @@
             return false;
         }
 
+        // Validar telefone
         let telefoneNumeros = telefone.replace(/[^0-9]/g, '');
         if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
             event.preventDefault();
@@ -84,6 +103,7 @@
             return false;
         }
 
+        // Validar endereço
         if (endereco.trim().length < 10) {
             event.preventDefault();
             document.getElementById('mensagemErro').textContent = 'Endereço muito curto. Digite um endereço completo.';
@@ -92,6 +112,7 @@
         }
     });
 
+    // Máscara para telefone
     document.getElementById('telefone').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length <= 11) {
@@ -106,6 +127,7 @@
         }
     });
 
+    // Máscara para CPF (se digitar 11 números)
     document.getElementById('raCpf').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length === 11) {

@@ -1,9 +1,10 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Cadastro - Biblioteca</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
 
@@ -14,8 +15,7 @@
 
         <div id="mensagemErro" class="mensagem erro" style="display: none;"></div>
 
-        <!-- ACTION CORRIGIDO: aponta para cadastro-2.html -->
-        <form id="formCadastro" action="cadastro-2.html" method="get">
+        <form id="formCadastro" action="${pageContext.request.contextPath}/cadastro-2.jsp" method="get">
             <div class="form-group">
                 <label>Nome completo</label>
                 <input type="text" name="nome" id="nome" placeholder="Digite seu nome completo" required>
@@ -43,7 +43,7 @@
 
         <div class="link-cadastro">
             <p>Já tem uma conta?</p>
-            <a href="login.jsp">← Fazer login</a>
+            <a href="${pageContext.request.contextPath}/login.jsp">← Fazer login</a>
         </div>
     </div>
 </div>
