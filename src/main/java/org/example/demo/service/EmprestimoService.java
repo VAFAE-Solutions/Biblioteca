@@ -1,22 +1,24 @@
 package org.example.demo.service;
 
 import org.example.demo.dao.EmprestimoDAO;
-import org.example.demo.model.Emprestimo;
-import org.example.demo.model.Exemplar;
+import org.example.demo.dao.UsuarioDAO;
+import org.example.demo.model.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class EmprestimoService {
 
-    private static final int DIAS_EMPRESTIMO = 7; // prazo padrão
-
     private final EmprestimoDAO emprestimoDAO;
     private final ExemplarService exemplarService;
+    private final MultaService multaService;
+    private final UsuarioDAO usuarioDAO;
 
     public EmprestimoService() {
         this.emprestimoDAO = new EmprestimoDAO();
         this.exemplarService = new ExemplarService();
+        this.multaService = new MultaService();
+        this.usuarioDAO = new UsuarioDAO();
     }
 
     public boolean realizarEmprestimo(int exemplarId, int usuarioId) {
@@ -24,22 +26,43 @@ public class EmprestimoService {
             throw new IllegalArgumentException("IDs inválidos.");
         }
 
-        // Verifica se o exemplar está disponível
+        // 1. Busca o usuário
+        Usuario usuario = usuarioDAO.buscarPorId(usuarioId);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuário não encontrado.");
+        }
+
+        // 2. Verifica multa pendente
+        if (multaService.usuarioPossuiMultaPendente(usuarioId)) {
+            throw new IllegalStateException("Usuário possui multa pendente.");
+        }
+
+        // 3. Verifica limite de cotas
+        int emprestimosAtivos = usuarioDAO.contarEmprestimosAtivos(usuarioId);
+        if (emprestimosAtivos >= usuario.getLimiteCotas()) {
+            throw new IllegalStateException("Limite de empréstimos atingido. "
+                    + "Máximo: " + usuario.getLimiteCotas());
+        }
+
+        // 4. Verifica se exemplar está disponível
         Exemplar exemplar = exemplarService.buscarPorId(exemplarId);
         if (exemplar == null) {
             throw new IllegalArgumentException("Exemplar não encontrado.");
         }
         if (exemplar.getStatus() != Exemplar.Status.DISPONIVEL) {
-            throw new IllegalStateException("Exemplar não está disponível para empréstimo.");
+            throw new IllegalStateException("Exemplar não está disponível.");
         }
 
-        // Cria o empréstimo
+        // 5. Calcula prazo por tipo de usuário
         LocalDate hoje = LocalDate.now();
+        LocalDate dataPrevista = hoje.plusDays(usuario.getPrazoEmprestimo());
+
+        // 6. Cria o empréstimo
         Emprestimo emprestimo = new Emprestimo(
                 exemplarId,
                 usuarioId,
                 hoje,
-                hoje.plusDays(DIAS_EMPRESTIMO)
+                dataPrevista
         );
 
         return emprestimoDAO.inserir(emprestimo);
@@ -63,7 +86,10 @@ public class EmprestimoService {
         emprestimo.setStatus(Emprestimo.Status.FINALIZADO);
 
         // Libera o exemplar
-        exemplarService.atualizarStatus(emprestimo.getExemplarId(), Exemplar.Status.DISPONIVEL);
+        exemplarService.atualizarStatus(
+                emprestimo.getExemplarId(),
+                Exemplar.Status.DISPONIVEL
+        );
 
         return emprestimoDAO.atualizar(emprestimo);
     }

@@ -1,6 +1,7 @@
 package org.example.demo.service;
 
 import org.example.demo.dao.ReservaDAO;
+import org.example.demo.model.Exemplar;
 import org.example.demo.model.FilaReserva;
 import org.example.demo.model.Reserva;
 
@@ -11,10 +12,12 @@ public class ReservaService {
 
     private final ReservaDAO reservaDAO;
     private final MultaService multaService;
+    private final ExemplarService exemplarService;
 
     public ReservaService() {
         this.reservaDAO = new ReservaDAO();
         this.multaService = new MultaService();
+        this.exemplarService = new ExemplarService();
     }
 
     public boolean realizarReserva(int livroId, int usuarioId, int unidadeId) {
@@ -22,15 +25,25 @@ public class ReservaService {
             throw new IllegalArgumentException("IDs inválidos.");
         }
 
+        // ✅ Verifica se há exemplar disponível — reserva só para indisponível
+        List<Exemplar> disponiveis = exemplarService
+                .buscarDisponiveisPorLivroEUnidade(livroId, unidadeId);
+        if (!disponiveis.isEmpty()) {
+            throw new IllegalStateException(
+                    "Livro disponível para empréstimo. Não é necessário reservar.");
+        }
+
         // Usuário com multa pendente não pode reservar
         if (multaService.usuarioPossuiMultaPendente(usuarioId)) {
-            throw new IllegalStateException("Usuário possui multa pendente. Quite antes de reservar.");
+            throw new IllegalStateException(
+                    "Usuário possui multa pendente. Quite antes de reservar.");
         }
 
         // Verifica se usuário já está na fila
         FilaReserva fila = reservaDAO.buscarFilaPorLivroEUnidade(livroId, unidadeId);
         if (fila.usuarioNaFila(usuarioId)) {
-            throw new IllegalStateException("Usuário já possui reserva ativa para este livro nesta unidade.");
+            throw new IllegalStateException(
+                    "Usuário já possui reserva ativa para este livro nesta unidade.");
         }
 
         Reserva reserva = new Reserva(

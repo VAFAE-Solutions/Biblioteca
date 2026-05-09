@@ -2,6 +2,7 @@ package org.example.demo.dao;
 
 import org.example.demo.Database;
 import org.example.demo.model.FilaReserva;
+import org.example.demo.model.Livro;
 import org.example.demo.model.Reserva;
 
 import java.sql.*;
@@ -42,7 +43,12 @@ public class ReservaDAO {
     }
 
     public Reserva buscarPorId(int id) {
-        String sql = "SELECT * FROM reservas WHERE id = ?";
+        String sql = """
+                SELECT r.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM reservas r
+                JOIN livros l ON r.livro_id = l.id
+                WHERE r.id = ?
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -51,7 +57,7 @@ public class ReservaDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapearReserva(rs);
+                return mapearReservaComLivro(rs);
             }
             return null;
 
@@ -60,8 +66,15 @@ public class ReservaDAO {
         }
     }
 
+    // ✅ JOIN com livros para exibir título
     public List<Reserva> buscarPorUsuario(int usuarioId) {
-        String sql = "SELECT * FROM reservas WHERE usuario_id = ? ORDER BY posicao_fila";
+        String sql = """
+                SELECT r.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM reservas r
+                JOIN livros l ON r.livro_id = l.id
+                WHERE r.usuario_id = ?
+                ORDER BY r.posicao_fila
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -71,7 +84,7 @@ public class ReservaDAO {
             List<Reserva> reservas = new ArrayList<>();
 
             while (rs.next()) {
-                reservas.add(mapearReserva(rs));
+                reservas.add(mapearReservaComLivro(rs));
             }
             return reservas;
 
@@ -82,9 +95,11 @@ public class ReservaDAO {
 
     public FilaReserva buscarFilaPorLivroEUnidade(int livroId, int unidadeId) {
         String sql = """
-                SELECT * FROM reservas
-                WHERE livro_id = ? AND unidade_id = ? AND status = 'AGUARDANDO'
-                ORDER BY posicao_fila
+                SELECT r.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM reservas r
+                JOIN livros l ON r.livro_id = l.id
+                WHERE r.livro_id = ? AND r.unidade_id = ? AND r.status = 'AGUARDANDO'
+                ORDER BY r.posicao_fila
                 """;
 
         try (Connection con = Database.getConnection();
@@ -98,7 +113,7 @@ public class ReservaDAO {
             List<Reserva> reservas = new ArrayList<>();
 
             while (rs.next()) {
-                reservas.add(mapearReserva(rs));
+                reservas.add(mapearReservaComLivro(rs));
             }
             fila.setFila(reservas);
             return fila;
@@ -124,8 +139,9 @@ public class ReservaDAO {
         }
     }
 
-    private Reserva mapearReserva(ResultSet rs) throws SQLException {
-        return new Reserva(
+    // ✅ Mapeia reserva com livro populado
+    private Reserva mapearReservaComLivro(ResultSet rs) throws SQLException {
+        Reserva reserva = new Reserva(
                 rs.getInt("id"),
                 rs.getInt("livro_id"),
                 rs.getInt("usuario_id"),
@@ -134,5 +150,14 @@ public class ReservaDAO {
                 Reserva.Status.valueOf(rs.getString("status")),
                 rs.getInt("posicao_fila")
         );
+
+        // Popula livro
+        Livro livro = new Livro();
+        livro.setId(rs.getInt("livro_id"));
+        livro.setTitulo(rs.getString("livro_titulo"));
+        livro.setCapaUrl(rs.getString("livro_capa"));
+
+        reserva.setLivro(livro);
+        return reserva;
     }
 }

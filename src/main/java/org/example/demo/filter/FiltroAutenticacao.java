@@ -11,13 +11,14 @@ import java.util.List;
 @WebFilter("/*")
 public class FiltroAutenticacao implements Filter {
 
-    // Rotas públicas — não precisam de login
     private static final List<String> ROTAS_PUBLICAS = List.of(
             "/login",
             "/logout",
-            "/home",      // catálogo público
-            "/detalhes",  // detalhes do livro públicos
-            "/buscar",    // busca pública
+            "/home",
+            "/detalhes",
+            "/buscar",
+            "/cadastro",
+            "/cadastro-completo",
             "/css",
             "/js",
             "/imagens"

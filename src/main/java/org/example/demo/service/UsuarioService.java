@@ -31,14 +31,20 @@ public class UsuarioService {
             throw new IllegalArgumentException("Tipo de usuário é obrigatório.");
         }
 
+        // ✅ Verifica se email já está cadastrado
+        Usuario existente = usuarioDAO.buscarPorEmail(usuario.getEmail());
+        if (existente != null) {
+            throw new IllegalArgumentException("E-mail já cadastrado. Use outro e-mail ou faça login.");
+        }
+
         // Hasheia a senha antes de salvar
         usuario.setSenhaHash(AutenticacaoService.gerarHash(usuario.getSenhaHash()));
 
         // Validações específicas por tipo
         switch (usuario.getTipo()) {
-            case ESTUDANTE    -> validarEstudante(usuario);
+            case ESTUDANTE     -> validarEstudante(usuario);
             case BIBLIOTECARIO -> validarBibliotecario(usuario);
-            default           -> {}
+            default            -> {}
         }
 
         return usuarioDAO.inserir(usuario);

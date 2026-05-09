@@ -1,5 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
+<%-- Garante que sempre passa pelo HomeServlet --%>
+<% if (request.getAttribute("livros") == null) {
+    response.sendRedirect(request.getContextPath() + "/home");
+    return;
+} %>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -17,8 +24,11 @@
         </div>
 
         <div class="search-box">
-            <form action="${pageContext.request.contextPath}/home" method="get" class="search-wrapper">
-                <input type="text" name="txtBusca" value="${termoPesquisado}" placeholder="Procurar Livro ou Autor">
+            <form action="${pageContext.request.contextPath}/home"
+                  method="get" class="search-wrapper">
+                <input type="text" name="txtBusca"
+                       value="${termoPesquisado}"
+                       placeholder="Procurar Livro ou Autor">
                 <button type="submit">🔍</button>
             </form>
         </div>
@@ -26,7 +36,7 @@
         <div class="user-box">
             <div class="auth-links">
                 <a href="${pageContext.request.contextPath}/login">Entrar</a>
-                <a href="${pageContext.request.contextPath}/login">Cadastrar-se</a>
+                <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
             </div>
             <div class="avatar"></div>
         </div>
@@ -52,8 +62,10 @@
             <h2>Resultados para: "${termoPesquisado}"</h2>
             <div class="books-grid">
                 <c:forEach var="livro" items="${livros}">
-                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${not empty livro.capaUrl ? livro.capaUrl : 'https://via.placeholder.com/200x300?text=Sem+Capa'}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}"
+                       class="book-card">
+                        <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:forEach>

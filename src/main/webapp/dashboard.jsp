@@ -37,6 +37,12 @@
             color: #40c4d4;
             font-weight: bold;
         }
+        .sidebar a.active {
+            background-color: #e8f7f8;
+            color: #40c4d4;
+            font-weight: bold;
+            border-left: 4px solid #40c4d4;
+        }
         .content { margin-left: 240px; padding: 30px; }
         .profile-box {
             display: flex;
@@ -77,16 +83,21 @@
 </div>
 
 <div class="sidebar">
-    <a href="${pageContext.request.contextPath}/dashboard">🏠 Catálogo</a>
+    <a href="${pageContext.request.contextPath}/dashboard" class="active">🏠 Catálogo</a>
+    <a href="${pageContext.request.contextPath}/perfil">👤 Meu Perfil</a>
     <a href="${pageContext.request.contextPath}/meus-emprestimos">📖 Meus Empréstimos</a>
-    <a href="${pageContext.request.contextPath}/logout">🚪 Sair</a>
+    <a href="${pageContext.request.contextPath}/minhas-reservas">🔖 Minhas Reservas</a>
+    <a href="${pageContext.request.contextPath}/multas">💰 Multas</a>
+    <a href="${pageContext.request.contextPath}/logout"
+       style="color: #dc3545;">🚪 Sair</a>
 </div>
 
 <div class="content">
 
     <div class="profile-box">
         <div>
-            <h3>Bem Vindo, ${not empty usuarioLogado.nome ? usuarioLogado.nome : usuarioLogado.email}</h3>
+            <h3>Bem Vindo, ${not empty usuarioLogado.nome
+                ? usuarioLogado.nome : usuarioLogado.email}</h3>
             <p class="text-muted mb-0">Perfil: ${usuarioLogado.tipo}</p>
         </div>
     </div>
@@ -106,8 +117,10 @@
         <c:forEach var="livro" items="${livros}">
             <div class="col-md-3 mb-4">
                 <div class="card h-100 book-card shadow-sm">
-                    <img src="${not empty livro.capaUrl ? livro.capaUrl : 'https://via.placeholder.com/200x300?text=Sem+Capa'}"
-                         class="card-img-top" alt="${livro.titulo}">
+                    <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
+                         class="card-img-top"
+                         alt="${livro.titulo}"
+                         onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                     <div class="card-body">
                         <h6 class="card-title text-truncate">${livro.titulo}</h6>
                         <p class="card-text small text-muted">${livro.autor}</p>
@@ -125,10 +138,13 @@
         <c:if test="${empty livros}">
             <div class="col-12">
                 <div class="alert alert-light border shadow-sm mt-3">
-                    Nenhum livro encontrado para "<strong>${termoPesquisado}</strong>".
+                    Nenhum livro encontrado para
+                    "<strong>${termoPesquisado}</strong>".
                     <br>
                     <a href="${pageContext.request.contextPath}/dashboard"
-                       class="alert-link text-info">Clique aqui para ver todos os livros.</a>
+                       class="alert-link text-info">
+                        Clique aqui para ver todos os livros.
+                    </a>
                 </div>
             </div>
         </c:if>

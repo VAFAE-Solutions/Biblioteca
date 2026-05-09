@@ -1,7 +1,9 @@
 package org.example.demo.controller;
 
 import org.example.demo.model.Usuario;
+import org.example.demo.service.EmprestimoService;
 import org.example.demo.service.LivroService;
+import org.example.demo.service.UsuarioService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,6 +14,8 @@ import java.io.IOException;
 public class AdminServlet extends HttpServlet {
 
     private final LivroService livroService = new LivroService();
+    private final UsuarioService usuarioService = new UsuarioService();
+    private final EmprestimoService emprestimoService = new EmprestimoService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -27,8 +31,23 @@ public class AdminServlet extends HttpServlet {
             return;
         }
 
+        // Livros
         request.setAttribute("livros", livroService.listarTodos());
         request.setAttribute("usuarioLogado", usuarioLogado);
+
+        // ✅ Cards extras para Admin
+        if (usuarioLogado.getTipo() == Usuario.Tipo.ADMIN) {
+            request.setAttribute("totalUsuarios",
+                    usuarioService.listarTodos().size());
+            request.setAttribute("totalAtrasados",
+                    emprestimoService.buscarAtrasados().size());
+        }
+
+        // ✅ Cards extras para Bibliotecário
+        if (usuarioLogado.getTipo() == Usuario.Tipo.BIBLIOTECARIO) {
+            request.setAttribute("totalAtivos",
+                    emprestimoService.buscarAtivos().size());
+        }
 
         request.getRequestDispatcher("/admin_dashboard.jsp")
                 .forward(request, response);

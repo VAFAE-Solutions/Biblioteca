@@ -4,27 +4,26 @@ import java.time.LocalDateTime;
 
 public class UsuarioBibliotecario extends Usuario {
 
-    private int unidadeId;   // obrigatório — constraint chk_bibliotecario_unidade
-    private Unidade unidade; // objeto completo, populado quando necessário
+    private int unidadeId;
+    private Unidade unidade;
 
-    // Construtor vazio — usado pelo DAO
     public UsuarioBibliotecario() {
         super();
         setTipo(Tipo.BIBLIOTECARIO);
     }
 
-    // Construtor mínimo — cadastro
-    public UsuarioBibliotecario(String nome, String email, String senhaHash, int unidadeId) {
+    public UsuarioBibliotecario(String nome, String email, String senhaHash,
+                                int unidadeId) {
         super(nome, email, senhaHash, Tipo.BIBLIOTECARIO);
         this.unidadeId = unidadeId;
     }
 
-    // Construtor completo — usado pelo DAO ao reconstruir do banco
     public UsuarioBibliotecario(int id, String nome, String email, String senhaHash,
-                                String telefone, boolean bloqueado, int tentativasLogin,
-                                LocalDateTime ultimaTentativa, LocalDateTime createdAt,
-                                LocalDateTime updatedAt, int unidadeId) {
-        super(id, nome, email, senhaHash, Tipo.BIBLIOTECARIO, telefone,
+                                String cpf, String telefone, boolean bloqueado,
+                                int tentativasLogin, LocalDateTime ultimaTentativa,
+                                LocalDateTime createdAt, LocalDateTime updatedAt,
+                                int unidadeId) {
+        super(id, nome, email, senhaHash, Tipo.BIBLIOTECARIO, cpf, telefone,
                 bloqueado, tentativasLogin, ultimaTentativa, createdAt, updatedAt);
         this.unidadeId = unidadeId;
     }
@@ -35,7 +34,7 @@ public class UsuarioBibliotecario extends Usuario {
     public Unidade getUnidade() { return unidade; }
     public void setUnidade(Unidade unidade) {
         this.unidade = unidade;
-        this.unidadeId = unidade.getId(); // mantém consistência
+        this.unidadeId = unidade.getId();
     }
 
     @Override

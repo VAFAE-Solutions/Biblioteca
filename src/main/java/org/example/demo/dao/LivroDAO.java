@@ -11,8 +11,9 @@ public class LivroDAO {
 
     public boolean inserir(Livro livro) {
         String sql = """
-                INSERT INTO livros (titulo, autor, editora, ano_publicacao, genero, descricao, sumario)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO livros (titulo, autor, editora, ano_publicacao, 
+                genero, descricao, sumario, capa_url)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection con = Database.getConnection();
@@ -25,6 +26,7 @@ public class LivroDAO {
             ps.setString(5, livro.getGenero());
             ps.setString(6, livro.getDescricao());
             ps.setString(7, livro.getSumario());
+            ps.setString(8, livro.getCapaUrl());
 
             int rows = ps.executeUpdate();
 
@@ -60,14 +62,13 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Busca simultânea por título, autor e gênero — aproveitado do projeto dela
     public List<Livro> buscarGeral(String termo) {
         if (termo == null || termo.trim().isEmpty()) {
             return listarTodos();
         }
 
         String sql = """
-                SELECT * FROM livros 
+                SELECT * FROM livros
                 WHERE titulo LIKE ? OR autor LIKE ? OR genero LIKE ?
                 ORDER BY titulo ASC
                 """;
@@ -174,7 +175,8 @@ public class LivroDAO {
     public boolean atualizar(Livro livro) {
         String sql = """
                 UPDATE livros SET titulo = ?, autor = ?, editora = ?,
-                ano_publicacao = ?, genero = ?, descricao = ?, sumario = ?
+                ano_publicacao = ?, genero = ?, descricao = ?, 
+                sumario = ?, capa_url = ?
                 WHERE id = ?
                 """;
 
@@ -188,7 +190,8 @@ public class LivroDAO {
             ps.setString(5, livro.getGenero());
             ps.setString(6, livro.getDescricao());
             ps.setString(7, livro.getSumario());
-            ps.setInt(8, livro.getId());
+            ps.setString(8, livro.getCapaUrl());
+            ps.setInt(9, livro.getId());
 
             return ps.executeUpdate() > 0;
 
@@ -212,7 +215,7 @@ public class LivroDAO {
     }
 
     private Livro mapearLivro(ResultSet rs) throws SQLException {
-        Livro livro = new Livro(
+        return new Livro(
                 rs.getInt("id"),
                 rs.getString("titulo"),
                 rs.getString("autor"),
@@ -221,9 +224,9 @@ public class LivroDAO {
                 rs.getString("genero"),
                 rs.getString("descricao"),
                 rs.getString("sumario"),
+                rs.getString("capa_url"),   // ✅ agora lê do banco
                 rs.getTimestamp("created_at") != null
                         ? rs.getTimestamp("created_at").toLocalDateTime() : null
         );
-        return livro;
     }
 }

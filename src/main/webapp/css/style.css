@@ -9,7 +9,8 @@ body {
     background-color: #f0f2f5;
 }
 
-/* HEADER */
+/* ===== HEADER ===== */
+
 .header-top {
     display: flex;
     align-items: center;
@@ -78,7 +79,8 @@ body {
     border-radius: 50%;
 }
 
-/* MENU */
+/* ===== MENU ===== */
+
 .nav-bar {
     background: #d1d1d1;
 }
@@ -96,7 +98,8 @@ body {
     cursor: pointer;
 }
 
-/* HOME */
+/* ===== HOME ===== */
+
 .home-wrapper {
     padding: 40px;
 }
@@ -111,7 +114,8 @@ body {
     padding-left: 10px;
 }
 
-/* LIVROS */
+/* ===== LIVROS ===== */
+
 .books-grid {
     display: flex;
     justify-content: center;
@@ -119,7 +123,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* 🔥 CORREÇÃO IMPORTANTE (links) */
 .book-card {
     width: 140px;
     text-align: center;
@@ -179,7 +182,8 @@ body {
     font-size: 14px;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -187,10 +191,18 @@ body {
     font-size: 14px;
 }
 
-.form-group input:focus {
-    border-color: #1a73e8;
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #40c4d4;
     outline: none;
-    box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+    box-shadow: 0 0 0 2px rgba(64,196,212,0.2);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 12px;
 }
 
 .btn-entrar {
@@ -207,6 +219,105 @@ body {
 
 .btn-entrar:hover {
     background: #1c5bb5;
+}
+
+/* ===== MENSAGENS ===== */
+
+.mensagem {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.mensagem.erro,
+.erro {
+    background-color: #ffe6e6;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.mensagem.sucesso,
+.sucesso {
+    background-color: #e8f5e9;
+    color: #388e3c;
+    border: 1px solid #c8e6c9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ===== CADASTRO ===== */
+
+.cadastro-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5;
+    padding: 40px;
+}
+
+.cadastro-container {
+    background: white;
+    padding: 40px;
+    width: 100%;
+    max-width: 550px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.cadastro-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 24px;
+    color: #333;
+}
+
+.cadastro-container p {
+    font-size: 14px;
+}
+
+.link-cadastro {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.link-cadastro a {
+    color: #2d73d5;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-cadastro a:hover {
+    text-decoration: underline;
+}
+
+.link-login {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.link-login a {
+    color: #39c3cf;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.link-login a:hover {
+    text-decoration: underline;
 }
 
 /* ===== DETALHE DO LIVRO ===== */
@@ -240,13 +351,308 @@ body {
     width: 100%;
 }
 
+.btn-reservar:hover {
+    background: #d4a900;
+}
+
 .wishlist {
     margin-top: 10px;
     color: #2d73d5;
     cursor: pointer;
+    text-align: center;
+    font-size: 14px;
 }
 
 .detalhe-direita {
     max-width: 600px;
     line-height: 1.6;
+}
+
+/* ===== STATUS DISPONIBILIDADE ===== */
+
+.status-disponivel {
+    color: #155724;
+    background: #d4edda;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+.status-indisponivel {
+    color: #721c24;
+    background: #f8d7da;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* ===== TELA DE PESQUISA ===== */
+
+.tela-pesquisa {
+    width: 100%;
+    background-color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.pesquisa-cabecalho {
+    display: flex;
+    height: 180px;
+    border-bottom: 1px solid #777;
+}
+
+.pesquisa-logo {
+    width: 190px;
+    height: 180px;
+    border: 1px solid #777;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+.pesquisa-logo img {
+    width: 90px;
+    height: 90px;
+}
+
+.pesquisa-logo p {
+    margin: 0;
+    letter-spacing: 6px;
+    font-size: 16px;
+}
+
+.pesquisa-topo-direita {
+    width: 100%;
+}
+
+.pesquisa-barra-azul {
+    height: 125px;
+    background-color: #27c4c9;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    border-top: 1px solid #777;
+    border-right: 1px solid #777;
+}
+
+.pesquisa-caixa {
+    display: flex;
+    background-color: white;
+    border: 2px solid #777;
+    height: 55px;
+}
+
+.pesquisa-caixa input {
+    width: 300px;
+    font-size: 28px;
+    border: none;
+    padding-left: 12px;
+}
+
+.pesquisa-caixa button {
+    width: 65px;
+    font-size: 30px;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+}
+
+.pesquisa-login {
+    margin-left: auto;
+    margin-right: 25px;
+    font-size: 20px;
+    text-align: center;
+    line-height: 35px;
+}
+
+.pesquisa-login span {
+    display: block;
+}
+
+.pesquisa-circulo {
+    width: 100px;
+    height: 100px;
+    background-color: white;
+    border: 2px solid #777;
+    border-radius: 50%;
+    margin-right: 55px;
+}
+
+.pesquisa-menu {
+    height: 55px;
+    display: flex;
+}
+
+.pesquisa-menu a {
+    width: 180px;
+    text-align: center;
+    padding-top: 15px;
+    border: 1px solid #777;
+    text-decoration: none;
+    color: black;
+    font-size: 20px;
+    background-color: white;
+}
+
+.pesquisa-conteudo {
+    padding: 50px 35px;
+}
+
+.pesquisa-conteudo h2 {
+    font-size: 30px;
+    margin-bottom: 25px;
+}
+
+.pesquisa-filtros {
+    margin-bottom: 20px;
+}
+
+.pesquisa-filtros select {
+    padding: 7px;
+    margin-right: 10px;
+}
+
+#resultadoBusca {
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.pesquisa-livros {
+    display: flex;
+    gap: 90px;
+    flex-wrap: wrap;
+}
+
+.pesquisa-card-livro {
+    width: 170px;
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.pesquisa-card-livro img {
+    width: 170px;
+    height: 250px;
+    object-fit: cover;
+    border: 1px solid #888;
+}
+
+.titulo-livro {
+    font-size: 20px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.autor-livro {
+    font-size: 13px;
+    margin: 3px;
+}
+
+.status-livro {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status-livro.disponivel {
+    color: green;
+}
+
+.status-livro.indisponivel {
+    color: red;
+}
+
+/* ===== FILTRO ===== */
+
+.caixa-filtro {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.caixa-filtro label {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.caixa-filtro select {
+    padding: 7px;
+    border: 1px solid #777;
+}
+
+.caixa-filtro button {
+    padding: 8px 15px;
+    background-color: #27c4c9;
+    border: 1px solid #777;
+    cursor: pointer;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 768px) {
+    .search-wrapper {
+        width: 200px;
+    }
+
+    .home-wrapper {
+        padding: 20px;
+    }
+
+    .books-grid {
+        gap: 15px;
+    }
+
+    .detalhe-box {
+        flex-direction: column;
+    }
+
+    .detalhe-esquerda {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+    .pesquisa-cabecalho {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .pesquisa-logo {
+        width: 100%;
+        height: 120px;
+    }
+
+    .pesquisa-barra-azul {
+        height: auto;
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .pesquisa-login {
+        margin: 0;
+    }
+
+    .pesquisa-circulo {
+        margin: 0;
+    }
+
+    .pesquisa-menu {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .pesquisa-menu a {
+        width: 100%;
+    }
+
+    .pesquisa-livros {
+        justify-content: center;
+        gap: 25px;
+    }
 }

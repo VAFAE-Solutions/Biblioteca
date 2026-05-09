@@ -2,20 +2,21 @@ package org.example.demo.controller;
 
 import org.example.demo.model.Usuario;
 import org.example.demo.service.EmprestimoService;
-import org.example.demo.service.MultaService;
+import org.example.demo.service.ExemplarService;
+import org.example.demo.model.Exemplar;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/reservar")
 public class EmprestimoServlet extends HttpServlet {
 
     private final EmprestimoService emprestimoService = new EmprestimoService();
-    private final MultaService multaService = new MultaService();
+    private final ExemplarService exemplarService = new ExemplarService();
 
-    // Exibe confirmação antes de reservar
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,7 +32,6 @@ public class EmprestimoServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    // Realiza o empréstimo
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -39,29 +39,56 @@ public class EmprestimoServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
+        String acao = request.getParameter("acao");
+
+        // ✅ Devolução
+        if ("devolver".equals(acao)) {
+            try {
+                int emprestimoId = Integer.parseInt(request.getParameter("id"));
+                emprestimoService.finalizarEmprestimo(emprestimoId);
+                response.sendRedirect(request.getContextPath()
+                        + "/meus-emprestimos?devolucao=sucesso");
+            } catch (IllegalStateException e) {
+                response.sendRedirect(request.getContextPath()
+                        + "/meus-emprestimos?devolucao=erro");
+            } catch (Exception e) {
+                response.sendRedirect(request.getContextPath()
+                        + "/meus-emprestimos?devolucao=erro");
+            }
+            return;
+        }
+
+        // ✅ Empréstimo
         String exemplarIdParam = request.getParameter("exemplarId");
         String livroIdParam    = request.getParameter("livroId");
 
         try {
-            int exemplarId = Integer.parseInt(exemplarIdParam);
-            int livroId    = Integer.parseInt(livroIdParam);
+            int livroId = Integer.parseInt(livroIdParam);
 
-            // Verifica multa pendente
-            if (multaService.usuarioPossuiMultaPendente(usuarioLogado.getId())) {
+            // Busca primeiro exemplar disponível do livro
+            List<Exemplar> disponiveis = exemplarService
+                    .buscarDisponiveisPorLivroEUnidade(livroId, 1);
+
+            if (disponiveis.isEmpty()) {
                 response.sendRedirect(request.getContextPath()
-                        + "/detalhes?id=" + livroId + "&erro=multa_pendente");
+                        + "/detalhes?id=" + livroId + "&reserva=erro");
                 return;
             }
+
+            int exemplarId = disponiveis.get(0).getId();
 
             emprestimoService.realizarEmprestimo(exemplarId, usuarioLogado.getId());
             response.sendRedirect(request.getContextPath()
                     + "/detalhes?id=" + livroId + "&reserva=sucesso");
 
         } catch (IllegalStateException e) {
+            String mensagem = e.getMessage().contains("multa")
+                    ? "multa_pendente" : "limite_atingido";
             response.sendRedirect(request.getContextPath()
-                    + "/detalhes?id=" + livroIdParam + "&reserva=erro");
+                    + "/detalhes?id=" + livroIdParam + "&erro=" + mensagem);
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/dashboard?erro=dados_invalidos");
+            response.sendRedirect(request.getContextPath()
+                    + "/dashboard?erro=dados_invalidos");
         }
     }
 }

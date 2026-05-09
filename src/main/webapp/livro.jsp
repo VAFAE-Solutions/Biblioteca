@@ -6,8 +6,13 @@
     <meta charset="UTF-8">
     <title>Detalhes - ${livro.titulo}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        .book-cover { max-width: 300px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .book-cover {
+            max-width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
         body { background-color: #f8f9fa; padding-top: 50px; }
     </style>
 </head>
@@ -15,7 +20,7 @@
 
 <div class="container bg-white p-5 rounded shadow-sm">
 
-    <%-- Mensagens de feedback --%>
+    <%-- Empréstimo realizado com sucesso --%>
     <c:if test="${param.reserva == 'sucesso'}">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>✅ Empréstimo realizado com sucesso!</strong>
@@ -26,29 +31,77 @@
         </div>
     </c:if>
 
-    <c:if test="${param.reserva == 'erro'}">
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <strong>❌ Erro no Empréstimo</strong>
-            Não há exemplares disponíveis para este livro.
+    <%-- Reserva realizada com sucesso --%>
+    <c:if test="${param.reserva == 'sucesso_reserva'}">
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✅ Reserva realizada com sucesso!</strong>
+            Você está na fila de espera.
+            <a href="${pageContext.request.contextPath}/minhas-reservas"
+               class="alert-link mx-2">Ver Minhas Reservas</a>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     </c:if>
 
+    <%-- Erro no empréstimo --%>
+    <c:if test="${param.reserva == 'erro'}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>❌ Empréstimo não realizado.</strong>
+            Não há exemplares disponíveis. Deseja fazer uma reserva?
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
+
+    <%-- Multa pendente --%>
     <c:if test="${param.erro == 'multa_pendente'}">
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>⚠️ Multa Pendente</strong>
-            Você possui multas pendentes. Quite antes de realizar um empréstimo.
-            <a href="${pageContext.request.contextPath}/meus-emprestimos"
+            <strong>⚠️ Multa Pendente!</strong>
+            Quite suas multas antes de realizar um empréstimo.
+            <a href="${pageContext.request.contextPath}/multas"
                class="alert-link mx-2">Ver Multas</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
+
+    <%-- Limite atingido --%>
+    <c:if test="${param.erro == 'limite_atingido'}">
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>⚠️ Limite Atingido!</strong>
+            Você atingiu o limite máximo de empréstimos simultâneos.
+            <a href="${pageContext.request.contextPath}/meus-emprestimos"
+               class="alert-link mx-2">Ver Meus Empréstimos</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </c:if>
+
+    <%-- Erro na reserva --%>
+    <c:if test="${param.erro == 'reserva_erro'}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>❌ Erro na reserva.</strong>
+            Não foi possível realizar a reserva. Tente novamente.
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     </c:if>
 
     <div class="row">
         <div class="col-md-4 text-center">
+
+            <%-- Capa do livro --%>
             <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
                  class="book-cover mb-3"
                  onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
+
+            <%-- Status do exemplar --%>
+            <div class="mb-3">
+                <c:choose>
+                    <c:when test="${exemplarDisponivel}">
+                        <span class="status-disponivel">✅ Disponível!</span>
+                    </c:when>
+                    <c:otherwise>
+                        <span class="status-indisponivel">❌ Indisponível</span>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
             <p>
                 <a href="${pageContext.request.contextPath}/dashboard"
                    class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
@@ -74,31 +127,69 @@
                 </p>
             </div>
 
-            <%-- Botão de empréstimo — só para usuários logados --%>
+            <%-- Ações por estado do livro e login --%>
             <c:choose>
+
+                <%-- Já emprestado com sucesso --%>
                 <c:when test="${param.reserva == 'sucesso'}">
                     <button class="btn btn-secondary btn-lg px-5 fw-bold" disabled>
                         Já Emprestado
                     </button>
                     <a href="${pageContext.request.contextPath}/meus-emprestimos"
-                       class="btn btn-outline-primary btn-lg ms-2">Ver Minha Lista</a>
+                       class="btn btn-outline-primary btn-lg ms-2">
+                        Ver Minha Lista
+                    </a>
                 </c:when>
-                <c:when test="${not empty sessionScope.usuarioLogado}">
-                    <form action="${pageContext.request.contextPath}/reservar" method="post">
-                        <input type="hidden" name="livroId" value="${livro.id}">
-                        <input type="hidden" name="exemplarId" value="${livro.id}">
-                        <button type="submit" class="btn btn-warning btn-lg px-5 fw-bold">
-                            Emprestar Agora!
-                        </button>
-                    </form>
+
+                <%-- Já reservado com sucesso --%>
+                <c:when test="${param.reserva == 'sucesso_reserva'}">
+                    <button class="btn btn-secondary btn-lg px-5 fw-bold" disabled>
+                        Já Reservado
+                    </button>
+                    <a href="${pageContext.request.contextPath}/minhas-reservas"
+                       class="btn btn-outline-primary btn-lg ms-2">
+                        Ver Minhas Reservas
+                    </a>
                 </c:when>
-                <c:otherwise>
+
+                <%-- Usuário não logado --%>
+                <c:when test="${empty sessionScope.usuarioLogado}">
                     <a href="${pageContext.request.contextPath}/login"
                        class="btn btn-warning btn-lg px-5 fw-bold">
                         Faça login para Emprestar
                     </a>
+                </c:when>
+
+                <%-- Exemplar disponível — pode emprestar --%>
+                <c:when test="${exemplarDisponivel}">
+                    <form action="${pageContext.request.contextPath}/reservar"
+                          method="post">
+                        <input type="hidden" name="livroId" value="${livro.id}">
+                        <button type="submit"
+                                class="btn btn-warning btn-lg px-5 fw-bold">
+                            Emprestar Agora!
+                        </button>
+                    </form>
+                </c:when>
+
+                <%-- Exemplar indisponível — pode reservar --%>
+                <c:otherwise>
+                    <form action="${pageContext.request.contextPath}/reservar-livro"
+                          method="post">
+                        <input type="hidden" name="livroId" value="${livro.id}">
+                        <button type="submit"
+                                class="btn btn-primary btn-lg px-5 fw-bold">
+                            🔖 Reservar na Fila
+                        </button>
+                    </form>
+                    <small class="text-muted d-block mt-2">
+                        Este livro está indisponível.
+                        Reserve seu lugar na fila de espera!
+                    </small>
                 </c:otherwise>
+
             </c:choose>
+
         </div>
     </div>
 </div>

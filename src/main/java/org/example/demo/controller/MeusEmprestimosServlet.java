@@ -23,6 +23,9 @@ public class MeusEmprestimosServlet extends HttpServlet {
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
         try {
+            // ✅ Verifica e atualiza atrasos automaticamente
+            emprestimoService.verificarEAtualizarAtrasos();
+
             // Lista empréstimos do usuário logado
             request.setAttribute("emprestimos",
                     emprestimoService.buscarPorUsuario(usuarioLogado.getId()));
@@ -31,11 +34,20 @@ public class MeusEmprestimosServlet extends HttpServlet {
             request.setAttribute("totalMulta",
                     multaService.calcularTotalMultasPendentes(usuarioLogado.getId()));
 
+            // Verifica se tem empréstimos atrasados
+            boolean temAtrasado = emprestimoService
+                    .buscarPorUsuario(usuarioLogado.getId())
+                    .stream()
+                    .anyMatch(e -> e.getStatus().name().equals("ATRASADO"));
+
+            request.setAttribute("temAtrasado", temAtrasado);
+
             request.getRequestDispatcher("/meus_emprestimos.jsp")
                     .forward(request, response);
 
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/dashboard?erro=lista_falhou");
+            response.sendRedirect(request.getContextPath()
+                    + "/dashboard?erro=lista_falhou");
         }
     }
 }

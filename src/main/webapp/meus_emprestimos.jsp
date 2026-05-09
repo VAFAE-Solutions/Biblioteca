@@ -16,6 +16,7 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         .alert-multa { border-left: 5px solid #dc3545; }
+        .alert-atraso { border-left: 5px solid #fd7e14; }
     </style>
 </head>
 <body>
@@ -29,13 +30,31 @@
                class="btn btn-outline-secondary">Voltar ao Catálogo</a>
         </div>
 
+        <%-- Aviso de devolução em atraso --%>
+        <c:if test="${temAtrasado}">
+            <div class="alert alert-warning alert-atraso shadow-sm mb-4">
+                <h5 class="alert-heading mb-1">⏰ Atenção! Devolução em Atraso</h5>
+                <span>Você possui livros com prazo de devolução vencido.
+                      Devolva o quanto antes para evitar multas adicionais.</span>
+            </div>
+        </c:if>
+
+        <%-- Aviso de devolução com sucesso --%>
+        <c:if test="${param.devolucao == 'sucesso'}">
+            <div class="alert alert-success shadow-sm mb-4">
+                <h5 class="alert-heading mb-1">✅ Devolução realizada!</h5>
+                <span>O livro foi devolvido com sucesso.</span>
+            </div>
+        </c:if>
+
         <%-- Alerta de multas pendentes --%>
         <c:if test="${totalMulta > 0}">
             <div class="alert alert-danger alert-multa d-flex justify-content-between
                         align-items-center shadow-sm mb-4">
                 <div>
                     <h5 class="alert-heading mb-1">⚠️ Multas por Atraso</h5>
-                    <span>Você possui débitos pendentes referentes a livros não entregues no prazo.</span>
+                    <span>Você possui débitos pendentes referentes a
+                          livros não entregues no prazo.</span>
                 </div>
                 <div class="text-end">
                     <span class="fs-4 fw-bold">
@@ -58,10 +77,20 @@
             </thead>
             <tbody>
             <c:forEach var="emp" items="${emprestimos}">
-                <tr>
-                    <td><strong>${emp.exemplar.livro.titulo}</strong></td>
+                <tr class="${emp.status == 'ATRASADO' ? 'table-danger' : ''}">
+
+                    <%-- ✅ Corrigido — mostra título do livro --%>
+                    <td>
+                        <strong>${emp.exemplar.livro.titulo}</strong>
+                    </td>
+
                     <td>${emp.dataEmprestimo}</td>
-                    <td class="text-danger fw-bold">${emp.dataDevolucaoPrevista}</td>
+                    <td class="${emp.status == 'ATRASADO' ? 'text-danger fw-bold' : ''}">
+                        ${emp.dataDevolucaoPrevista}
+                        <c:if test="${emp.status == 'ATRASADO'}">
+                            <span class="badge bg-danger ms-1">VENCIDO</span>
+                        </c:if>
+                    </td>
                     <td>
                         <c:choose>
                             <c:when test="${emp.status == 'ATIVO'}">
@@ -76,11 +105,18 @@
                         </c:choose>
                     </td>
                     <td>
-                        <form action="${pageContext.request.contextPath}/reservar" method="post">
-                            <input type="hidden" name="id" value="${emp.id}">
-                            <input type="hidden" name="acao" value="devolver">
-                            <button type="submit" class="btn btn-sm btn-primary">Devolver</button>
-                        </form>
+                        <c:if test="${emp.status != 'FINALIZADO'}">
+                            <form action="${pageContext.request.contextPath}/reservar"
+                                  method="post">
+                                <input type="hidden" name="id" value="${emp.id}">
+                                <input type="hidden" name="acao" value="devolver">
+                                <button type="submit"
+                                        class="btn btn-sm ${emp.status == 'ATRASADO'
+                                               ? 'btn-danger' : 'btn-primary'}">
+                                    Devolver
+                                </button>
+                            </form>
+                        </c:if>
                     </td>
                 </tr>
             </c:forEach>

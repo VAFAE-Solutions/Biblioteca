@@ -25,9 +25,9 @@ public class UsuarioDAO {
             stmt.execute();
 
             return new String[]{
-                    stmt.getString(3),              // status
-                    String.valueOf(stmt.getInt(4)), // id
-                    stmt.getString(5)               // tipo
+                    stmt.getString(3),
+                    String.valueOf(stmt.getInt(4)),
+                    stmt.getString(5)
             };
 
         } catch (SQLException e) {
@@ -38,8 +38,8 @@ public class UsuarioDAO {
     // ✅ Inserir usuário
     public boolean inserir(Usuario usuario) {
         String sql = """
-                INSERT INTO usuario (nome, email, senha_hash, tipo, ra, telefone, unidade_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO usuario (nome, email, senha_hash, tipo, ra, cpf, telefone, unidade_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection con = Database.getConnection();
@@ -49,17 +49,18 @@ public class UsuarioDAO {
             ps.setString(2, usuario.getEmail());
             ps.setString(3, usuario.getSenhaHash());
             ps.setString(4, usuario.getTipo().name());
-            ps.setString(6, usuario.getTelefone());
+            ps.setString(7, usuario.getTelefone());
+            ps.setString(6, usuario.getCpf());
 
             if (usuario instanceof UsuarioEstudante estudante) {
                 ps.setInt(5, estudante.getRa());
-                ps.setNull(7, Types.INTEGER);
+                ps.setNull(8, Types.INTEGER);
             } else if (usuario instanceof UsuarioBibliotecario bibliotecario) {
                 ps.setNull(5, Types.INTEGER);
-                ps.setInt(7, bibliotecario.getUnidadeId());
+                ps.setInt(8, bibliotecario.getUnidadeId());
             } else {
                 ps.setNull(5, Types.INTEGER);
-                ps.setNull(7, Types.INTEGER);
+                ps.setNull(8, Types.INTEGER);
             }
 
             int rows = ps.executeUpdate();
@@ -139,7 +140,8 @@ public class UsuarioDAO {
     // ✅ Atualizar dados do usuário
     public boolean atualizar(Usuario usuario) {
         String sql = """
-                UPDATE usuario SET nome = ?, email = ?, telefone = ?, updated_at = NOW()
+                UPDATE usuario SET nome = ?, email = ?, telefone = ?,
+                cpf = ?, updated_at = NOW()
                 WHERE id = ?
                 """;
 
@@ -149,7 +151,8 @@ public class UsuarioDAO {
             ps.setString(1, usuario.getNome());
             ps.setString(2, usuario.getEmail());
             ps.setString(3, usuario.getTelefone());
-            ps.setInt(4, usuario.getId());
+            ps.setString(4, usuario.getCpf());
+            ps.setInt(5, usuario.getId());
 
             return ps.executeUpdate() > 0;
 
@@ -180,6 +183,29 @@ public class UsuarioDAO {
         }
     }
 
+    // ✅ Contar empréstimos ativos do usuário
+    public int contarEmprestimosAtivos(int usuarioId) {
+        String sql = """
+                SELECT COUNT(*) FROM emprestimo
+                WHERE usuario_id = ? AND status IN ('ATIVO', 'ATRASADO')
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, usuarioId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar empréstimos: " + e.getMessage(), e);
+        }
+    }
+
     // ✅ Mapear ResultSet → objeto correto
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         String tipo = rs.getString("tipo");
@@ -203,6 +229,7 @@ public class UsuarioDAO {
         usuario.setNome(rs.getString("nome"));
         usuario.setEmail(rs.getString("email"));
         usuario.setSenhaHash(rs.getString("senha_hash"));
+        usuario.setCpf(rs.getString("cpf"));
         usuario.setTelefone(rs.getString("telefone"));
         usuario.setBloqueado(rs.getBoolean("bloqueado"));
         usuario.setTentativasLogin(rs.getInt("tentativas_login"));

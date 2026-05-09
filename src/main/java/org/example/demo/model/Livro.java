@@ -12,7 +12,7 @@ public class Livro {
     private String genero;
     private String descricao;
     private String sumario;
-    private String capaUrl;        // mantido para compatibilidade com os JSPs
+    private String capaUrl;        // agora existe no banco ✅
     private LocalDateTime createdAt;
 
     public Livro() {}
@@ -30,9 +30,10 @@ public class Livro {
 
     public Livro(int id, String titulo, String autor, String editora,
                  int anoPublicacao, String genero, String descricao,
-                 String sumario, LocalDateTime createdAt) {
+                 String sumario, String capaUrl, LocalDateTime createdAt) {
         this(titulo, autor, editora, anoPublicacao, genero, descricao, sumario);
         this.id = id;
+        this.capaUrl = capaUrl;
         this.createdAt = createdAt;
     }
 

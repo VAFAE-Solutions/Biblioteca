@@ -2,6 +2,8 @@ package org.example.demo.dao;
 
 import org.example.demo.Database;
 import org.example.demo.model.Emprestimo;
+import org.example.demo.model.Exemplar;
+import org.example.demo.model.Livro;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class EmprestimoDAO {
 
-    // ✅ Transação aproveitada do projeto dela
+    // ✅ Transação com INSERT + UPDATE exemplar
     public boolean inserir(Emprestimo emprestimo) {
         String sqlEmprestimo = """
                 INSERT INTO emprestimo (exemplar_id, usuario_id, data_emprestimo,
@@ -21,7 +23,6 @@ public class EmprestimoDAO {
         try (Connection con = Database.getConnection()) {
             con.setAutoCommit(false);
             try {
-                // INSERT no empréstimo
                 try (PreparedStatement ps = con.prepareStatement(sqlEmprestimo,
                         Statement.RETURN_GENERATED_KEYS)) {
 
@@ -40,7 +41,6 @@ public class EmprestimoDAO {
                     }
                 }
 
-                // UPDATE no exemplar → EMPRESTADO
                 try (PreparedStatement ps = con.prepareStatement(sqlUpdateExemplar)) {
                     ps.setInt(1, emprestimo.getExemplarId());
                     ps.executeUpdate();
@@ -59,7 +59,13 @@ public class EmprestimoDAO {
     }
 
     public Emprestimo buscarPorId(int id) {
-        String sql = "SELECT * FROM emprestimo WHERE id = ?";
+        String sql = """
+                SELECT e.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM emprestimo e
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE e.id = ?
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -68,7 +74,7 @@ public class EmprestimoDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapearEmprestimo(rs);
+                return mapearEmprestimoComLivro(rs);
             }
             return null;
 
@@ -77,8 +83,16 @@ public class EmprestimoDAO {
         }
     }
 
+    // ✅ JOIN com exemplar e livro para exibir título
     public List<Emprestimo> buscarPorUsuario(int usuarioId) {
-        String sql = "SELECT * FROM emprestimo WHERE usuario_id = ?";
+        String sql = """
+                SELECT e.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM emprestimo e
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE e.usuario_id = ?
+                ORDER BY e.data_emprestimo DESC
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -88,7 +102,7 @@ public class EmprestimoDAO {
             List<Emprestimo> emprestimos = new ArrayList<>();
 
             while (rs.next()) {
-                emprestimos.add(mapearEmprestimo(rs));
+                emprestimos.add(mapearEmprestimoComLivro(rs));
             }
             return emprestimos;
 
@@ -98,7 +112,13 @@ public class EmprestimoDAO {
     }
 
     public List<Emprestimo> buscarPorStatus(Emprestimo.Status status) {
-        String sql = "SELECT * FROM emprestimo WHERE status = ?";
+        String sql = """
+                SELECT e.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM emprestimo e
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE e.status = ?
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -108,7 +128,7 @@ public class EmprestimoDAO {
             List<Emprestimo> emprestimos = new ArrayList<>();
 
             while (rs.next()) {
-                emprestimos.add(mapearEmprestimo(rs));
+                emprestimos.add(mapearEmprestimoComLivro(rs));
             }
             return emprestimos;
 
@@ -119,8 +139,11 @@ public class EmprestimoDAO {
 
     public List<Emprestimo> buscarAtrasados(LocalDate hoje) {
         String sql = """
-                SELECT * FROM emprestimo
-                WHERE status = 'ATIVO' AND data_devolucao_prevista < ?
+                SELECT e.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM emprestimo e
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE e.status = 'ATIVO' AND e.data_devolucao_prevista < ?
                 """;
 
         try (Connection con = Database.getConnection();
@@ -131,7 +154,7 @@ public class EmprestimoDAO {
             List<Emprestimo> emprestimos = new ArrayList<>();
 
             while (rs.next()) {
-                emprestimos.add(mapearEmprestimo(rs));
+                emprestimos.add(mapearEmprestimoComLivro(rs));
             }
             return emprestimos;
 
@@ -161,10 +184,11 @@ public class EmprestimoDAO {
         }
     }
 
-    private Emprestimo mapearEmprestimo(ResultSet rs) throws SQLException {
+    // ✅ Mapeia empréstimo com livro populado
+    private Emprestimo mapearEmprestimoComLivro(ResultSet rs) throws SQLException {
         Date dataDevolucao = rs.getDate("data_devolucao");
 
-        return new Emprestimo(
+        Emprestimo emp = new Emprestimo(
                 rs.getInt("id"),
                 rs.getInt("exemplar_id"),
                 rs.getInt("usuario_id"),
@@ -173,5 +197,17 @@ public class EmprestimoDAO {
                 dataDevolucao != null ? dataDevolucao.toLocalDate() : null,
                 Emprestimo.Status.valueOf(rs.getString("status"))
         );
+
+        // Popula exemplar com livro
+        Livro livro = new Livro();
+        livro.setTitulo(rs.getString("livro_titulo"));
+        livro.setCapaUrl(rs.getString("livro_capa"));
+
+        Exemplar exemplar = new Exemplar();
+        exemplar.setId(rs.getInt("exemplar_id"));
+        exemplar.setLivro(livro);
+
+        emp.setExemplar(exemplar);
+        return emp;
     }
 }

@@ -1,6 +1,9 @@
 package org.example.demo.dao;
 
 import org.example.demo.Database;
+import org.example.demo.model.Emprestimo;
+import org.example.demo.model.Exemplar;
+import org.example.demo.model.Livro;
 import org.example.demo.model.Multa;
 
 import java.sql.*;
@@ -40,7 +43,14 @@ public class MultaDAO {
     }
 
     public Multa buscarPorId(int id) {
-        String sql = "SELECT * FROM multa WHERE id = ?";
+        String sql = """
+                SELECT m.*, l.titulo as livro_titulo
+                FROM multa m
+                JOIN emprestimo e ON m.emprestimo_id = e.id
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE m.id = ?
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -49,7 +59,7 @@ public class MultaDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                return mapearMulta(rs);
+                return mapearMultaComLivro(rs);
             }
             return null;
 
@@ -58,8 +68,17 @@ public class MultaDAO {
         }
     }
 
+    // ✅ JOIN com emprestimo, exemplar e livros
     public List<Multa> buscarPorUsuario(int usuarioId) {
-        String sql = "SELECT * FROM multa WHERE usuario_id = ?";
+        String sql = """
+                SELECT m.*, l.titulo as livro_titulo
+                FROM multa m
+                JOIN emprestimo e ON m.emprestimo_id = e.id
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE m.usuario_id = ?
+                ORDER BY m.data_geracao DESC
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -69,7 +88,7 @@ public class MultaDAO {
             List<Multa> multas = new ArrayList<>();
 
             while (rs.next()) {
-                multas.add(mapearMulta(rs));
+                multas.add(mapearMultaComLivro(rs));
             }
             return multas;
 
@@ -78,8 +97,17 @@ public class MultaDAO {
         }
     }
 
+    // ✅ JOIN com emprestimo, exemplar e livros
     public List<Multa> buscarPendentesPorUsuario(int usuarioId) {
-        String sql = "SELECT * FROM multa WHERE usuario_id = ? AND pago = false";
+        String sql = """
+                SELECT m.*, l.titulo as livro_titulo
+                FROM multa m
+                JOIN emprestimo e ON m.emprestimo_id = e.id
+                JOIN exemplar ex ON e.exemplar_id = ex.id
+                JOIN livros l ON ex.livro_id = l.id
+                WHERE m.usuario_id = ? AND m.pago = false
+                ORDER BY m.data_geracao DESC
+                """;
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -89,7 +117,7 @@ public class MultaDAO {
             List<Multa> multas = new ArrayList<>();
 
             while (rs.next()) {
-                multas.add(mapearMulta(rs));
+                multas.add(mapearMultaComLivro(rs));
             }
             return multas;
 
@@ -138,10 +166,11 @@ public class MultaDAO {
         }
     }
 
-    private Multa mapearMulta(ResultSet rs) throws SQLException {
+    // ✅ Mapeia multa com livro populado
+    private Multa mapearMultaComLivro(ResultSet rs) throws SQLException {
         Date dataPagamento = rs.getDate("data_pagamento");
 
-        return new Multa(
+        Multa multa = new Multa(
                 rs.getInt("id"),
                 rs.getInt("emprestimo_id"),
                 rs.getInt("usuario_id"),
@@ -150,5 +179,19 @@ public class MultaDAO {
                 rs.getDate("data_geracao").toLocalDate(),
                 dataPagamento != null ? dataPagamento.toLocalDate() : null
         );
+
+        // Popula empréstimo com livro
+        Livro livro = new Livro();
+        livro.setTitulo(rs.getString("livro_titulo"));
+
+        Exemplar exemplar = new Exemplar();
+        exemplar.setLivro(livro);
+
+        Emprestimo emprestimo = new Emprestimo();
+        emprestimo.setId(rs.getInt("emprestimo_id"));
+        emprestimo.setExemplar(exemplar);
+
+        multa.setEmprestimo(emprestimo);
+        return multa;
     }
 }

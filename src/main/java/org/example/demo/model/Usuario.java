@@ -11,12 +11,17 @@ public class Usuario {
     private String email;
     private String senhaHash;
     private Tipo tipo;
+    private String cpf;
     private String telefone;
     private boolean bloqueado = false;
     private int tentativasLogin = 0;
     private LocalDateTime ultimaTentativa;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    // Regras de negócio por tipo
+    private int prazoEmprestimo;
+    private int limiteCotas;
 
     public Usuario() {}
 
@@ -25,20 +30,35 @@ public class Usuario {
         this.email = email;
         this.senhaHash = senhaHash;
         this.tipo = tipo;
+        this.prazoEmprestimo = calcularPrazoPorTipo(tipo);
+        this.limiteCotas = calcularLimitePorTipo(tipo);
     }
 
     public Usuario(int id, String nome, String email, String senhaHash,
-                   Tipo tipo, String telefone, boolean bloqueado,
+                   Tipo tipo, String cpf, String telefone, boolean bloqueado,
                    int tentativasLogin, LocalDateTime ultimaTentativa,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this(nome, email, senhaHash, tipo);
         this.id = id;
+        this.cpf = cpf;
         this.telefone = telefone;
         this.bloqueado = bloqueado;
         this.tentativasLogin = tentativasLogin;
         this.ultimaTentativa = ultimaTentativa;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    // Define prazo por tipo
+    private int calcularPrazoPorTipo(Tipo tipo) {
+        if (tipo == Tipo.ESTUDANTE) return 15;
+        return 7;
+    }
+
+    // Define limite de cotas por tipo
+    private int calcularLimitePorTipo(Tipo tipo) {
+        if (tipo == Tipo.ESTUDANTE) return 5;
+        return 3;
     }
 
     public int getId() { return id; }
@@ -54,7 +74,14 @@ public class Usuario {
     public void setSenhaHash(String senhaHash) { this.senhaHash = senhaHash; }
 
     public Tipo getTipo() { return tipo; }
-    public void setTipo(Tipo tipo) { this.tipo = tipo; }
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+        this.prazoEmprestimo = calcularPrazoPorTipo(tipo);
+        this.limiteCotas = calcularLimitePorTipo(tipo);
+    }
+
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
 
     public String getTelefone() { return telefone; }
     public void setTelefone(String telefone) { this.telefone = telefone; }
@@ -73,6 +100,12 @@ public class Usuario {
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public int getPrazoEmprestimo() { return prazoEmprestimo; }
+    public void setPrazoEmprestimo(int prazoEmprestimo) { this.prazoEmprestimo = prazoEmprestimo; }
+
+    public int getLimiteCotas() { return limiteCotas; }
+    public void setLimiteCotas(int limiteCotas) { this.limiteCotas = limiteCotas; }
 
     @Override
     public String toString() {
