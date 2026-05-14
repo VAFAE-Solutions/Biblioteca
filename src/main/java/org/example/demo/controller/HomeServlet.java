@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.ArrayList;
 
 @WebServlet("/home")
 public class HomeServlet extends HttpServlet {
@@ -19,13 +18,14 @@ public class HomeServlet extends HttpServlet {
 
         String txtBusca = request.getParameter("txtBusca");
 
-        // Só busca se houver termo — rota pública não carrega tudo por padrão
         if (txtBusca != null && !txtBusca.trim().isEmpty()) {
             request.setAttribute("livros", livroService.buscarGeral(txtBusca));
         } else {
-            request.setAttribute("livros", new ArrayList<>());
+            request.setAttribute("livros", new java.util.ArrayList<>());
         }
 
+        // ✅ Passa todos os livros para exibir nas seções
+        request.setAttribute("todosLivros", livroService.listarTodos());
         request.setAttribute("termoPesquisado", txtBusca);
 
         request.getRequestDispatcher("/index.jsp")

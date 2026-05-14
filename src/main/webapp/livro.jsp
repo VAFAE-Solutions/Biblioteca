@@ -103,8 +103,13 @@
                         <a href="${pageContext.request.contextPath}/admin"
                            class="btn btn-outline-secondary w-100">Voltar ao Painel</a>
                     </c:when>
-                    <c:otherwise>
+                    <c:when test="${not empty sessionScope.usuarioLogado}">
                         <a href="${pageContext.request.contextPath}/dashboard"
+                           class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
+                    </c:when>
+                    <c:otherwise>
+                        <%-- ✅ Não logado — volta para home pública --%>
+                        <a href="${pageContext.request.contextPath}/home"
                            class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
                     </c:otherwise>
                 </c:choose>

@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%-- Garante que sempre passa pelo HomeServlet --%>
-<% if (request.getAttribute("livros") == null) {
+<% if (request.getAttribute("todosLivros") == null) {
     response.sendRedirect(request.getContextPath() + "/home");
     return;
 } %>
@@ -45,11 +45,11 @@
 
     <nav class="nav-bar">
         <ul>
-            <li>Sobre Nós</li>
-            <li>Gêneros</li>
-            <li>Localização</li>
-            <li>Dúvidas</li>
-            <li>Contato</li>
+            <li><a href="${pageContext.request.contextPath}/sobre">Sobre Nós</a></li>
+            <li><a href="${pageContext.request.contextPath}/generos">Gêneros</a></li>
+            <li><a href="${pageContext.request.contextPath}/localizacao">Localização</a></li>
+            <li><a href="${pageContext.request.contextPath}/duvidas">Dúvidas</a></li>
+            <li><a href="${pageContext.request.contextPath}/contato">Contato</a></li>
         </ul>
     </nav>
 </header>
@@ -77,55 +77,97 @@
         </div>
     </c:if>
 
+    <%-- Em alta — Don Quixote, Dom Casmurro, Demian, Drácula, A Divina Comédia --%>
     <div class="highlights-container">
         <h2>Em alta!</h2>
         <div class="books-grid">
-            <a href="${pageContext.request.contextPath}/detalhes?id=1" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8228691-L.jpg">
-                <p>Don Quixote</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=2" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8231856-L.jpg">
-                <p>Dom Casmurro</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=3" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8231990-L.jpg">
-                <p>Demian</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=4" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8231995-L.jpg">
-                <p>Drácula</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=5" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8232001-L.jpg">
-                <p>A Divina Comédia</p>
-            </a>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 4}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 2}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 5}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 6}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 7}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
         </div>
     </div>
 
+    <%-- Recomendações — Java for Dummies, Moby Dick, Harry Potter, A Guerra dos Mundos, Jujutsu Kaisen --%>
     <div class="highlights-container">
         <h2>Recomendações da Equipe!</h2>
         <div class="books-grid">
-            <a href="${pageContext.request.contextPath}/detalhes?id=6" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/8099256-L.jpg">
-                <p>Java for Dummies</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=7" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/7222246-L.jpg">
-                <p>Moby Dick</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=8" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/7984916-L.jpg">
-                <p>Harry Potter</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=9" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/7222256-L.jpg">
-                <p>A Guerra dos Mundos</p>
-            </a>
-            <a href="${pageContext.request.contextPath}/detalhes?id=10" class="book-card">
-                <img src="https://covers.openlibrary.org/b/id/10958337-L.jpg">
-                <p>Jujutsu Kaisen</p>
-            </a>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 8}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 9}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 10}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 11}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
+            <c:forEach var="livro" items="${todosLivros}">
+                <c:if test="${livro.id == 12}">
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <p>${livro.titulo}</p>
+                    </a>
+                </c:if>
+            </c:forEach>
         </div>
     </div>
 

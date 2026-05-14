@@ -22,7 +22,12 @@ public class FiltroAutenticacao implements Filter {
             "/css",
             "/js",
             "/imagens",
-            "/index.jsp"
+            "/index.jsp",
+            "/sobre",        // ✅
+            "/generos",      // ✅
+            "/localizacao",  // ✅
+            "/duvidas",      // ✅
+            "/contato"       // ✅
     );
 
     @Override
