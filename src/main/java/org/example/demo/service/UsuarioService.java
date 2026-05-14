@@ -81,7 +81,6 @@ public class UsuarioService {
         return usuarioDAO.listarTodos();
     }
 
-    // ✅ Lista todos incluindo inativos — para admin ver histórico
     public List<Usuario> listarTodosIncluindoInativos() {
         return usuarioDAO.listarTodosIncluindoInativos();
     }
@@ -107,7 +106,6 @@ public class UsuarioService {
         return usuarioDAO.atualizarBloqueio(id, false, 0);
     }
 
-    // ✅ Desativar em vez de deletar
     public boolean desativar(int id) {
         if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         Usuario usuario = buscarPorId(id);
@@ -115,13 +113,34 @@ public class UsuarioService {
         return usuarioDAO.desativar(id);
     }
 
-    // ✅ Reativar usuário
     public boolean reativar(int id) {
         if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         return usuarioDAO.reativar(id);
     }
 
-    // ✅ Mantido para compatibilidade — agora chama desativar
+    // ✅ Ajustar limite de cotas
+    public boolean ajustarLimiteCotas(int id, Integer novoLimite) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+        if (novoLimite != null && novoLimite <= 0) {
+            throw new IllegalArgumentException("Limite deve ser maior que zero.");
+        }
+        if (novoLimite != null && novoLimite > 20) {
+            throw new IllegalArgumentException("Limite não pode ser maior que 20.");
+        }
+        Usuario usuario = buscarPorId(id);
+        if (usuario == null) throw new IllegalArgumentException("Usuário não encontrado.");
+        if (usuario.getTipo() != Usuario.Tipo.ESTUDANTE &&
+                usuario.getTipo() != Usuario.Tipo.COMUM) {
+            throw new IllegalArgumentException("Ajuste de limite só é permitido para Estudantes e Usuários Comuns.");
+        }
+        return usuarioDAO.ajustarLimiteCotas(id, novoLimite);
+    }
+
+    // ✅ Resetar limite para o padrão do tipo
+    public boolean resetarLimiteCotas(int id) {
+        return ajustarLimiteCotas(id, null);
+    }
+
     public boolean deletar(int id) {
         return desativar(id);
     }

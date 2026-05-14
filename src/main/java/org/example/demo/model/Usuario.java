@@ -14,7 +14,7 @@ public class Usuario {
     private String cpf;
     private String telefone;
     private boolean bloqueado = false;
-    private boolean ativo = true; // ✅ novo campo
+    private boolean ativo = true;
     private int tentativasLogin = 0;
     private LocalDateTime ultimaTentativa;
     private LocalDateTime createdAt;
@@ -23,6 +23,7 @@ public class Usuario {
     // Regras de negócio por tipo
     private int prazoEmprestimo;
     private int limiteCotas;
+    private Integer limiteCotasCustom = null; // ✅ novo campo — null = usa padrão do tipo
 
     public Usuario() {}
 
@@ -89,7 +90,6 @@ public class Usuario {
     public boolean isBloqueado() { return bloqueado; }
     public void setBloqueado(boolean bloqueado) { this.bloqueado = bloqueado; }
 
-    // ✅ getter/setter ativo
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
@@ -108,8 +108,17 @@ public class Usuario {
     public int getPrazoEmprestimo() { return prazoEmprestimo; }
     public void setPrazoEmprestimo(int prazoEmprestimo) { this.prazoEmprestimo = prazoEmprestimo; }
 
-    public int getLimiteCotas() { return limiteCotas; }
+    // ✅ Retorna o limite customizado se existir, senão o padrão do tipo
+    public int getLimiteCotas() {
+        if (limiteCotasCustom != null) return limiteCotasCustom;
+        return limiteCotas;
+    }
     public void setLimiteCotas(int limiteCotas) { this.limiteCotas = limiteCotas; }
+
+    public Integer getLimiteCotasCustom() { return limiteCotasCustom; }
+    public void setLimiteCotasCustom(Integer limiteCotasCustom) {
+        this.limiteCotasCustom = limiteCotasCustom;
+    }
 
     @Override
     public String toString() {

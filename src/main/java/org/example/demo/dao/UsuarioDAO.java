@@ -76,7 +76,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Busca só usuários ativos
     public Usuario buscarPorId(int id) {
         String sql = "SELECT * FROM usuario WHERE id = ? AND ativo = TRUE";
 
@@ -96,7 +95,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Busca só usuários ativos
     public Usuario buscarPorEmail(String email) {
         String sql = "SELECT * FROM usuario WHERE email = ? AND ativo = TRUE";
 
@@ -116,7 +114,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Lista só usuários ativos
     public List<Usuario> listarTodos() {
         String sql = "SELECT * FROM usuario WHERE ativo = TRUE";
         List<Usuario> usuarios = new ArrayList<>();
@@ -135,7 +132,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Lista todos incluindo inativos — para admin ver histórico
     public List<Usuario> listarTodosIncluindoInativos() {
         String sql = "SELECT * FROM usuario";
         List<Usuario> usuarios = new ArrayList<>();
@@ -242,7 +238,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Desativar em vez de deletar
     public boolean desativar(int id) {
         String sql = "UPDATE usuario SET ativo = FALSE, updated_at = NOW() WHERE id = ?";
 
@@ -257,7 +252,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Reativar usuário
     public boolean reativar(int id) {
         String sql = "UPDATE usuario SET ativo = TRUE, updated_at = NOW() WHERE id = ?";
 
@@ -272,7 +266,27 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Mantido para compatibilidade mas não recomendado
+    // ✅ Ajustar limite de cotas customizado
+    public boolean ajustarLimiteCotas(int id, Integer novoLimite) {
+        String sql = "UPDATE usuario SET limite_cotas_custom = ?, updated_at = NOW() WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            if (novoLimite != null) {
+                ps.setInt(1, novoLimite);
+            } else {
+                ps.setNull(1, Types.INTEGER); // ✅ NULL = volta ao padrão do tipo
+            }
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao ajustar limite de cotas: " + e.getMessage(), e);
+        }
+    }
+
     public boolean deletar(int id) {
         String sql = "DELETE FROM usuario WHERE id = ?";
 
@@ -312,8 +326,14 @@ public class UsuarioDAO {
         usuario.setCpf(rs.getString("cpf"));
         usuario.setTelefone(rs.getString("telefone"));
         usuario.setBloqueado(rs.getBoolean("bloqueado"));
-        usuario.setAtivo(rs.getBoolean("ativo")); // ✅ novo campo
+        usuario.setAtivo(rs.getBoolean("ativo"));
         usuario.setTentativasLogin(rs.getInt("tentativas_login"));
+
+        // ✅ Lê limite customizado — pode ser NULL
+        int limiteCustom = rs.getInt("limite_cotas_custom");
+        if (!rs.wasNull()) {
+            usuario.setLimiteCotasCustom(limiteCustom);
+        }
 
         Timestamp ultimaTentativa = rs.getTimestamp("ultima_tentativa");
         usuario.setUltimaTentativa(ultimaTentativa != null

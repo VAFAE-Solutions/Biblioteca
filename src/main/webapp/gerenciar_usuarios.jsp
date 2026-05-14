@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -46,8 +47,14 @@
     <c:if test="${param.acao == 'reativar'}">
         <div class="alert alert-success">✅ Usuário reativado com sucesso.</div>
     </c:if>
+    <c:if test="${param.acao == 'ajustar_limite'}">
+        <div class="alert alert-success">✅ Limite de cotas ajustado com sucesso.</div>
+    </c:if>
+    <c:if test="${param.acao == 'resetar_limite'}">
+        <div class="alert alert-info">🔄 Limite de cotas resetado para o padrão.</div>
+    </c:if>
     <c:if test="${param.acao == 'erro'}">
-        <div class="alert alert-danger">❌ Erro ao processar ação. Tente novamente.</div>
+        <div class="alert alert-danger">❌ ${not empty param.msg ? param.msg : 'Erro ao processar ação. Tente novamente.'}</div>
     </c:if>
 
     <div class="card shadow-sm">
@@ -59,6 +66,7 @@
                     <th>Nome</th>
                     <th>E-mail</th>
                     <th>Tipo</th>
+                    <th>Limite Cotas</th>
                     <th>Status</th>
                     <th>Ações</th>
                 </tr>
@@ -70,6 +78,19 @@
                         <td>${u.nome}</td>
                         <td>${u.email}</td>
                         <td><span class="badge bg-info text-white">${u.tipo}</span></td>
+                        <td>
+                            <c:choose>
+                                <c:when test="${u.tipo == 'ESTUDANTE' || u.tipo == 'COMUM'}">
+                                    ${u.limiteCotas}
+                                    <c:if test="${u.limiteCotasCustom != null}">
+                                        <span class="badge bg-warning text-dark ms-1">custom</span>
+                                    </c:if>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted">—</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
                         <td>
                             <c:choose>
                                 <c:when test="${!u.ativo}">
@@ -84,8 +105,13 @@
                             </c:choose>
                         </td>
                         <td>
+                            <%-- Botão Ver Detalhes — sempre visível --%>
+                            <a href="${pageContext.request.contextPath}/admin/usuarios?detalhe=${u.id}"
+                               class="btn btn-sm btn-info text-white">
+                                Ver
+                            </a>
+
                             <c:choose>
-                                <%-- Usuário inativo — só pode reativar --%>
                                 <c:when test="${!u.ativo}">
                                     <form action="${pageContext.request.contextPath}/admin/usuarios"
                                           method="post" class="d-inline">
@@ -96,7 +122,6 @@
                                         </button>
                                     </form>
                                 </c:when>
-                                <%-- Usuário bloqueado — pode desbloquear ou desativar --%>
                                 <c:when test="${u.bloqueado}">
                                     <form action="${pageContext.request.contextPath}/admin/usuarios"
                                           method="post" class="d-inline">
@@ -116,7 +141,6 @@
                                         </button>
                                     </form>
                                 </c:when>
-                                <%-- Usuário ativo — pode bloquear ou desativar --%>
                                 <c:otherwise>
                                     <form action="${pageContext.request.contextPath}/admin/usuarios"
                                           method="post" class="d-inline">
@@ -142,7 +166,7 @@
                 </c:forEach>
                 <c:if test="${empty usuarios}">
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
                             Nenhum usuário encontrado.
                         </td>
                     </tr>
@@ -152,6 +176,143 @@
         </div>
     </div>
 </div>
+
+<%-- ✅ Modal de detalhes do usuário --%>
+<c:if test="${not empty usuarioDetalhe}">
+<div class="modal fade show d-block" tabindex="-1"
+     style="background: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    👤 ${usuarioDetalhe.nome}
+                    <span class="badge bg-info text-white ms-2">${usuarioDetalhe.tipo}</span>
+                </h5>
+                <a href="${pageContext.request.contextPath}/admin/usuarios"
+                   class="btn-close"></a>
+            </div>
+            <div class="modal-body">
+
+                <%-- Informações básicas --%>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>E-mail:</strong> ${usuarioDetalhe.email}</p>
+                        <p><strong>Telefone:</strong>
+                            ${not empty usuarioDetalhe.telefone ? usuarioDetalhe.telefone : 'Não informado'}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong>
+                            <c:choose>
+                                <c:when test="${!usuarioDetalhe.ativo}">
+                                    <span class="badge bg-secondary">INATIVO</span>
+                                </c:when>
+                                <c:when test="${usuarioDetalhe.bloqueado}">
+                                    <span class="badge bg-danger">BLOQUEADO</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge bg-success">ATIVO</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </p>
+                        <c:if test="${usuarioDetalhe.tipo == 'ESTUDANTE' || usuarioDetalhe.tipo == 'COMUM'}">
+                            <p><strong>Limite de Cotas:</strong>
+                                ${usuarioDetalhe.limiteCotas}
+                                <c:if test="${usuarioDetalhe.limiteCotasCustom != null}">
+                                    <span class="badge bg-warning text-dark">customizado</span>
+                                </c:if>
+                            </p>
+                        </c:if>
+                    </div>
+                </div>
+
+                <hr>
+
+                <%-- Multas --%>
+                <h6 class="fw-bold">💰 Multas</h6>
+                <c:choose>
+                    <c:when test="${totalMulta > 0}">
+                        <div class="alert alert-danger py-2">
+                            Total pendente: <strong>R$
+                            <fmt:formatNumber value="${totalMulta}"
+                                minFractionDigits="2" maxFractionDigits="2"/></strong>
+                        </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="alert alert-success py-2">✅ Sem multas pendentes.</div>
+                    </c:otherwise>
+                </c:choose>
+
+                <c:if test="${not empty multasUsuario}">
+                    <table class="table table-sm table-hover">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Data</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach var="m" items="${multasUsuario}">
+                            <tr>
+                                <td>${m.dataGeracao}</td>
+                                <td>R$ <fmt:formatNumber value="${m.valor}"
+                                        minFractionDigits="2" maxFractionDigits="2"/></td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${m.pago}">
+                                            <span class="badge bg-success">PAGO</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="badge bg-danger">PENDENTE</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </c:if>
+
+                <%-- Ajuste de limite — só para ESTUDANTE e COMUM --%>
+                <c:if test="${usuarioDetalhe.tipo == 'ESTUDANTE' || usuarioDetalhe.tipo == 'COMUM'}">
+                    <hr>
+                    <h6 class="fw-bold">📚 Ajustar Limite de Cotas</h6>
+                    <form action="${pageContext.request.contextPath}/admin/usuarios"
+                          method="post" class="d-flex gap-2 align-items-end">
+                        <input type="hidden" name="id" value="${usuarioDetalhe.id}">
+                        <input type="hidden" name="acao" value="ajustar_limite">
+                        <div>
+                            <label class="form-label small">Novo limite (atual: ${usuarioDetalhe.limiteCotas})</label>
+                            <input type="number" name="limite" class="form-control"
+                                   min="1" max="20"
+                                   value="${usuarioDetalhe.limiteCotas}"
+                                   style="width: 120px;">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+
+                    <c:if test="${usuarioDetalhe.limiteCotasCustom != null}">
+                        <form action="${pageContext.request.contextPath}/admin/usuarios"
+                              method="post" class="mt-2">
+                            <input type="hidden" name="id" value="${usuarioDetalhe.id}">
+                            <input type="hidden" name="acao" value="resetar_limite">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                🔄 Resetar para padrão do tipo
+                            </button>
+                        </form>
+                    </c:if>
+                </c:if>
+
+            </div>
+            <div class="modal-footer">
+                <a href="${pageContext.request.contextPath}/admin/usuarios"
+                   class="btn btn-secondary">Fechar</a>
+            </div>
+        </div>
+    </div>
+</div>
+</c:if>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
