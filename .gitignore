@@ -44,5 +44,18 @@ build/
 ### Windows ###
 Thumbs.db
 
-# Arquivo de teste
+### Logs ###
+*.log
+logs/
+
+### Arquivos de ambiente ###
+*.env
+.env
+
+### Pacotes gerados ###
+*.war
+*.jar
+*.class
+
+### Arquivo de teste ###
 src/main/java/main.java
