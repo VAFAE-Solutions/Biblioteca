@@ -64,4 +64,16 @@ public class ExemplarService {
         exemplar.setStatus(novoStatus);
         return exemplarDAO.atualizar(exemplar);
     }
+
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        if (id <= 0) {
+            throw new IllegalArgumentException("ID inválido.");
+        }
+        Exemplar exemplar = exemplarDAO.buscarPorId(id);
+        if (exemplar == null) {
+            throw new IllegalArgumentException("Exemplar não encontrado.");
+        }
+        return exemplarDAO.desativar(id);
+    }
 }

@@ -12,7 +12,8 @@ public class Livro {
     private String genero;
     private String descricao;
     private String sumario;
-    private String capaUrl;        // agora existe no banco ✅
+    private String capaUrl;
+    private boolean ativo = true; // ✅ novo campo
     private LocalDateTime createdAt;
 
     public Livro() {}
@@ -30,10 +31,12 @@ public class Livro {
 
     public Livro(int id, String titulo, String autor, String editora,
                  int anoPublicacao, String genero, String descricao,
-                 String sumario, String capaUrl, LocalDateTime createdAt) {
+                 String sumario, String capaUrl, boolean ativo,
+                 LocalDateTime createdAt) {
         this(titulo, autor, editora, anoPublicacao, genero, descricao, sumario);
         this.id = id;
         this.capaUrl = capaUrl;
+        this.ativo = ativo;
         this.createdAt = createdAt;
     }
 
@@ -64,11 +67,15 @@ public class Livro {
     public String getCapaUrl() { return capaUrl; }
     public void setCapaUrl(String capaUrl) { this.capaUrl = capaUrl; }
 
+    // ✅ getter/setter ativo
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
-        return "Livro{id=" + id + ", titulo=" + titulo + ", autor=" + autor + "}";
+        return "Livro{id=" + id + ", titulo=" + titulo + ", autor=" + autor + ", ativo=" + ativo + "}";
     }
 }

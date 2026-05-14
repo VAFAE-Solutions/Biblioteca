@@ -38,8 +38,9 @@ public class ExemplarDAO {
         }
     }
 
+    // ✅ Busca só exemplares ativos
     public Exemplar buscarPorId(int id) {
-        String sql = "SELECT * FROM exemplar WHERE id = ?";
+        String sql = "SELECT * FROM exemplar WHERE id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -57,8 +58,9 @@ public class ExemplarDAO {
         }
     }
 
+    // ✅ Busca só exemplares ativos
     public List<Exemplar> buscarPorLivro(int livroId) {
-        String sql = "SELECT * FROM exemplar WHERE livro_id = ?";
+        String sql = "SELECT * FROM exemplar WHERE livro_id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -77,10 +79,12 @@ public class ExemplarDAO {
         }
     }
 
+    // ✅ Busca só exemplares ativos e disponíveis
     public List<Exemplar> buscarDisponiveisPorLivroEUnidade(int livroId, int unidadeId) {
         String sql = """
                 SELECT * FROM exemplar
-                WHERE livro_id = ? AND unidade_id = ? AND status = 'DISPONIVEL'
+                WHERE livro_id = ? AND unidade_id = ?
+                AND status = 'DISPONIVEL' AND ativo = TRUE
                 """;
 
         try (Connection con = Database.getConnection();
@@ -117,13 +121,29 @@ public class ExemplarDAO {
         }
     }
 
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        String sql = "UPDATE exemplar SET ativo = FALSE WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao desativar exemplar: " + e.getMessage(), e);
+        }
+    }
+
     private Exemplar mapearExemplar(ResultSet rs) throws SQLException {
         return new Exemplar(
                 rs.getInt("id"),
                 rs.getInt("livro_id"),
                 rs.getInt("unidade_id"),
                 rs.getString("codigo_patrimonio"),
-                Exemplar.Status.valueOf(rs.getString("status"))
+                Exemplar.Status.valueOf(rs.getString("status")),
+                rs.getBoolean("ativo") // ✅ novo campo
         );
     }
 }

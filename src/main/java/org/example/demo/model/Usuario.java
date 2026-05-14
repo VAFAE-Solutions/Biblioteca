@@ -14,6 +14,7 @@ public class Usuario {
     private String cpf;
     private String telefone;
     private boolean bloqueado = false;
+    private boolean ativo = true; // ✅ novo campo
     private int tentativasLogin = 0;
     private LocalDateTime ultimaTentativa;
     private LocalDateTime createdAt;
@@ -36,26 +37,25 @@ public class Usuario {
 
     public Usuario(int id, String nome, String email, String senhaHash,
                    Tipo tipo, String cpf, String telefone, boolean bloqueado,
-                   int tentativasLogin, LocalDateTime ultimaTentativa,
+                   boolean ativo, int tentativasLogin, LocalDateTime ultimaTentativa,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this(nome, email, senhaHash, tipo);
         this.id = id;
         this.cpf = cpf;
         this.telefone = telefone;
         this.bloqueado = bloqueado;
+        this.ativo = ativo;
         this.tentativasLogin = tentativasLogin;
         this.ultimaTentativa = ultimaTentativa;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    // Define prazo por tipo
     private int calcularPrazoPorTipo(Tipo tipo) {
         if (tipo == Tipo.ESTUDANTE) return 15;
         return 7;
     }
 
-    // Define limite de cotas por tipo
     private int calcularLimitePorTipo(Tipo tipo) {
         if (tipo == Tipo.ESTUDANTE) return 5;
         return 3;
@@ -89,6 +89,10 @@ public class Usuario {
     public boolean isBloqueado() { return bloqueado; }
     public void setBloqueado(boolean bloqueado) { this.bloqueado = bloqueado; }
 
+    // ✅ getter/setter ativo
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
     public int getTentativasLogin() { return tentativasLogin; }
     public void setTentativasLogin(int tentativasLogin) { this.tentativasLogin = tentativasLogin; }
 
@@ -109,6 +113,6 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario{id=" + id + ", nome=" + nome + ", tipo=" + tipo + "}";
+        return "Usuario{id=" + id + ", nome=" + nome + ", tipo=" + tipo + ", ativo=" + ativo + "}";
     }
 }

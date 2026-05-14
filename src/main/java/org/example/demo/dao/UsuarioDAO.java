@@ -9,7 +9,6 @@ import java.util.List;
 
 public class UsuarioDAO {
 
-    // ✅ Executa a stored procedure de autenticação
     public String[] executarLoginProcedure(String email, String senhaHash) {
         String sql = "{call sp_autenticar_usuario(?, ?, ?, ?, ?)}";
 
@@ -18,9 +17,9 @@ public class UsuarioDAO {
 
             stmt.setString(1, email);
             stmt.setString(2, senhaHash);
-            stmt.registerOutParameter(3, Types.VARCHAR); // p_status_id
-            stmt.registerOutParameter(4, Types.INTEGER); // p_usuario_id
-            stmt.registerOutParameter(5, Types.VARCHAR); // p_tipo
+            stmt.registerOutParameter(3, Types.VARCHAR);
+            stmt.registerOutParameter(4, Types.INTEGER);
+            stmt.registerOutParameter(5, Types.VARCHAR);
 
             stmt.execute();
 
@@ -35,7 +34,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Inserir usuário
     public boolean inserir(Usuario usuario) {
         String sql = """
                 INSERT INTO usuario (nome, email, senha_hash, tipo, ra, cpf, telefone, unidade_id)
@@ -49,8 +47,8 @@ public class UsuarioDAO {
             ps.setString(2, usuario.getEmail());
             ps.setString(3, usuario.getSenhaHash());
             ps.setString(4, usuario.getTipo().name());
-            ps.setString(7, usuario.getTelefone());
             ps.setString(6, usuario.getCpf());
+            ps.setString(7, usuario.getTelefone());
 
             if (usuario instanceof UsuarioEstudante estudante) {
                 ps.setInt(5, estudante.getRa());
@@ -78,9 +76,9 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Buscar por ID
+    // ✅ Busca só usuários ativos
     public Usuario buscarPorId(int id) {
-        String sql = "SELECT * FROM usuario WHERE id = ?";
+        String sql = "SELECT * FROM usuario WHERE id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -98,9 +96,9 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Buscar por email
+    // ✅ Busca só usuários ativos
     public Usuario buscarPorEmail(String email) {
-        String sql = "SELECT * FROM usuario WHERE email = ?";
+        String sql = "SELECT * FROM usuario WHERE email = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -118,8 +116,27 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Listar todos
+    // ✅ Lista só usuários ativos
     public List<Usuario> listarTodos() {
+        String sql = "SELECT * FROM usuario WHERE ativo = TRUE";
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(mapearUsuario(rs));
+            }
+            return usuarios;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar usuários: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ Lista todos incluindo inativos — para admin ver histórico
+    public List<Usuario> listarTodosIncluindoInativos() {
         String sql = "SELECT * FROM usuario";
         List<Usuario> usuarios = new ArrayList<>();
 
@@ -137,7 +154,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Atualizar dados do usuário
     public boolean atualizar(Usuario usuario) {
         String sql = """
                 UPDATE usuario SET nome = ?, email = ?, telefone = ?,
@@ -161,7 +177,28 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Atualizar tentativas de login
+    public boolean atualizarBloqueio(int id, boolean bloqueado, int tentativas) {
+        String sql = """
+                UPDATE usuario SET bloqueado = ?, tentativas_login = ?,
+                ultima_tentativa = ?, updated_at = NOW()
+                WHERE id = ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setBoolean(1, bloqueado);
+            ps.setInt(2, tentativas);
+            ps.setObject(3, bloqueado ? java.time.LocalDateTime.now() : null);
+            ps.setInt(4, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar bloqueio: " + e.getMessage(), e);
+        }
+    }
+
     public boolean atualizarTentativas(Usuario usuario) {
         String sql = """
                 UPDATE usuario SET tentativas_login = ?, ultima_tentativa = ?, bloqueado = ?
@@ -183,7 +220,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Contar empréstimos ativos do usuário
     public int contarEmprestimosAtivos(int usuarioId) {
         String sql = """
                 SELECT COUNT(*) FROM emprestimo
@@ -206,7 +242,51 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Mapear ResultSet → objeto correto
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        String sql = "UPDATE usuario SET ativo = FALSE, updated_at = NOW() WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao desativar usuário: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ Reativar usuário
+    public boolean reativar(int id) {
+        String sql = "UPDATE usuario SET ativo = TRUE, updated_at = NOW() WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao reativar usuário: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ Mantido para compatibilidade mas não recomendado
+    public boolean deletar(int id) {
+        String sql = "DELETE FROM usuario WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao deletar usuário: " + e.getMessage(), e);
+        }
+    }
+
     private Usuario mapearUsuario(ResultSet rs) throws SQLException {
         String tipo = rs.getString("tipo");
 
@@ -232,6 +312,7 @@ public class UsuarioDAO {
         usuario.setCpf(rs.getString("cpf"));
         usuario.setTelefone(rs.getString("telefone"));
         usuario.setBloqueado(rs.getBoolean("bloqueado"));
+        usuario.setAtivo(rs.getBoolean("ativo")); // ✅ novo campo
         usuario.setTentativasLogin(rs.getInt("tentativas_login"));
 
         Timestamp ultimaTentativa = rs.getTimestamp("ultima_tentativa");

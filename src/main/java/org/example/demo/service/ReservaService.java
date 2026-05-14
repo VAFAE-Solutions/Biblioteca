@@ -25,7 +25,6 @@ public class ReservaService {
             throw new IllegalArgumentException("IDs inválidos.");
         }
 
-        // ✅ Verifica se há exemplar disponível — reserva só para indisponível
         List<Exemplar> disponiveis = exemplarService
                 .buscarDisponiveisPorLivroEUnidade(livroId, unidadeId);
         if (!disponiveis.isEmpty()) {
@@ -33,13 +32,11 @@ public class ReservaService {
                     "Livro disponível para empréstimo. Não é necessário reservar.");
         }
 
-        // Usuário com multa pendente não pode reservar
         if (multaService.usuarioPossuiMultaPendente(usuarioId)) {
             throw new IllegalStateException(
                     "Usuário possui multa pendente. Quite antes de reservar.");
         }
 
-        // Verifica se usuário já está na fila
         FilaReserva fila = reservaDAO.buscarFilaPorLivroEUnidade(livroId, unidadeId);
         if (fila.usuarioNaFila(usuarioId)) {
             throw new IllegalStateException(
@@ -99,5 +96,13 @@ public class ReservaService {
             throw new IllegalArgumentException("ID do usuário inválido.");
         }
         return reservaDAO.buscarPorUsuario(usuarioId);
+    }
+
+    // ✅ Novo método para buscar todas as reservas aguardando de uma unidade
+    public List<Reserva> buscarFilaCompleta(int unidadeId) {
+        if (unidadeId <= 0) {
+            throw new IllegalArgumentException("ID da unidade inválido.");
+        }
+        return reservaDAO.buscarAguardandoPorUnidade(unidadeId);
     }
 }

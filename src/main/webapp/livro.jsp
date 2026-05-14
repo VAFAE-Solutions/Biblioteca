@@ -20,7 +20,6 @@
 
 <div class="container bg-white p-5 rounded shadow-sm">
 
-    <%-- Empréstimo realizado com sucesso --%>
     <c:if test="${param.reserva == 'sucesso'}">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>✅ Empréstimo realizado com sucesso!</strong>
@@ -31,7 +30,6 @@
         </div>
     </c:if>
 
-    <%-- Reserva realizada com sucesso --%>
     <c:if test="${param.reserva == 'sucesso_reserva'}">
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <strong>✅ Reserva realizada com sucesso!</strong>
@@ -42,7 +40,6 @@
         </div>
     </c:if>
 
-    <%-- Erro no empréstimo --%>
     <c:if test="${param.reserva == 'erro'}">
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>❌ Empréstimo não realizado.</strong>
@@ -51,7 +48,6 @@
         </div>
     </c:if>
 
-    <%-- Multa pendente --%>
     <c:if test="${param.erro == 'multa_pendente'}">
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>⚠️ Multa Pendente!</strong>
@@ -62,7 +58,6 @@
         </div>
     </c:if>
 
-    <%-- Limite atingido --%>
     <c:if test="${param.erro == 'limite_atingido'}">
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>⚠️ Limite Atingido!</strong>
@@ -73,7 +68,6 @@
         </div>
     </c:if>
 
-    <%-- Erro na reserva --%>
     <c:if test="${param.erro == 'reserva_erro'}">
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <strong>❌ Erro na reserva.</strong>
@@ -85,12 +79,10 @@
     <div class="row">
         <div class="col-md-4 text-center">
 
-            <%-- Capa do livro --%>
             <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
                  class="book-cover mb-3"
                  onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
 
-            <%-- Status do exemplar --%>
             <div class="mb-3">
                 <c:choose>
                     <c:when test="${exemplarDisponivel}">
@@ -102,9 +94,20 @@
                 </c:choose>
             </div>
 
+            <%-- ✅ Voltar para o lugar certo conforme o perfil --%>
             <p>
-                <a href="${pageContext.request.contextPath}/dashboard"
-                   class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.usuarioLogado &&
+                                   (sessionScope.usuarioLogado.tipo == 'ADMIN' ||
+                                    sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO')}">
+                        <a href="${pageContext.request.contextPath}/admin"
+                           class="btn btn-outline-secondary w-100">Voltar ao Painel</a>
+                    </c:when>
+                    <c:otherwise>
+                        <a href="${pageContext.request.contextPath}/dashboard"
+                           class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
+                    </c:otherwise>
+                </c:choose>
             </p>
         </div>
 
@@ -127,10 +130,8 @@
                 </p>
             </div>
 
-            <%-- Ações por estado do livro e login --%>
             <c:choose>
 
-                <%-- Já emprestado com sucesso --%>
                 <c:when test="${param.reserva == 'sucesso'}">
                     <button class="btn btn-secondary btn-lg px-5 fw-bold" disabled>
                         Já Emprestado
@@ -141,7 +142,6 @@
                     </a>
                 </c:when>
 
-                <%-- Já reservado com sucesso --%>
                 <c:when test="${param.reserva == 'sucesso_reserva'}">
                     <button class="btn btn-secondary btn-lg px-5 fw-bold" disabled>
                         Já Reservado
@@ -152,7 +152,6 @@
                     </a>
                 </c:when>
 
-                <%-- Usuário não logado --%>
                 <c:when test="${empty sessionScope.usuarioLogado}">
                     <a href="${pageContext.request.contextPath}/login"
                        class="btn btn-warning btn-lg px-5 fw-bold">
@@ -160,7 +159,6 @@
                     </a>
                 </c:when>
 
-                <%-- Exemplar disponível — pode emprestar --%>
                 <c:when test="${exemplarDisponivel}">
                     <form action="${pageContext.request.contextPath}/reservar"
                           method="post">
@@ -172,7 +170,6 @@
                     </form>
                 </c:when>
 
-                <%-- Exemplar indisponível — pode reservar --%>
                 <c:otherwise>
                     <form action="${pageContext.request.contextPath}/reservar-livro"
                           method="post">

@@ -15,10 +15,11 @@ public class UsuarioAdministrador extends Usuario {
 
     public UsuarioAdministrador(int id, String nome, String email, String senhaHash,
                                 String cpf, String telefone, boolean bloqueado,
-                                int tentativasLogin, LocalDateTime ultimaTentativa,
+                                boolean ativo, int tentativasLogin,
+                                LocalDateTime ultimaTentativa,
                                 LocalDateTime createdAt, LocalDateTime updatedAt) {
         super(id, nome, email, senhaHash, Tipo.ADMIN, cpf, telefone,
-                bloqueado, tentativasLogin, ultimaTentativa, createdAt, updatedAt);
+                bloqueado, ativo, tentativasLogin, ultimaTentativa, createdAt, updatedAt);
     }
 
     @Override

@@ -31,16 +31,11 @@ public class UsuarioService {
             throw new IllegalArgumentException("Tipo de usuário é obrigatório.");
         }
 
-        // ✅ Verifica se email já está cadastrado
         Usuario existente = usuarioDAO.buscarPorEmail(usuario.getEmail());
         if (existente != null) {
             throw new IllegalArgumentException("E-mail já cadastrado. Use outro e-mail ou faça login.");
         }
 
-        // Hasheia a senha antes de salvar
-        usuario.setSenhaHash(AutenticacaoService.gerarHash(usuario.getSenhaHash()));
-
-        // Validações específicas por tipo
         switch (usuario.getTipo()) {
             case ESTUDANTE     -> validarEstudante(usuario);
             case BIBLIOTECARIO -> validarBibliotecario(usuario);
@@ -86,6 +81,11 @@ public class UsuarioService {
         return usuarioDAO.listarTodos();
     }
 
+    // ✅ Lista todos incluindo inativos — para admin ver histórico
+    public List<Usuario> listarTodosIncluindoInativos() {
+        return usuarioDAO.listarTodosIncluindoInativos();
+    }
+
     public boolean atualizar(Usuario usuario) {
         if (usuario == null || usuario.getId() <= 0) {
             throw new IllegalArgumentException("Usuário inválido para atualização.");
@@ -94,22 +94,35 @@ public class UsuarioService {
     }
 
     public boolean bloquear(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         Usuario usuario = buscarPorId(id);
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuário não encontrado.");
-        }
-        usuario.setBloqueado(true);
-        return usuarioDAO.atualizar(usuario);
+        if (usuario == null) throw new IllegalArgumentException("Usuário não encontrado.");
+        return usuarioDAO.atualizarBloqueio(id, true, usuario.getTentativasLogin());
     }
 
     public boolean desbloquear(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         Usuario usuario = buscarPorId(id);
-        if (usuario == null) {
-            throw new IllegalArgumentException("Usuário não encontrado.");
-        }
-        usuario.setBloqueado(false);
-        usuario.setTentativasLogin(0);
-        usuario.setUltimaTentativa(null);
-        return usuarioDAO.atualizar(usuario);
+        if (usuario == null) throw new IllegalArgumentException("Usuário não encontrado.");
+        return usuarioDAO.atualizarBloqueio(id, false, 0);
+    }
+
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+        Usuario usuario = buscarPorId(id);
+        if (usuario == null) throw new IllegalArgumentException("Usuário não encontrado.");
+        return usuarioDAO.desativar(id);
+    }
+
+    // ✅ Reativar usuário
+    public boolean reativar(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+        return usuarioDAO.reativar(id);
+    }
+
+    // ✅ Mantido para compatibilidade — agora chama desativar
+    public boolean deletar(int id) {
+        return desativar(id);
     }
 }

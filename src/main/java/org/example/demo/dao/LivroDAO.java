@@ -11,7 +11,7 @@ public class LivroDAO {
 
     public boolean inserir(Livro livro) {
         String sql = """
-                INSERT INTO livros (titulo, autor, editora, ano_publicacao, 
+                INSERT INTO livros (titulo, autor, editora, ano_publicacao,
                 genero, descricao, sumario, capa_url)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
@@ -43,8 +43,9 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Busca só livros ativos
     public Livro buscarPorId(int id) {
-        String sql = "SELECT * FROM livros WHERE id = ?";
+        String sql = "SELECT * FROM livros WHERE id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -62,6 +63,7 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Busca só livros ativos
     public List<Livro> buscarGeral(String termo) {
         if (termo == null || termo.trim().isEmpty()) {
             return listarTodos();
@@ -69,7 +71,7 @@ public class LivroDAO {
 
         String sql = """
                 SELECT * FROM livros
-                WHERE titulo LIKE ? OR autor LIKE ? OR genero LIKE ?
+                WHERE ativo = TRUE AND (titulo LIKE ? OR autor LIKE ? OR genero LIKE ?)
                 ORDER BY titulo ASC
                 """;
 
@@ -94,8 +96,9 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Busca só livros ativos
     public List<Livro> buscarPorTitulo(String titulo) {
-        String sql = "SELECT * FROM livros WHERE titulo LIKE ? ORDER BY titulo ASC";
+        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND titulo LIKE ? ORDER BY titulo ASC";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -114,8 +117,9 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Busca só livros ativos
     public List<Livro> buscarPorAutor(String autor) {
-        String sql = "SELECT * FROM livros WHERE autor LIKE ? ORDER BY autor ASC";
+        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND autor LIKE ? ORDER BY autor ASC";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -134,8 +138,9 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Busca só livros ativos
     public List<Livro> buscarPorGenero(String genero) {
-        String sql = "SELECT * FROM livros WHERE genero LIKE ? ORDER BY titulo ASC";
+        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND genero LIKE ? ORDER BY titulo ASC";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -154,8 +159,9 @@ public class LivroDAO {
         }
     }
 
+    // ✅ Lista só livros ativos
     public List<Livro> listarTodos() {
-        String sql = "SELECT * FROM livros ORDER BY created_at DESC";
+        String sql = "SELECT * FROM livros WHERE ativo = TRUE ORDER BY created_at DESC";
         List<Livro> livros = new ArrayList<>();
 
         try (Connection con = Database.getConnection();
@@ -175,7 +181,7 @@ public class LivroDAO {
     public boolean atualizar(Livro livro) {
         String sql = """
                 UPDATE livros SET titulo = ?, autor = ?, editora = ?,
-                ano_publicacao = ?, genero = ?, descricao = ?, 
+                ano_publicacao = ?, genero = ?, descricao = ?,
                 sumario = ?, capa_url = ?
                 WHERE id = ?
                 """;
@@ -200,8 +206,9 @@ public class LivroDAO {
         }
     }
 
-    public boolean deletar(int id) {
-        String sql = "DELETE FROM livros WHERE id = ?";
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        String sql = "UPDATE livros SET ativo = FALSE WHERE id = ?";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -210,8 +217,13 @@ public class LivroDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao deletar livro: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao desativar livro: " + e.getMessage(), e);
         }
+    }
+
+    // ✅ Mantido para compatibilidade
+    public boolean deletar(int id) {
+        return desativar(id);
     }
 
     private Livro mapearLivro(ResultSet rs) throws SQLException {
@@ -224,7 +236,8 @@ public class LivroDAO {
                 rs.getString("genero"),
                 rs.getString("descricao"),
                 rs.getString("sumario"),
-                rs.getString("capa_url"),   // ✅ agora lê do banco
+                rs.getString("capa_url"),
+                rs.getBoolean("ativo"), // ✅ novo campo
                 rs.getTimestamp("created_at") != null
                         ? rs.getTimestamp("created_at").toLocalDateTime() : null
         );

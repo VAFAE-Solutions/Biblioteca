@@ -9,6 +9,7 @@ public class Exemplar {
     private int unidadeId;
     private String codigoPatrimonio;
     private Status status = Status.DISPONIVEL;
+    private boolean ativo = true; // ✅ novo campo
 
     // objetos completos, populados quando necessário
     private Livro livro;
@@ -29,6 +30,12 @@ public class Exemplar {
         this.status = status;
     }
 
+    public Exemplar(int id, int livroId, int unidadeId,
+                    String codigoPatrimonio, Status status, boolean ativo) {
+        this(id, livroId, unidadeId, codigoPatrimonio, status);
+        this.ativo = ativo; // ✅ construtor completo com ativo
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -46,6 +53,10 @@ public class Exemplar {
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
+    // ✅ getter/setter ativo
+    public boolean isAtivo() { return ativo; }
+    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+
     public Livro getLivro() { return livro; }
     public void setLivro(Livro livro) {
         this.livro = livro;
@@ -61,6 +72,6 @@ public class Exemplar {
     @Override
     public String toString() {
         return "Exemplar{id=" + id + ", codigoPatrimonio=" + codigoPatrimonio
-                + ", status=" + status + "}";
+                + ", status=" + status + ", ativo=" + ativo + "}";
     }
 }

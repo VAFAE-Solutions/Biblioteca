@@ -13,7 +13,8 @@ public class AutenticacaoService {
         SUCESSO,
         USUARIO_NAO_ENCONTRADO,
         SENHA_INCORRETA,
-        USUARIO_BLOQUEADO
+        USUARIO_BLOQUEADO,
+        USUARIO_INATIVO // ✅ novo status
     }
 
     private final UsuarioDAO usuarioDAO;
@@ -31,15 +32,17 @@ public class AutenticacaoService {
             return null;
         }
 
-        // 1. Hasheia a senha e chama a procedure
         String senhaHash = gerarHash(senha);
         String[] resultado = usuarioDAO.executarLoginProcedure(email, senhaHash);
         String status = resultado[0];
 
-        // 2. Trata o resultado da procedure
         switch (status) {
             case "usuario_nao_encontrado" -> {
                 ultimoResultado = ResultadoAutenticacao.USUARIO_NAO_ENCONTRADO;
+                return null;
+            }
+            case "usuario_inativo" -> { // ✅ novo caso
+                ultimoResultado = ResultadoAutenticacao.USUARIO_INATIVO;
                 return null;
             }
             case "usuario_bloqueado",
@@ -53,14 +56,12 @@ public class AutenticacaoService {
             }
         }
 
-        // 3. Login bem sucedido — busca objeto completo pelo ID
         int usuarioId = Integer.parseInt(resultado[1]);
         Usuario usuario = usuarioDAO.buscarPorId(usuarioId);
         ultimoResultado = ResultadoAutenticacao.SUCESSO;
         return usuario;
     }
 
-    // Gera SHA-256 da senha
     public static String gerarHash(String senha) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

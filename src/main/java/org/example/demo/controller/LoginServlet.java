@@ -13,14 +13,12 @@ public class LoginServlet extends HttpServlet {
 
     private final AutenticacaoService autenticacaoService = new AutenticacaoService();
 
-    // Exibe a página de login
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }
 
-    // Processa o formulário de login
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,7 +34,6 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("usuarioLogado", usuario);
                 session.setMaxInactiveInterval(1800);
 
-                // Redireciona conforme o tipo
                 switch (usuario.getTipo()) {
                     case ADMIN,
                          BIBLIOTECARIO -> response.sendRedirect(
@@ -48,6 +45,10 @@ public class LoginServlet extends HttpServlet {
             }
             case USUARIO_BLOQUEADO -> {
                 request.setAttribute("erro", "usuario_bloqueado");
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
+            }
+            case USUARIO_INATIVO -> { // ✅ novo caso
+                request.setAttribute("erro", "usuario_inativo");
                 request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
             case SENHA_INCORRETA -> {

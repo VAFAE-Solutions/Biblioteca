@@ -66,7 +66,6 @@ public class ReservaDAO {
         }
     }
 
-    // ✅ JOIN com livros para exibir título
     public List<Reserva> buscarPorUsuario(int usuarioId) {
         String sql = """
                 SELECT r.*, l.titulo as livro_titulo, l.capa_url as livro_capa
@@ -123,6 +122,33 @@ public class ReservaDAO {
         }
     }
 
+    // ✅ Novo método — busca todas as reservas aguardando de uma unidade
+    public List<Reserva> buscarAguardandoPorUnidade(int unidadeId) {
+        String sql = """
+                SELECT r.*, l.titulo as livro_titulo, l.capa_url as livro_capa
+                FROM reservas r
+                JOIN livros l ON r.livro_id = l.id
+                WHERE r.unidade_id = ? AND r.status = 'AGUARDANDO'
+                ORDER BY r.posicao_fila
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, unidadeId);
+            ResultSet rs = ps.executeQuery();
+            List<Reserva> reservas = new ArrayList<>();
+
+            while (rs.next()) {
+                reservas.add(mapearReservaComLivro(rs));
+            }
+            return reservas;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar reservas por unidade: " + e.getMessage(), e);
+        }
+    }
+
     public boolean atualizar(Reserva reserva) {
         String sql = "UPDATE reservas SET status = ? WHERE id = ?";
 
@@ -139,7 +165,6 @@ public class ReservaDAO {
         }
     }
 
-    // ✅ Mapeia reserva com livro populado
     private Reserva mapearReservaComLivro(ResultSet rs) throws SQLException {
         Reserva reserva = new Reserva(
                 rs.getInt("id"),
@@ -151,7 +176,6 @@ public class ReservaDAO {
                 rs.getInt("posicao_fila")
         );
 
-        // Popula livro
         Livro livro = new Livro();
         livro.setId(rs.getInt("livro_id"));
         livro.setTitulo(rs.getString("livro_titulo"));

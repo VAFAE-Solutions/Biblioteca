@@ -20,7 +20,13 @@ public class DashboardServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
-        // Busca com filtro
+        // ✅ Redireciona admin/bibliotecário para o painel correto
+        if (usuarioLogado.getTipo() == Usuario.Tipo.ADMIN ||
+                usuarioLogado.getTipo() == Usuario.Tipo.BIBLIOTECARIO) {
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
+
         String txtBusca = request.getParameter("txtBusca");
 
         if (txtBusca != null && !txtBusca.trim().isEmpty()) {

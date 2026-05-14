@@ -17,11 +17,16 @@ public class BuscaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // ✅ Seta usuarioLogado para o dashboard.jsp
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            request.setAttribute("usuarioLogado", session.getAttribute("usuarioLogado"));
+        }
+
         String termo  = request.getParameter("txtBusca");
         String filtro = request.getParameter("filtro");
 
         if (termo != null && !termo.trim().isEmpty()) {
-            // Busca com filtro específico ou geral
             var livros = switch (filtro != null ? filtro : "geral") {
                 case "titulo"  -> livroService.buscarPorTitulo(termo);
                 case "autor"   -> livroService.buscarPorAutor(termo);

@@ -21,7 +21,8 @@ public class FiltroAutenticacao implements Filter {
             "/cadastro-completo",
             "/css",
             "/js",
-            "/imagens"
+            "/imagens",
+            "/index.jsp"
     );
 
     @Override
@@ -33,6 +34,12 @@ public class FiltroAutenticacao implements Filter {
 
         String uri         = request.getRequestURI();
         String contextPath = request.getContextPath();
+
+        // ✅ Permite acesso à raiz do projeto
+        if (uri.equals(contextPath + "/") || uri.equals(contextPath)) {
+            chain.doFilter(req, resp);
+            return;
+        }
 
         // Verifica se é rota pública
         boolean rotaPublica = ROTAS_PUBLICAS.stream()

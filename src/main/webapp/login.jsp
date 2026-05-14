@@ -14,19 +14,21 @@
 
         <h2>Acesse sua Conta</h2>
 
-        <%-- Mensagem de cadastro realizado com sucesso --%>
         <c:if test="${param.cadastro == 'sucesso'}">
             <div class="mensagem sucesso">
                 Cadastro realizado com sucesso! Faça login para continuar.
             </div>
         </c:if>
 
-        <%-- Mensagens de erro vindas do LoginServlet --%>
         <c:if test="${not empty erro}">
             <div class="erro">
                 <c:choose>
                     <c:when test="${erro == 'usuario_bloqueado'}">
                         Usuário bloqueado. Entre em contato com a biblioteca.
+                    </c:when>
+                    <c:when test="${erro == 'usuario_inativo'}">
+                        <%-- ✅ novo caso --%>
+                        Usuário desativado. Entre em contato com a biblioteca.
                     </c:when>
                     <c:when test="${erro == 'login_falhou'}">
                         Senha incorreta. Tente novamente.

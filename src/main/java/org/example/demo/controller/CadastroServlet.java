@@ -15,7 +15,6 @@ public class CadastroServlet extends HttpServlet {
 
     private final UsuarioService usuarioService = new UsuarioService();
 
-    // ✅ Exibe tela de cadastro passo 1
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -23,7 +22,6 @@ public class CadastroServlet extends HttpServlet {
         String uri = request.getRequestURI();
 
         if (uri.endsWith("cadastro-completo")) {
-            // Verifica se veio do passo 1
             HttpSession session = request.getSession(false);
             if (session == null || session.getAttribute("cadastroNome") == null) {
                 response.sendRedirect(request.getContextPath() + "/cadastro");
@@ -37,7 +35,6 @@ public class CadastroServlet extends HttpServlet {
         }
     }
 
-    // ✅ Processa passo 1 — salva na sessão e redireciona
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -51,7 +48,6 @@ public class CadastroServlet extends HttpServlet {
         }
     }
 
-    // ✅ Passo 1 — valida e salva na sessão
     private void processarPasso1(HttpServletRequest request,
                                  HttpServletResponse response)
             throws ServletException, IOException {
@@ -60,7 +56,6 @@ public class CadastroServlet extends HttpServlet {
         String email = request.getParameter("email");
         String senha = request.getParameter("senha");
 
-        // Validações básicas
         if (nome == null || nome.trim().length() < 3) {
             request.setAttribute("erro", "Nome deve ter ao menos 3 caracteres.");
             request.getRequestDispatcher("/cadastro.jsp")
@@ -80,7 +75,6 @@ public class CadastroServlet extends HttpServlet {
             return;
         }
 
-        // Salva na sessão — senha nunca vai para a URL
         HttpSession session = request.getSession();
         session.setAttribute("cadastroNome", nome.trim());
         session.setAttribute("cadastroEmail", email.trim());
@@ -89,23 +83,20 @@ public class CadastroServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/cadastro-completo");
     }
 
-    // ✅ Passo 2 — cria o usuário no banco
     private void processarPasso2(HttpServletRequest request,
                                  HttpServletResponse response)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
 
-        // Recupera dados do passo 1
         String nome  = (String) session.getAttribute("cadastroNome");
         String email = (String) session.getAttribute("cadastroEmail");
         String senha = (String) session.getAttribute("cadastroSenha");
 
-        // Dados do passo 2
-        String tipoStr   = request.getParameter("tipo");
-        String telefone  = request.getParameter("telefone");
-        String cpf       = request.getParameter("cpf");
-        String raParam   = request.getParameter("ra");
+        String tipoStr  = request.getParameter("tipo");
+        String telefone = request.getParameter("telefone");
+        String cpf      = request.getParameter("cpf");
+        String raParam  = request.getParameter("ra");
 
         try {
             Usuario usuario;
@@ -114,6 +105,7 @@ public class CadastroServlet extends HttpServlet {
             if (tipo == Usuario.Tipo.ESTUDANTE) {
                 UsuarioEstudante estudante = new UsuarioEstudante();
                 estudante.setRa(Integer.parseInt(raParam));
+                estudante.setCpf(cpf); // ✅ CPF agora é setado para estudante também
                 usuario = estudante;
             } else {
                 usuario = new Usuario();
@@ -128,12 +120,10 @@ public class CadastroServlet extends HttpServlet {
 
             usuarioService.cadastrar(usuario);
 
-            // Limpa sessão de cadastro
             session.removeAttribute("cadastroNome");
             session.removeAttribute("cadastroEmail");
             session.removeAttribute("cadastroSenha");
 
-            // Redireciona para login com mensagem de sucesso
             response.sendRedirect(request.getContextPath()
                     + "/login?cadastro=sucesso");
 

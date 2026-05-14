@@ -33,7 +33,6 @@ public class LivroService {
         return livroDAO.buscarPorId(id);
     }
 
-    // ✅ Busca simultânea por título, autor e gênero
     public List<Livro> buscarGeral(String termo) {
         if (termo == null || termo.isBlank()) {
             throw new IllegalArgumentException("Termo de busca não pode ser vazio.");
@@ -76,10 +75,16 @@ public class LivroService {
         return livroDAO.atualizar(livro);
     }
 
-    public boolean deletar(int id) {
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
         if (id <= 0) {
             throw new IllegalArgumentException("ID inválido.");
         }
-        return livroDAO.deletar(id);
+        return livroDAO.desativar(id);
+    }
+
+    // ✅ Mantido para compatibilidade — agora chama desativar
+    public boolean deletar(int id) {
+        return desativar(id);
     }
 }

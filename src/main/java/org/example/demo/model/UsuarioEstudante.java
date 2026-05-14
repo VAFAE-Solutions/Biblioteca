@@ -18,11 +18,12 @@ public class UsuarioEstudante extends Usuario {
 
     public UsuarioEstudante(int id, String nome, String email, String senhaHash,
                             String cpf, String telefone, boolean bloqueado,
-                            int tentativasLogin, LocalDateTime ultimaTentativa,
+                            boolean ativo, int tentativasLogin,
+                            LocalDateTime ultimaTentativa,
                             LocalDateTime createdAt, LocalDateTime updatedAt,
                             int ra) {
         super(id, nome, email, senhaHash, Tipo.ESTUDANTE, cpf, telefone,
-                bloqueado, tentativasLogin, ultimaTentativa, createdAt, updatedAt);
+                bloqueado, ativo, tentativasLogin, ultimaTentativa, createdAt, updatedAt);
         this.ra = ra;
     }
 

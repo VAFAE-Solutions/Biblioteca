@@ -1,5 +1,6 @@
 package org.example.demo.service;
 
+import org.example.demo.dao.EmprestimoDAO;
 import org.example.demo.dao.MultaDAO;
 import org.example.demo.model.Emprestimo;
 import org.example.demo.model.Multa;
@@ -11,14 +12,14 @@ import java.util.List;
 
 public class MultaService {
 
-    private static final BigDecimal VALOR_DIARIO = new BigDecimal("2.00"); // R$ 2,00 por dia
+    private static final BigDecimal VALOR_DIARIO = new BigDecimal("2.00");
 
     private final MultaDAO multaDAO;
-    private final EmprestimoService emprestimoService;
+    private final EmprestimoDAO emprestimoDAO; // ✅ DAO direto, sem EmprestimoService
 
     public MultaService() {
         this.multaDAO = new MultaDAO();
-        this.emprestimoService = new EmprestimoService();
+        this.emprestimoDAO = new EmprestimoDAO(); // ✅ sem mais ciclo
     }
 
     public boolean gerarMulta(int emprestimoId) {
@@ -26,7 +27,7 @@ public class MultaService {
             throw new IllegalArgumentException("ID inválido.");
         }
 
-        Emprestimo emprestimo = emprestimoService.buscarPorId(emprestimoId);
+        Emprestimo emprestimo = emprestimoDAO.buscarPorId(emprestimoId); // ✅ DAO direto
         if (emprestimo == null) {
             throw new IllegalArgumentException("Empréstimo não encontrado.");
         }
@@ -34,12 +35,10 @@ public class MultaService {
             throw new IllegalStateException("Multa só pode ser gerada para empréstimos atrasados.");
         }
 
-        // Verifica se já existe multa
         if (multaDAO.existeMultaPorEmprestimo(emprestimoId)) {
             throw new IllegalStateException("Já existe multa gerada para este empréstimo.");
         }
 
-        // Calcula dias de atraso e valor
         long diasAtraso = ChronoUnit.DAYS.between(
                 emprestimo.getDataDevolucaoPrevista(),
                 LocalDate.now()
@@ -93,7 +92,6 @@ public class MultaService {
         return !buscarPendentes(usuarioId).isEmpty();
     }
 
-    // ✅ Calcula valor total de multas pendentes — aproveitado do projeto dela
     public double calcularTotalMultasPendentes(int usuarioId) {
         return buscarPendentes(usuarioId).stream()
                 .mapToDouble(m -> m.getValor().doubleValue())
