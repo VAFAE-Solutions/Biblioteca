@@ -43,3 +43,6 @@ build/
 
 ### Windows ###
 Thumbs.db
+
+# Arquivo de teste
+src/main/java/main.java
