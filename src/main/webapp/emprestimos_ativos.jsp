@@ -42,7 +42,21 @@
 </div>
 
 <div class="main-content">
-    <h2 class="mb-4">📅 Empréstimos Ativos</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📅 Empréstimos Ativos</h2>
+        <a href="${pageContext.request.contextPath}/admin/emprestimo-presencial"
+           class="btn btn-primary">
+            + Registrar Empréstimo Presencial
+        </a>
+    </div>
+
+    <%-- Feedbacks --%>
+    <c:if test="${param.devolucao == 'sucesso'}">
+        <div class="alert alert-success">✅ Devolução registrada com sucesso!</div>
+    </c:if>
+    <c:if test="${param.devolucao == 'erro'}">
+        <div class="alert alert-danger">❌ Erro ao registrar devolução.</div>
+    </c:if>
 
     <c:if test="${not empty emprestimosAtrasados}">
         <div class="alert alert-danger mb-4">
@@ -50,6 +64,7 @@
         </div>
     </c:if>
 
+    <%-- Ativos --%>
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-white">
             <strong>✅ Ativos (${emprestimosAtivos.size()})</strong>
@@ -60,10 +75,10 @@
                 <tr>
                     <th>ID</th>
                     <th>Livro</th>
-                    <th>Usuário ID</th>
+                    <th>Usuário</th>
                     <th>Data Empréstimo</th>
                     <th>Devolução Prevista</th>
-                    <th>Status</th>
+                    <th>Ação</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -71,10 +86,18 @@
                     <tr>
                         <td>${emp.id}</td>
                         <td><strong>${emp.exemplar.livro.titulo}</strong></td>
-                        <td>${emp.usuarioId}</td>
+                        <td>${usuariosMap[emp.usuarioId]}</td>
                         <td>${emp.dataEmprestimo}</td>
                         <td>${emp.dataDevolucaoPrevista}</td>
-                        <td><span class="badge bg-success">ATIVO</span></td>
+                        <td>
+                            <form action="${pageContext.request.contextPath}/admin/emprestimos"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="emprestimoId" value="${emp.id}">
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    ✅ Devolver
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty emprestimosAtivos}">
@@ -89,6 +112,7 @@
         </div>
     </div>
 
+    <%-- Atrasados --%>
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <strong>⏰ Atrasados (${emprestimosAtrasados.size()})</strong>
@@ -99,10 +123,10 @@
                 <tr>
                     <th>ID</th>
                     <th>Livro</th>
-                    <th>Usuário ID</th>
+                    <th>Usuário</th>
                     <th>Data Empréstimo</th>
                     <th>Devolução Prevista</th>
-                    <th>Status</th>
+                    <th>Ação</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -110,10 +134,18 @@
                     <tr class="table-danger">
                         <td>${emp.id}</td>
                         <td><strong>${emp.exemplar.livro.titulo}</strong></td>
-                        <td>${emp.usuarioId}</td>
+                        <td>${usuariosMap[emp.usuarioId]}</td>
                         <td>${emp.dataEmprestimo}</td>
                         <td>${emp.dataDevolucaoPrevista}</td>
-                        <td><span class="badge bg-danger">ATRASADO</span></td>
+                        <td>
+                            <form action="${pageContext.request.contextPath}/admin/emprestimos"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="emprestimoId" value="${emp.id}">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    ✅ Devolver
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty emprestimosAtrasados}">
