@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Cadastrar Bibliotecário - Library</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         .sidebar-admin { background: #212529; color: white; min-height: 100vh; width: 250px; position: fixed; }
         .sidebar-admin a { color: #adb5bd; text-decoration: none; padding: 15px; display: block; }
@@ -54,8 +55,14 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Senha *</label>
-                        <input type="password" name="senha" class="form-control"
-                               minlength="6" required>
+                        <div class="input-group">
+                            <input type="password" name="senha" id="senhaBib"
+                                   class="form-control" minlength="6" required>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="toggleSenha('senhaBib', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Telefone</label>
@@ -92,7 +99,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // Máscara telefone
+    function toggleSenha(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye-slash';
+        }
+    }
+
     document.querySelector('[name="telefone"]').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length <= 11) {
@@ -107,7 +125,6 @@
         }
     });
 
-    // Máscara CPF
     document.querySelector('[name="cpf"]').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         if (value.length <= 11) {

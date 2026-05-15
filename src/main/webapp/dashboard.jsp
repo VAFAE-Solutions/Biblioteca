@@ -7,7 +7,7 @@
     <title>Biblioteca Digital - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f4f4; }
+        body { background-color: #f4f4f4; margin-top: 56px; }
         .topbar {
             background-color: #40c4d4;
             padding: 10px 20px;
@@ -15,6 +15,12 @@
             align-items: center;
             justify-content: space-between;
             color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            height: 56px;
         }
         .search-box { width: 300px; }
         .sidebar {
@@ -23,7 +29,9 @@
             background: #fff;
             border-right: 1px solid #ccc;
             position: fixed;
+            top: 56px;
             padding-top: 20px;
+            overflow-y: auto;
         }
         .sidebar a {
             display: block;
@@ -42,6 +50,10 @@
             color: #40c4d4;
             font-weight: bold;
             border-left: 4px solid #40c4d4;
+        }
+        .sidebar a.link-home {
+            color: #40c4d4;
+            font-size: 13px;
         }
         .content { margin-left: 240px; padding: 30px; }
         .profile-box {
@@ -88,8 +100,8 @@
     <a href="${pageContext.request.contextPath}/meus-emprestimos">📖 Meus Empréstimos</a>
     <a href="${pageContext.request.contextPath}/minhas-reservas">🔖 Minhas Reservas</a>
     <a href="${pageContext.request.contextPath}/multas">💰 Multas</a>
-    <a href="${pageContext.request.contextPath}/logout"
-       style="color: #dc3545;">🚪 Sair</a>
+    <a href="${pageContext.request.contextPath}/home" class="link-home">🌐 Página Inicial</a>
+    <a href="${pageContext.request.contextPath}/logout" style="color: #dc3545;">🚪 Sair</a>
 </div>
 
 <div class="content">

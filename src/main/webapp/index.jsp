@@ -20,7 +20,9 @@
     <div class="header-top">
 
         <div class="logo-box">
-            <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png">
+            <a href="${pageContext.request.contextPath}/home">
+                <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png">
+            </a>
         </div>
 
         <div class="search-box">
@@ -34,11 +36,40 @@
         </div>
 
         <div class="user-box">
-            <div class="auth-links">
-                <a href="${pageContext.request.contextPath}/login">Entrar</a>
-                <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
-            </div>
-            <div class="avatar"></div>
+            <%-- ✅ Logado — mostra botão voltar conforme tipo --%>
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuarioLogado}">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' ||
+                                       sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
+                            <a href="${pageContext.request.contextPath}/admin"
+                               style="padding: 8px 16px; background: #fff;
+                                      color: #39c3cf; border-radius: 8px;
+                                      text-decoration: none; font-weight: bold;
+                                      border: 1px solid #39c3cf;">
+                                ← Voltar ao Painel
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/dashboard"
+                               style="padding: 8px 16px; background: #fff;
+                                      color: #39c3cf; border-radius: 8px;
+                                      text-decoration: none; font-weight: bold;
+                                      border: 1px solid #39c3cf;">
+                                ← Voltar ao Catálogo
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <%-- Não logado — mostra entrar/cadastrar --%>
+                    <div class="auth-links">
+                        <a href="${pageContext.request.contextPath}/login">Entrar</a>
+                        <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
+                    </div>
+                    <div class="avatar"></div>
+                </c:otherwise>
+            </c:choose>
         </div>
 
     </div>
@@ -77,7 +108,7 @@
         </div>
     </c:if>
 
-    <%-- Em alta — Don Quixote, Dom Casmurro, Demian, Drácula, A Divina Comédia --%>
+    <%-- Em alta --%>
     <div class="highlights-container">
         <h2>Em alta!</h2>
         <div class="books-grid">
@@ -124,7 +155,7 @@
         </div>
     </div>
 
-    <%-- Recomendações — Java for Dummies, Moby Dick, Harry Potter, A Guerra dos Mundos, Jujutsu Kaisen --%>
+    <%-- Recomendações --%>
     <div class="highlights-container">
         <h2>Recomendações da Equipe!</h2>
         <div class="books-grid">

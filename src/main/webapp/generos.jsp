@@ -9,26 +9,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f4f4; }
-        .page-hero {
-            background: linear-gradient(135deg, #40c4d4, #27aab5);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .genero-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
+        .page-hero { background: linear-gradient(135deg, #40c4d4, #27aab5); color: white; padding: 80px 0; text-align: center; }
+        .genero-card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s; cursor: pointer; }
         .genero-card:hover { transform: translateY(-5px); }
-        .book-thumb {
-            width: 60px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
     </style>
 </head>
 <body>
@@ -47,11 +30,25 @@
             </form>
         </div>
         <div class="user-box">
-            <div class="auth-links">
-                <a href="${pageContext.request.contextPath}/login">Entrar</a>
-                <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
-            </div>
-            <div class="avatar"></div>
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuarioLogado}">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' || sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
+                            <a href="${pageContext.request.contextPath}/admin" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Painel</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/dashboard" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Catálogo</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <div class="auth-links">
+                        <a href="${pageContext.request.contextPath}/login">Entrar</a>
+                        <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
+                    </div>
+                    <div class="avatar"></div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
     <nav class="nav-bar">
@@ -72,13 +69,10 @@
 
 <div class="container py-5">
     <div class="row g-4">
-
         <c:set var="generos" value="Aventura,Fantasia,Ficção,Ficção Científica,Manga,Poesia,Romance,Tecnologia,Terror" />
-
         <c:forEach var="genero" items="${generos}">
             <div class="col-md-4">
-                <a href="${pageContext.request.contextPath}/buscar?txtBusca=${genero}&filtro=genero"
-                   style="text-decoration: none;">
+                <a href="${pageContext.request.contextPath}/buscar?txtBusca=${genero}&filtro=genero" style="text-decoration: none;">
                     <div class="card genero-card p-4">
                         <div class="d-flex align-items-center gap-3">
                             <span style="font-size: 2rem;">
@@ -104,7 +98,6 @@
                 </a>
             </div>
         </c:forEach>
-
     </div>
 </div>
 

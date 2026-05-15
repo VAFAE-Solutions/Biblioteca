@@ -7,7 +7,7 @@
     <title>Minhas Reservas - Library</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f4f4f4; }
+        body { background-color: #f4f4f4; margin-top: 56px; }
         .topbar {
             background-color: #40c4d4;
             padding: 10px 20px;
@@ -15,6 +15,10 @@
             align-items: center;
             justify-content: space-between;
             color: white;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: 56px;
         }
         .sidebar {
             width: 220px;
@@ -22,33 +26,16 @@
             background: #fff;
             border-right: 1px solid #ccc;
             position: fixed;
+            top: 56px;
             padding-top: 20px;
+            overflow-y: auto;
         }
-        .sidebar a {
-            display: block;
-            padding: 15px;
-            color: #333;
-            text-decoration: none;
-            border-bottom: 1px solid #ddd;
-        }
-        .sidebar a:hover {
-            background-color: #f0f0f0;
-            color: #40c4d4;
-            font-weight: bold;
-        }
-        .sidebar a.active {
-            background-color: #e8f7f8;
-            color: #40c4d4;
-            font-weight: bold;
-            border-left: 4px solid #40c4d4;
-        }
+        .sidebar a { display: block; padding: 15px; color: #333; text-decoration: none; border-bottom: 1px solid #ddd; }
+        .sidebar a:hover { background-color: #f0f0f0; color: #40c4d4; font-weight: bold; }
+        .sidebar a.active { background-color: #e8f7f8; color: #40c4d4; font-weight: bold; border-left: 4px solid #40c4d4; }
+        .sidebar a.link-home { color: #40c4d4; font-size: 13px; }
         .content { margin-left: 240px; padding: 30px; }
-        .table-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+        .table-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
@@ -57,8 +44,7 @@
     <div><strong>📚 Library Digital</strong></div>
     <div>
         <span class="me-3"><strong>${usuarioLogado.nome}</strong></span>
-        <a href="${pageContext.request.contextPath}/logout"
-           class="btn btn-danger btn-sm">Sair</a>
+        <a href="${pageContext.request.contextPath}/logout" class="btn btn-danger btn-sm">Sair</a>
     </div>
 </div>
 
@@ -68,30 +54,20 @@
     <a href="${pageContext.request.contextPath}/meus-emprestimos">📖 Meus Empréstimos</a>
     <a href="${pageContext.request.contextPath}/minhas-reservas" class="active">🔖 Minhas Reservas</a>
     <a href="${pageContext.request.contextPath}/multas">💰 Multas</a>
-    <a href="${pageContext.request.contextPath}/logout"
-       style="color: #dc3545;">🚪 Sair</a>
+    <a href="${pageContext.request.contextPath}/home" class="link-home">🌐 Página Inicial</a>
+    <a href="${pageContext.request.contextPath}/logout" style="color: #dc3545;">🚪 Sair</a>
 </div>
 
 <div class="content">
     <div class="table-container">
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary">🔖 Minhas Reservas</h2>
-            <a href="${pageContext.request.contextPath}/dashboard"
-               class="btn btn-outline-secondary">Voltar ao Catálogo</a>
-        </div>
+        <h2 class="fw-bold text-primary mb-4">🔖 Minhas Reservas</h2>
 
-        <%-- Feedback cancelamento --%>
         <c:if test="${param.cancelamento == 'sucesso'}">
-            <div class="alert alert-success shadow-sm mb-4">
-                ✅ Reserva cancelada com sucesso!
-            </div>
+            <div class="alert alert-success shadow-sm mb-4">✅ Reserva cancelada com sucesso!</div>
         </c:if>
-
         <c:if test="${param.cancelamento == 'erro'}">
-            <div class="alert alert-danger shadow-sm mb-4">
-                ❌ Erro ao cancelar reserva. Tente novamente.
-            </div>
+            <div class="alert alert-danger shadow-sm mb-4">❌ Erro ao cancelar reserva. Tente novamente.</div>
         </c:if>
 
         <table class="table table-hover">
@@ -107,15 +83,9 @@
             <tbody>
             <c:forEach var="reserva" items="${reservas}">
                 <tr>
-                    <%-- ✅ Corrigido — mostra título do livro --%>
                     <td><strong>${reserva.livro.titulo}</strong></td>
-
                     <td>${reserva.dataReserva}</td>
-                    <td>
-                        <span class="badge bg-info text-white">
-                            ${reserva.posicaoFila}º na fila
-                        </span>
-                    </td>
+                    <td><span class="badge bg-info text-white">${reserva.posicaoFila}º na fila</span></td>
                     <td>
                         <c:choose>
                             <c:when test="${reserva.status == 'AGUARDANDO'}">
@@ -131,19 +101,15 @@
                     </td>
                     <td>
                         <c:if test="${reserva.status == 'AGUARDANDO'}">
-                            <form action="${pageContext.request.contextPath}/minhas-reservas"
-                                  method="post">
+                            <form action="${pageContext.request.contextPath}/minhas-reservas" method="post">
                                 <input type="hidden" name="id" value="${reserva.id}">
                                 <input type="hidden" name="acao" value="cancelar">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    Cancelar
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-danger">Cancelar</button>
                             </form>
                         </c:if>
                     </td>
                 </tr>
             </c:forEach>
-
             <c:if test="${empty reservas}">
                 <tr>
                     <td colspan="5" class="text-center py-5 text-muted">

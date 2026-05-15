@@ -9,18 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f4f4; }
-        .page-hero {
-            background: linear-gradient(135deg, #40c4d4, #27aab5);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .unidade-card {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border-left: 5px solid #40c4d4;
-        }
+        .page-hero { background: linear-gradient(135deg, #40c4d4, #27aab5); color: white; padding: 80px 0; text-align: center; }
+        .unidade-card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 5px solid #40c4d4; }
     </style>
 </head>
 <body>
@@ -39,11 +29,25 @@
             </form>
         </div>
         <div class="user-box">
-            <div class="auth-links">
-                <a href="${pageContext.request.contextPath}/login">Entrar</a>
-                <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
-            </div>
-            <div class="avatar"></div>
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuarioLogado}">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' || sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
+                            <a href="${pageContext.request.contextPath}/admin" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Painel</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/dashboard" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Catálogo</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <div class="auth-links">
+                        <a href="${pageContext.request.contextPath}/login">Entrar</a>
+                        <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
+                    </div>
+                    <div class="avatar"></div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
     <nav class="nav-bar">
@@ -70,20 +74,13 @@
                     <h4 class="fw-bold text-info">🏛️ ${u.nome}</h4>
                     <hr>
                     <p><strong>📍 Endereço:</strong> ${u.endereco}</p>
-                    <p><strong>📞 Telefone:</strong>
-                        ${not empty u.telefone ? u.telefone : 'Não informado'}
-                    </p>
-                    <p><strong>🕐 Horário:</strong>
-                        ${not empty u.horarioFuncionamento ? u.horarioFuncionamento : 'Não informado'}
-                    </p>
-                    <a href="${pageContext.request.contextPath}/login"
-                       class="btn btn-outline-info mt-2">
-                        Acessar Acervo →
-                    </a>
+                    <p><strong>📞 Telefone:</strong> ${not empty u.telefone ? u.telefone : 'Não informado'}</p>
+                    <p><strong>🕐 Horário:</strong> ${not empty u.horarioFuncionamento ? u.horarioFuncionamento : 'Não informado'}</p>
+                    <a href="${pageContext.request.contextPath}/home"
+                       class="btn btn-outline-info mt-2">Acessar Acervo →</a>
                 </div>
             </div>
         </c:forEach>
-
         <c:if test="${empty unidades}">
             <div class="col-12 text-center text-muted py-5">
                 Nenhuma unidade cadastrada no momento.

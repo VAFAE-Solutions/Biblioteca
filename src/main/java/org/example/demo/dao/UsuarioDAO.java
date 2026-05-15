@@ -150,6 +150,29 @@ public class UsuarioDAO {
         }
     }
 
+    // ✅ Lista usuários bloqueados ou com solicitação de reset
+    public List<Usuario> listarBloqueadosOuComReset() {
+        String sql = """
+                SELECT * FROM usuario
+                WHERE ativo = TRUE AND (bloqueado = TRUE OR solicita_reset = TRUE)
+                ORDER BY solicita_reset DESC, bloqueado DESC
+                """;
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                usuarios.add(mapearUsuario(rs));
+            }
+            return usuarios;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar bloqueados: " + e.getMessage(), e);
+        }
+    }
+
     public boolean atualizar(Usuario usuario) {
         String sql = """
                 UPDATE usuario SET nome = ?, email = ?, telefone = ?,
@@ -216,6 +239,74 @@ public class UsuarioDAO {
         }
     }
 
+    // ✅ Solicitar reset de senha
+    public boolean solicitarReset(int id) {
+        String sql = """
+                UPDATE usuario SET solicita_reset = TRUE, updated_at = NOW()
+                WHERE id = ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao solicitar reset: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ Aprovar reset — admin define nova senha temporária e desbloqueia
+    public boolean aprovarReset(int id, String senhaTemporariaHash) {
+        String sql = """
+                UPDATE usuario SET
+                    senha_hash = ?,
+                    senha_temporaria = ?,
+                    solicita_reset = FALSE,
+                    bloqueado = FALSE,
+                    tentativas_login = 0,
+                    updated_at = NOW()
+                WHERE id = ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, senhaTemporariaHash);
+            ps.setString(2, senhaTemporariaHash);
+            ps.setInt(3, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao aprovar reset: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ Atualizar senha (usuário trocando no perfil)
+    public boolean atualizarSenha(int id, String novaSenhaHash) {
+        String sql = """
+                UPDATE usuario SET
+                    senha_hash = ?,
+                    senha_temporaria = NULL,
+                    updated_at = NOW()
+                WHERE id = ?
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, novaSenhaHash);
+            ps.setInt(2, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar senha: " + e.getMessage(), e);
+        }
+    }
+
     public int contarEmprestimosAtivos(int usuarioId) {
         String sql = """
                 SELECT COUNT(*) FROM emprestimo
@@ -266,7 +357,6 @@ public class UsuarioDAO {
         }
     }
 
-    // ✅ Ajustar limite de cotas customizado
     public boolean ajustarLimiteCotas(int id, Integer novoLimite) {
         String sql = "UPDATE usuario SET limite_cotas_custom = ?, updated_at = NOW() WHERE id = ?";
 
@@ -276,7 +366,7 @@ public class UsuarioDAO {
             if (novoLimite != null) {
                 ps.setInt(1, novoLimite);
             } else {
-                ps.setNull(1, Types.INTEGER); // ✅ NULL = volta ao padrão do tipo
+                ps.setNull(1, Types.INTEGER);
             }
             ps.setInt(2, id);
 
@@ -329,8 +419,9 @@ public class UsuarioDAO {
         usuario.setAtivo(rs.getBoolean("ativo"));
         usuario.setTentativasLogin(rs.getInt("tentativas_login"));
         usuario.setTipo(Usuario.Tipo.valueOf(tipo));
+        usuario.setSolicitaReset(rs.getBoolean("solicita_reset")); // ✅
+        usuario.setSenhaTemporaria(rs.getString("senha_temporaria")); // ✅
 
-        // ✅ Lê limite customizado — pode ser NULL
         int limiteCustom = rs.getInt("limite_cotas_custom");
         if (!rs.wasNull()) {
             usuario.setLimiteCotasCustom(limiteCustom);

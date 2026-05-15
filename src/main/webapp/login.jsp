@@ -6,6 +6,20 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        .input-senha-wrapper { position: relative; display: flex; align-items: center; }
+        .input-senha-wrapper input { width: 100%; padding-right: 45px; }
+        .toggle-senha {
+            position: absolute;
+            right: 12px;
+            cursor: pointer;
+            color: #aaa;
+            font-size: 18px;
+            user-select: none;
+        }
+        .toggle-senha:hover { color: #39c3cf; }
+    </style>
 </head>
 <body>
 
@@ -24,10 +38,14 @@
             <div class="erro">
                 <c:choose>
                     <c:when test="${erro == 'usuario_bloqueado'}">
-                        Usuário bloqueado. Entre em contato com a biblioteca.
+                        Usuário bloqueado após múltiplas tentativas.
+                        <br><br>
+                        <a href="${pageContext.request.contextPath}/esqueceu-senha"
+                           style="color:#d32f2f; font-weight: bold;">
+                            🔑 Solicitar desbloqueio via "Esqueceu a senha?"
+                        </a>
                     </c:when>
                     <c:when test="${erro == 'usuario_inativo'}">
-                        <%-- ✅ novo caso --%>
                         Usuário desativado. Entre em contato com a biblioteca.
                     </c:when>
                     <c:when test="${erro == 'login_falhou'}">
@@ -50,13 +68,25 @@
             </div>
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" name="senha"
-                       placeholder="********" required>
+                <div class="input-senha-wrapper">
+                    <input type="password" name="senha" id="senhaLogin"
+                           placeholder="••••••••" required>
+                    <span class="toggle-senha" onclick="toggleSenha('senhaLogin', this)">
+                        <i class="bi bi-eye-slash"></i>
+                    </span>
+                </div>
             </div>
             <button type="submit" class="btn-entrar">
                 Entrar no Sistema
             </button>
         </form>
+
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="${pageContext.request.contextPath}/esqueceu-senha"
+               style="color: #888; font-size: 14px; text-decoration: none;">
+                Esqueceu a senha?
+            </a>
+        </div>
 
         <div style="text-align: center; margin-top: 20px;
                     padding-top: 15px; border-top: 1px solid #eee;">
@@ -73,5 +103,18 @@
     </div>
 </div>
 
+<script>
+    function toggleSenha(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye-slash';
+        }
+    }
+</script>
 </body>
 </html>

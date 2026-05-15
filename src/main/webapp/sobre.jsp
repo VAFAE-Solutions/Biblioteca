@@ -9,32 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f4f4; }
-        .page-hero {
-            background: linear-gradient(135deg, #40c4d4, #27aab5);
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .card-equipe {
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: transform 0.2s;
-        }
+        .page-hero { background: linear-gradient(135deg, #40c4d4, #27aab5); color: white; padding: 80px 0; text-align: center; }
+        .card-equipe { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: transform 0.2s; }
         .card-equipe:hover { transform: translateY(-5px); }
-        .avatar-membro {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #40c4d4, #27aab5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: white;
-            font-weight: bold;
-            margin: 0 auto 15px;
-        }
+        .avatar-membro { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #40c4d4, #27aab5); display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; font-weight: bold; margin: 0 auto 15px; }
     </style>
 </head>
 <body>
@@ -53,11 +31,25 @@
             </form>
         </div>
         <div class="user-box">
-            <div class="auth-links">
-                <a href="${pageContext.request.contextPath}/login">Entrar</a>
-                <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
-            </div>
-            <div class="avatar"></div>
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuarioLogado}">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' || sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
+                            <a href="${pageContext.request.contextPath}/admin" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Painel</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/dashboard" style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">← Voltar ao Catálogo</a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+                <c:otherwise>
+                    <div class="auth-links">
+                        <a href="${pageContext.request.contextPath}/login">Entrar</a>
+                        <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
+                    </div>
+                    <div class="avatar"></div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
     <nav class="nav-bar">
@@ -77,24 +69,14 @@
 </div>
 
 <div class="container py-5">
-
     <div class="row align-items-center mb-5">
         <div class="col-md-6">
             <h2 class="fw-bold mb-3">Nossa Missão</h2>
-            <p class="text-muted fs-5">
-                A Library Digital nasceu com o objetivo de democratizar o acesso
-                ao conhecimento, oferecendo um sistema moderno e eficiente de
-                gerenciamento de biblioteca para estudantes, professores e
-                entusiastas da leitura.
-            </p>
-            <p class="text-muted fs-5">
-                Acreditamos que livros transformam vidas e que toda pessoa merece
-                acesso fácil e rápido ao acervo bibliográfico.
-            </p>
+            <p class="text-muted fs-5">A Library Digital nasceu com o objetivo de democratizar o acesso ao conhecimento, oferecendo um sistema moderno e eficiente de gerenciamento de biblioteca para estudantes, professores e entusiastas da leitura.</p>
+            <p class="text-muted fs-5">Acreditamos que livros transformam vidas e que toda pessoa merece acesso fácil e rápido ao acervo bibliográfico.</p>
         </div>
         <div class="col-md-6 text-center">
-            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png"
-                 width="250" alt="Biblioteca">
+            <img src="https://cdn-icons-png.flaticon.com/512/2232/2232688.png" width="250" alt="Biblioteca">
         </div>
     </div>
 
@@ -102,7 +84,6 @@
 
     <h2 class="fw-bold text-center mb-5">Nossa Equipe</h2>
     <div class="row g-4 justify-content-center">
-
         <div class="col-md-4">
             <div class="card card-equipe p-4 text-center">
                 <div class="avatar-membro">A</div>
@@ -111,7 +92,6 @@
                 <p class="text-muted small">RA: 2404054</p>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card card-equipe p-4 text-center">
                 <div class="avatar-membro">V</div>
@@ -120,7 +100,6 @@
                 <p class="text-muted small">RA: 2402432</p>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card card-equipe p-4 text-center">
                 <div class="avatar-membro">F</div>
@@ -129,7 +108,6 @@
                 <p class="text-muted small">RA: 2301598</p>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card card-equipe p-4 text-center">
                 <div class="avatar-membro">A</div>
@@ -138,7 +116,6 @@
                 <p class="text-muted small">RA: 2301546</p>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card card-equipe p-4 text-center">
                 <div class="avatar-membro">E</div>
@@ -147,7 +124,6 @@
                 <p class="text-muted small">RA: 2401537</p>
             </div>
         </div>
-
     </div>
 
     <hr class="my-5">
@@ -175,7 +151,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

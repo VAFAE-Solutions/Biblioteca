@@ -27,7 +27,6 @@ public class GerenciarUsuariosServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Se vier um id, carrega detalhes do usuário para o modal
         String idParam = request.getParameter("detalhe");
         if (idParam != null) {
             try {
@@ -45,6 +44,9 @@ public class GerenciarUsuariosServlet extends HttpServlet {
 
         request.setAttribute("usuarioLogado", usuarioLogado);
         request.setAttribute("usuarios", usuarioService.listarTodosIncluindoInativos());
+        // ✅ Lista bloqueados e com reset para o painel
+        request.setAttribute("usuariosBloqueadosOuReset",
+                usuarioService.listarBloqueadosOuComReset());
 
         request.getRequestDispatcher("/gerenciar_usuarios.jsp")
                 .forward(request, response);
@@ -59,20 +61,23 @@ public class GerenciarUsuariosServlet extends HttpServlet {
 
         try {
             switch (acao) {
-                case "bloquear"         -> usuarioService.bloquear(id);
-                case "desbloquear"      -> usuarioService.desbloquear(id);
-                case "desativar"        -> usuarioService.desativar(id);
-                case "reativar"         -> usuarioService.reativar(id);
-                case "ajustar_limite"   -> {
-                    // ✅ Ajusta limite customizado
+                case "bloquear"       -> usuarioService.bloquear(id);
+                case "desbloquear"    -> usuarioService.desbloquear(id);
+                case "desativar"      -> usuarioService.desativar(id);
+                case "reativar"       -> usuarioService.reativar(id);
+                case "ajustar_limite" -> {
                     String limiteParam = request.getParameter("limite");
                     if (limiteParam != null && !limiteParam.isBlank()) {
                         usuarioService.ajustarLimiteCotas(id, Integer.parseInt(limiteParam));
                     }
                 }
-                case "resetar_limite"   -> {
-                    // ✅ Reseta para o padrão do tipo
-                    usuarioService.resetarLimiteCotas(id);
+                case "resetar_limite" -> usuarioService.resetarLimiteCotas(id);
+                case "aprovar_reset"  -> {
+                    // ✅ Admin aprova reset e senha temporária é exibida
+                    String senhaTemp = usuarioService.aprovarReset(id);
+                    response.sendRedirect(request.getContextPath()
+                            + "/admin/usuarios?acao=reset_aprovado&senha=" + senhaTemp + "&id=" + id);
+                    return;
                 }
             }
             response.sendRedirect(request.getContextPath()

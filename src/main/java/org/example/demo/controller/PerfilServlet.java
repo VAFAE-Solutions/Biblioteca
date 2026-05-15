@@ -5,6 +5,7 @@ import org.example.demo.model.UsuarioEstudante;
 import org.example.demo.service.EmprestimoService;
 import org.example.demo.service.MultaService;
 import org.example.demo.service.ReservaService;
+import org.example.demo.service.UsuarioService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -17,6 +18,7 @@ public class PerfilServlet extends HttpServlet {
     private final EmprestimoService emprestimoService = new EmprestimoService();
     private final MultaService multaService = new MultaService();
     private final ReservaService reservaService = new ReservaService();
+    private final UsuarioService usuarioService = new UsuarioService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -28,7 +30,6 @@ public class PerfilServlet extends HttpServlet {
         try {
             int id = usuarioLogado.getId();
 
-            // Total de empréstimos ativos
             long totalEmprestimos = emprestimoService
                     .buscarPorUsuario(id)
                     .stream()
@@ -36,11 +37,8 @@ public class PerfilServlet extends HttpServlet {
                             || e.getStatus().name().equals("ATRASADO"))
                     .count();
 
-            // Total de multas pendentes
-            double totalMulta = multaService
-                    .calcularTotalMultasPendentes(id);
+            double totalMulta = multaService.calcularTotalMultasPendentes(id);
 
-            // Total de reservas ativas
             long totalReservas = reservaService
                     .buscarPorUsuario(id)
                     .stream()
@@ -51,7 +49,6 @@ public class PerfilServlet extends HttpServlet {
             request.setAttribute("totalMulta", totalMulta);
             request.setAttribute("totalReservas", totalReservas);
 
-            // ✅ Cast para UsuarioEstudante para exibir RA no perfil
             if (usuarioLogado instanceof UsuarioEstudante estudante) {
                 request.setAttribute("ra", estudante.getRa());
             }
@@ -62,6 +59,59 @@ public class PerfilServlet extends HttpServlet {
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath()
                     + "/dashboard?erro=perfil_falhou");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        HttpSession session = request.getSession(false);
+        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+        String acao = request.getParameter("acao");
+
+        try {
+            if ("trocar_senha".equals(acao)) {
+                // ✅ Trocar senha
+                String senhaAtual = request.getParameter("senhaAtual");
+                String novaSenha  = request.getParameter("novaSenha");
+                String confirmar  = request.getParameter("confirmarSenha");
+
+                if (!novaSenha.equals(confirmar)) {
+                    throw new IllegalArgumentException("As senhas não coincidem.");
+                }
+
+                usuarioService.atualizarSenha(usuarioLogado.getId(), senhaAtual, novaSenha);
+                response.sendRedirect(request.getContextPath()
+                        + "/perfil?senha=sucesso");
+
+            } else {
+                // ✅ Atualizar dados do perfil
+                String nome     = request.getParameter("nome");
+                String telefone = request.getParameter("telefone");
+                String cpf      = request.getParameter("cpf");
+
+                if (nome == null || nome.trim().length() < 3) {
+                    throw new IllegalArgumentException("Nome deve ter ao menos 3 caracteres.");
+                }
+
+                usuarioLogado.setNome(nome.trim());
+                usuarioLogado.setTelefone(telefone);
+                usuarioLogado.setCpf(cpf);
+
+                usuarioService.atualizar(usuarioLogado);
+                session.setAttribute("usuarioLogado", usuarioLogado);
+
+                response.sendRedirect(request.getContextPath()
+                        + "/perfil?atualizado=sucesso");
+            }
+
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("erro", e.getMessage());
+            doGet(request, response);
+        } catch (Exception e) {
+            request.setAttribute("erro", "Erro ao atualizar. Tente novamente.");
+            doGet(request, response);
         }
     }
 }

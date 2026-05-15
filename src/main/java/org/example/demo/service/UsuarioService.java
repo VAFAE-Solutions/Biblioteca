@@ -2,8 +2,10 @@ package org.example.demo.service;
 
 import org.example.demo.dao.UsuarioDAO;
 import org.example.demo.model.*;
+import org.example.demo.service.AutenticacaoService;
 
 import java.util.List;
+import java.util.UUID;
 
 public class UsuarioService {
 
@@ -14,7 +16,6 @@ public class UsuarioService {
     }
 
     public boolean cadastrar(Usuario usuario) {
-
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não pode ser nulo.");
         }
@@ -85,6 +86,11 @@ public class UsuarioService {
         return usuarioDAO.listarTodosIncluindoInativos();
     }
 
+    // ✅ Lista usuários bloqueados ou com solicitação de reset
+    public List<Usuario> listarBloqueadosOuComReset() {
+        return usuarioDAO.listarBloqueadosOuComReset();
+    }
+
     public boolean atualizar(Usuario usuario) {
         if (usuario == null || usuario.getId() <= 0) {
             throw new IllegalArgumentException("Usuário inválido para atualização.");
@@ -118,7 +124,56 @@ public class UsuarioService {
         return usuarioDAO.reativar(id);
     }
 
-    // ✅ Ajustar limite de cotas
+    // ✅ Solicitar reset de senha — marca no banco e bloqueia
+    public boolean solicitarReset(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("E-mail não pode ser vazio.");
+        }
+        Usuario usuario = usuarioDAO.buscarPorEmail(email);
+        if (usuario == null) {
+            throw new IllegalArgumentException("E-mail não encontrado.");
+        }
+        return usuarioDAO.solicitarReset(usuario.getId());
+    }
+
+    // ✅ Aprovar reset — admin gera senha temporária
+    public String aprovarReset(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+
+        // Gera senha temporária aleatória de 8 caracteres
+        String senhaTemporaria = UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 8)
+                .toUpperCase();
+
+        String senhaHash = AutenticacaoService.gerarHash(senhaTemporaria);
+        usuarioDAO.aprovarReset(id, senhaHash);
+
+        // Retorna a senha em texto para o admin mostrar na tela
+        return senhaTemporaria;
+    }
+
+    // ✅ Atualizar senha no perfil
+    public boolean atualizarSenha(int id, String senhaAtual, String novaSenha) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+        if (novaSenha == null || novaSenha.length() < 6) {
+            throw new IllegalArgumentException("Nova senha deve ter ao menos 6 caracteres.");
+        }
+
+        Usuario usuario = buscarPorId(id);
+        if (usuario == null) throw new IllegalArgumentException("Usuário não encontrado.");
+
+        // Verifica senha atual
+        String senhaAtualHash = AutenticacaoService.gerarHash(senhaAtual);
+        if (!senhaAtualHash.equals(usuario.getSenhaHash())) {
+            throw new IllegalArgumentException("Senha atual incorreta.");
+        }
+
+        String novaSenhaHash = AutenticacaoService.gerarHash(novaSenha);
+        return usuarioDAO.atualizarSenha(id, novaSenhaHash);
+    }
+
     public boolean ajustarLimiteCotas(int id, Integer novoLimite) {
         if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         if (novoLimite != null && novoLimite <= 0) {
@@ -136,7 +191,6 @@ public class UsuarioService {
         return usuarioDAO.ajustarLimiteCotas(id, novoLimite);
     }
 
-    // ✅ Resetar limite para o padrão do tipo
     public boolean resetarLimiteCotas(int id) {
         return ajustarLimiteCotas(id, null);
     }

@@ -23,7 +23,11 @@ public class Usuario {
     // Regras de negócio por tipo
     private int prazoEmprestimo;
     private int limiteCotas;
-    private Integer limiteCotasCustom = null; // ✅ novo campo — null = usa padrão do tipo
+    private Integer limiteCotasCustom = null;
+
+    // ✅ Novos campos
+    private String senhaTemporaria = null;
+    private boolean solicitaReset = false;
 
     public Usuario() {}
 
@@ -108,7 +112,6 @@ public class Usuario {
     public int getPrazoEmprestimo() { return prazoEmprestimo; }
     public void setPrazoEmprestimo(int prazoEmprestimo) { this.prazoEmprestimo = prazoEmprestimo; }
 
-    // ✅ Retorna o limite customizado se existir, senão o padrão do tipo
     public int getLimiteCotas() {
         if (limiteCotasCustom != null) return limiteCotasCustom;
         return limiteCotas;
@@ -118,6 +121,26 @@ public class Usuario {
     public Integer getLimiteCotasCustom() { return limiteCotasCustom; }
     public void setLimiteCotasCustom(Integer limiteCotasCustom) {
         this.limiteCotasCustom = limiteCotasCustom;
+    }
+
+    // ✅ getter/setter senhaTemporaria
+    public String getSenhaTemporaria() { return senhaTemporaria; }
+    public void setSenhaTemporaria(String senhaTemporaria) {
+        this.senhaTemporaria = senhaTemporaria;
+    }
+
+    // ✅ getter/setter solicitaReset
+    public boolean isSolicitaReset() { return solicitaReset; }
+    public void setSolicitaReset(boolean solicitaReset) {
+        this.solicitaReset = solicitaReset;
+    }
+
+    // ✅ Método utilitário para saber o tipo de bloqueio
+    public String getTipoBloqueio() {
+        if (bloqueado && solicitaReset) return "TENTATIVAS_E_RESET";
+        if (bloqueado) return "TENTATIVAS";
+        if (solicitaReset) return "RESET";
+        return null;
     }
 
     @Override

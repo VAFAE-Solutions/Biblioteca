@@ -87,7 +87,7 @@
             color: #39c3cf;
             font-weight: bold;
         }
-        .campo-ra { display: none; }
+        .campo-ra  { display: none; }
         .campo-cpf { display: none; }
     </style>
 </head>
@@ -97,7 +97,6 @@
         <h2>Complete seu Cadastro</h2>
         <p class="subtitulo">Passo 2 de 2 - Dados Adicionais</p>
 
-        <%-- Erro vindo do servidor --%>
         <c:if test="${not empty erro}">
             <div class="mensagem erro">${erro}</div>
         </c:if>
@@ -108,7 +107,6 @@
               action="${pageContext.request.contextPath}/cadastro-completo"
               method="post">
 
-            <%-- Campos ocultos vindos da sessão --%>
             <input type="hidden" name="nome" value="${sessionScope.cadastroNome}">
             <input type="hidden" name="email" value="${sessionScope.cadastroEmail}">
 
@@ -129,12 +127,12 @@
                 <small>Obrigatório para estudantes</small>
             </div>
 
-            <%-- Campo CPF — para usuário comum --%>
+            <%-- ✅ Campo CPF — para estudante E usuário comum --%>
             <div class="form-group campo-cpf" id="campoCpf">
                 <label>CPF</label>
                 <input type="text" name="cpf" id="cpf"
                        placeholder="000.000.000-00">
-                <small>Obrigatório para usuários comuns</small>
+                <small>Obrigatório</small>
             </div>
 
             <div class="form-group">
@@ -156,19 +154,21 @@
 <script>
     function mostrarCampos() {
         const tipo = document.getElementById('tipo').value;
-        const campoRa = document.getElementById('campoRa');
+        const campoRa  = document.getElementById('campoRa');
         const campoCpf = document.getElementById('campoCpf');
-        const ra = document.getElementById('ra');
+        const ra  = document.getElementById('ra');
         const cpf = document.getElementById('cpf');
 
-        campoRa.style.display = 'none';
+        campoRa.style.display  = 'none';
         campoCpf.style.display = 'none';
-        ra.required = false;
+        ra.required  = false;
         cpf.required = false;
 
         if (tipo === 'ESTUDANTE') {
-            campoRa.style.display = 'block';
-            ra.required = true;
+            campoRa.style.display  = 'block';
+            campoCpf.style.display = 'block'; // ✅ CPF também para estudante
+            ra.required  = true;
+            cpf.required = true;
         } else if (tipo === 'COMUM') {
             campoCpf.style.display = 'block';
             cpf.required = true;
@@ -178,9 +178,9 @@
     document.getElementById('formCadastroPasso2')
         .addEventListener('submit', function(event) {
 
-        const tipo = document.getElementById('tipo').value;
+        const tipo     = document.getElementById('tipo').value;
         const telefone = document.getElementById('telefone').value;
-        const erro = document.getElementById('mensagemErro');
+        const erro     = document.getElementById('mensagemErro');
 
         erro.style.display = 'none';
 
@@ -201,7 +201,8 @@
             }
         }
 
-        if (tipo === 'COMUM') {
+        // ✅ Valida CPF para ESTUDANTE e COMUM
+        if (tipo === 'ESTUDANTE' || tipo === 'COMUM') {
             const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
             if (cpf.length !== 11) {
                 event.preventDefault();

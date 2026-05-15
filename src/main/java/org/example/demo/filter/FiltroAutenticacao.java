@@ -13,6 +13,7 @@ public class FiltroAutenticacao implements Filter {
 
     private static final List<String> ROTAS_PUBLICAS = List.of(
             "/login",
+            "/esqueceu-senha",  // ✅
             "/logout",
             "/home",
             "/detalhes",
