@@ -1,6 +1,6 @@
 package org.example.demo.dao;
 
-import org.example.demo.Database;
+import org.example.demo.database.Database;
 import org.example.demo.model.*;
 
 import java.sql.*;
@@ -328,6 +328,7 @@ public class UsuarioDAO {
         usuario.setBloqueado(rs.getBoolean("bloqueado"));
         usuario.setAtivo(rs.getBoolean("ativo"));
         usuario.setTentativasLogin(rs.getInt("tentativas_login"));
+        usuario.setTipo(Usuario.Tipo.valueOf(tipo));
 
         // ✅ Lê limite customizado — pode ser NULL
         int limiteCustom = rs.getInt("limite_cotas_custom");

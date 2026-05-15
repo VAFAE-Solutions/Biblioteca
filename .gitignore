@@ -59,3 +59,6 @@ logs/
 
 ### Arquivo de teste ###
 src/main/java/main.java
+
+### Configurações sensíveis ###
+src/main/resources/database.properties

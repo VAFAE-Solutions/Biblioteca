@@ -1,6 +1,6 @@
 package org.example.demo.dao;
 
-import org.example.demo.Database;
+import org.example.demo.database.Database;
 import org.example.demo.model.FilaReserva;
 import org.example.demo.model.Livro;
 import org.example.demo.model.Reserva;

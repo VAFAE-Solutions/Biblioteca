@@ -1,6 +1,6 @@
 package org.example.demo.dao;
 
-import org.example.demo.Database;
+import org.example.demo.database.Database;
 import org.example.demo.model.Emprestimo;
 import org.example.demo.model.Exemplar;
 import org.example.demo.model.Livro;
