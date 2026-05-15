@@ -15,7 +15,6 @@ public class EmprestimoServlet extends HttpServlet {
     private final EmprestimoService emprestimoService = new EmprestimoService();
     private final MultaService multaService = new MultaService();
 
-    // Exibe confirmação antes de reservar
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -31,7 +30,6 @@ public class EmprestimoServlet extends HttpServlet {
                 .forward(request, response);
     }
 
-    // Realiza o empréstimo
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -46,20 +44,22 @@ public class EmprestimoServlet extends HttpServlet {
             int exemplarId = Integer.parseInt(exemplarIdParam);
             int livroId    = Integer.parseInt(livroIdParam);
 
-            // Verifica multa pendente
             if (multaService.usuarioPossuiMultaPendente(usuarioLogado.getId())) {
                 response.sendRedirect(request.getContextPath()
                         + "/detalhes?id=" + livroId + "&erro=multa_pendente");
                 return;
             }
 
-            emprestimoService.realizarEmprestimo(exemplarId, usuarioLogado.getId());
+            // ✅ ALTERADO — passa o objeto inteiro em vez de só o ID
+            emprestimoService.realizarEmprestimo(exemplarId, usuarioLogado);
             response.sendRedirect(request.getContextPath()
                     + "/detalhes?id=" + livroId + "&reserva=sucesso");
 
         } catch (IllegalStateException e) {
+            // ✅ ALTERADO — distingue erro de limite dos outros erros
+            String motivo = e.getMessage().contains("Limite") ? "limite_atingido" : "indisponivel";
             response.sendRedirect(request.getContextPath()
-                    + "/detalhes?id=" + livroIdParam + "&reserva=erro");
+                    + "/detalhes?id=" + livroIdParam + "&reserva=erro&motivo=" + motivo);
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/dashboard?erro=dados_invalidos");
         }

@@ -3,13 +3,22 @@ package org.example.demo.service;
 import org.example.demo.dao.EmprestimoDAO;
 import org.example.demo.model.Emprestimo;
 import org.example.demo.model.Exemplar;
+import org.example.demo.model.Usuario;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class EmprestimoService {
 
-    private static final int DIAS_EMPRESTIMO = 7; // prazo padrão
+    private static final int DIAS_EMPRESTIMO = 7;
+
+    // ✅ Limite por tipo de usuário
+    private static final Map<String, Integer> LIMITES = Map.of(
+            "ESTUDANTE",     2,
+            "ADMIN",         5,
+            "BIBLIOTECARIO", 5
+    );
 
     private final EmprestimoDAO emprestimoDAO;
     private final ExemplarService exemplarService;
@@ -19,12 +28,12 @@ public class EmprestimoService {
         this.exemplarService = new ExemplarService();
     }
 
-    public boolean realizarEmprestimo(int exemplarId, int usuarioId) {
-        if (exemplarId <= 0 || usuarioId <= 0) {
-            throw new IllegalArgumentException("IDs inválidos.");
+    // ✅ ALTERADO — recebe Usuario inteiro para verificar o limite por tipo
+    public boolean realizarEmprestimo(int exemplarId, Usuario usuario) {
+        if (exemplarId <= 0 || usuario == null) {
+            throw new IllegalArgumentException("Dados inválidos.");
         }
 
-        // Verifica se o exemplar está disponível
         Exemplar exemplar = exemplarService.buscarPorId(exemplarId);
         if (exemplar == null) {
             throw new IllegalArgumentException("Exemplar não encontrado.");
@@ -33,11 +42,18 @@ public class EmprestimoService {
             throw new IllegalStateException("Exemplar não está disponível para empréstimo.");
         }
 
-        // Cria o empréstimo
+        // Verifica limite por tipo de usuário
+        int limite = LIMITES.getOrDefault(usuario.getTipo().name(), 3);
+        int ativos  = emprestimoDAO.contarEmprestimosAtivos(usuario.getId());
+
+        if (ativos >= limite) {
+            throw new IllegalStateException("Limite de " + limite + " empréstimos atingido.");
+        }
+
         LocalDate hoje = LocalDate.now();
         Emprestimo emprestimo = new Emprestimo(
                 exemplarId,
-                usuarioId,
+                usuario.getId(),
                 hoje,
                 hoje.plusDays(DIAS_EMPRESTIMO)
         );
@@ -58,11 +74,9 @@ public class EmprestimoService {
             throw new IllegalStateException("Empréstimo já finalizado.");
         }
 
-        // Registra devolução
         emprestimo.setDataDevolucao(LocalDate.now());
         emprestimo.setStatus(Emprestimo.Status.FINALIZADO);
 
-        // Libera o exemplar
         exemplarService.atualizarStatus(emprestimo.getExemplarId(), Exemplar.Status.DISPONIVEL);
 
         return emprestimoDAO.atualizar(emprestimo);

@@ -8,7 +8,7 @@ public class Database {
 
     private static final String URL     = "jdbc:mysql://localhost:3306/biblioteca";
     private static final String USUARIO = "root";
-    private static final String SENHA   = "sua_senha"; // cada membro troca pela senha local
+    private static final String SENHA   = "@Obatala1996@"; // cada membro troca pela senha local
 
     public static Connection getConnection() {
         try {

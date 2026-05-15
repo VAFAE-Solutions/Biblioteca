@@ -10,7 +10,6 @@ import java.util.List;
 
 public class EmprestimoDAO {
 
-    // ✅ Transação aproveitada do projeto dela
     public boolean inserir(Emprestimo emprestimo) {
         String sqlEmprestimo = """
                 INSERT INTO emprestimo (exemplar_id, usuario_id, data_emprestimo,
@@ -21,7 +20,6 @@ public class EmprestimoDAO {
         try (Connection con = Database.getConnection()) {
             con.setAutoCommit(false);
             try {
-                // INSERT no empréstimo
                 try (PreparedStatement ps = con.prepareStatement(sqlEmprestimo,
                         Statement.RETURN_GENERATED_KEYS)) {
 
@@ -40,7 +38,6 @@ public class EmprestimoDAO {
                     }
                 }
 
-                // UPDATE no exemplar → EMPRESTADO
                 try (PreparedStatement ps = con.prepareStatement(sqlUpdateExemplar)) {
                     ps.setInt(1, emprestimo.getExemplarId());
                     ps.executeUpdate();
@@ -158,6 +155,26 @@ public class EmprestimoDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar empréstimo: " + e.getMessage(), e);
+        }
+    }
+
+    // ✅ NOVO — conta empréstimos ativos/atrasados do usuário
+    public int contarEmprestimosAtivos(int usuarioId) {
+        String sql = """
+                SELECT COUNT(*) FROM emprestimo
+                WHERE usuario_id = ? AND status IN ('ATIVO', 'ATRASADO')
+                """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, usuarioId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+            return 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar empréstimos: " + e.getMessage(), e);
         }
     }
 
