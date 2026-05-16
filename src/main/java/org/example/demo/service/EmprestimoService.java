@@ -12,12 +12,14 @@ public class EmprestimoService {
     private final EmprestimoDAO emprestimoDAO;
     private final ExemplarService exemplarService;
     private final MultaService multaService;
+    private final ReservaService reservaService;
     private final UsuarioDAO usuarioDAO;
 
     public EmprestimoService() {
         this.emprestimoDAO = new EmprestimoDAO();
         this.exemplarService = new ExemplarService();
         this.multaService = new MultaService();
+        this.reservaService = new ReservaService();
         this.usuarioDAO = new UsuarioDAO();
     }
 
@@ -26,25 +28,21 @@ public class EmprestimoService {
             throw new IllegalArgumentException("IDs inválidos.");
         }
 
-        // 1. Busca o usuário
         Usuario usuario = usuarioDAO.buscarPorId(usuarioId);
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não encontrado.");
         }
 
-        // 2. Verifica multa pendente
         if (multaService.usuarioPossuiMultaPendente(usuarioId)) {
             throw new IllegalStateException("Usuário possui multa pendente.");
         }
 
-        // 3. Verifica limite de cotas
         int emprestimosAtivos = usuarioDAO.contarEmprestimosAtivos(usuarioId);
         if (emprestimosAtivos >= usuario.getLimiteCotas()) {
             throw new IllegalStateException("Limite de empréstimos atingido. "
                     + "Máximo: " + usuario.getLimiteCotas());
         }
 
-        // 4. Verifica se exemplar está disponível
         Exemplar exemplar = exemplarService.buscarPorId(exemplarId);
         if (exemplar == null) {
             throw new IllegalArgumentException("Exemplar não encontrado.");
@@ -53,11 +51,9 @@ public class EmprestimoService {
             throw new IllegalStateException("Exemplar não está disponível.");
         }
 
-        // 5. Calcula prazo por tipo de usuário
         LocalDate hoje = LocalDate.now();
         LocalDate dataPrevista = hoje.plusDays(usuario.getPrazoEmprestimo());
 
-        // 6. Cria o empréstimo
         Emprestimo emprestimo = new Emprestimo(
                 exemplarId,
                 usuarioId,
@@ -81,17 +77,29 @@ public class EmprestimoService {
             throw new IllegalStateException("Empréstimo já finalizado.");
         }
 
-        // Registra devolução
         emprestimo.setDataDevolucao(LocalDate.now());
         emprestimo.setStatus(Emprestimo.Status.FINALIZADO);
 
-        // Libera o exemplar
         exemplarService.atualizarStatus(
                 emprestimo.getExemplarId(),
                 Exemplar.Status.DISPONIVEL
         );
 
-        return emprestimoDAO.atualizar(emprestimo);
+        boolean resultado = emprestimoDAO.atualizar(emprestimo);
+
+        // ✅ Passo 2 — Atende próxima reserva da fila automaticamente
+        if (resultado && emprestimo.getExemplar() != null
+                && emprestimo.getExemplar().getLivro() != null) {
+            try {
+                int livroId    = emprestimo.getExemplar().getLivro().getId();
+                int unidadeId  = emprestimo.getExemplar().getUnidadeId();
+                reservaService.atenderProximaReserva(livroId, unidadeId);
+            } catch (Exception ignored) {
+                // Sem reservas na fila — ignora silenciosamente
+            }
+        }
+
+        return resultado;
     }
 
     public boolean verificarEAtualizarAtrasos() {
@@ -99,6 +107,13 @@ public class EmprestimoService {
         for (Emprestimo emprestimo : atrasados) {
             emprestimo.setStatus(Emprestimo.Status.ATRASADO);
             emprestimoDAO.atualizar(emprestimo);
+
+            // ✅ Passo 1 — Gera multa automaticamente se ainda não existe
+            try {
+                multaService.gerarMulta(emprestimo.getId());
+            } catch (IllegalStateException ignored) {
+                // Multa já existe — ignora silenciosamente
+            }
         }
         return !atrasados.isEmpty();
     }

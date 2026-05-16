@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -30,6 +31,7 @@
     <a href="${pageContext.request.contextPath}/admin/emprestimos" class="active">📅 Empréstimos Ativos</a>
     <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
+        <a href="${pageContext.request.contextPath}/admin/unidades">🏛️ Unidades</a>
         <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
     </c:if>
@@ -45,22 +47,30 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>📅 Empréstimos Ativos</h2>
         <a href="${pageContext.request.contextPath}/admin/emprestimo-presencial"
-           class="btn btn-primary">
-            + Registrar Empréstimo Presencial
-        </a>
+           class="btn btn-primary">+ Registrar Empréstimo Presencial</a>
     </div>
 
     <%-- Feedbacks --%>
     <c:if test="${param.devolucao == 'sucesso'}">
         <div class="alert alert-success">✅ Devolução registrada com sucesso!</div>
     </c:if>
-    <c:if test="${param.devolucao == 'erro'}">
-        <div class="alert alert-danger">❌ Erro ao registrar devolução.</div>
+    <c:if test="${param.pagamento == 'sucesso'}">
+        <div class="alert alert-success">✅ Pagamento de multa registrado com sucesso!</div>
+    </c:if>
+    <c:if test="${not empty param.erro}">
+        <div class="alert alert-danger">❌ ${param.erro}</div>
     </c:if>
 
     <c:if test="${not empty emprestimosAtrasados}">
         <div class="alert alert-danger mb-4">
             ⚠️ <strong>${emprestimosAtrasados.size()}</strong> empréstimo(s) em atraso!
+        </div>
+        <%-- ✅ Aviso de pagamento presencial para o bibliotecário --%>
+        <div class="alert alert-info mb-4">
+            🏛️ <strong>Pagamento de multas:</strong>
+            Registre o pagamento apenas após receber o valor presencialmente no balcão.
+            O botão <strong>💰 Registrar Pagamento</strong> confirma a quitação e libera
+            o usuário para novos empréstimos.
         </div>
     </c:if>
 
@@ -86,12 +96,13 @@
                     <tr>
                         <td>${emp.id}</td>
                         <td><strong>${emp.exemplar.livro.titulo}</strong></td>
-                        <td>${usuariosMap[emp.usuarioId]}</td>
+                        <td>${emp.usuario.nome}</td>
                         <td>${emp.dataEmprestimo}</td>
                         <td>${emp.dataDevolucaoPrevista}</td>
                         <td>
                             <form action="${pageContext.request.contextPath}/admin/emprestimos"
                                   method="post" class="d-inline">
+                                <input type="hidden" name="acao" value="devolver">
                                 <input type="hidden" name="emprestimoId" value="${emp.id}">
                                 <button type="submit" class="btn btn-sm btn-success">
                                     ✅ Devolver
@@ -126,7 +137,8 @@
                     <th>Usuário</th>
                     <th>Data Empréstimo</th>
                     <th>Devolução Prevista</th>
-                    <th>Ação</th>
+                    <th>Multa</th>
+                    <th>Ações</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -134,23 +146,51 @@
                     <tr class="table-danger">
                         <td>${emp.id}</td>
                         <td><strong>${emp.exemplar.livro.titulo}</strong></td>
-                        <td>${usuariosMap[emp.usuarioId]}</td>
+                        <td>${emp.usuario.nome}</td>
                         <td>${emp.dataEmprestimo}</td>
                         <td>${emp.dataDevolucaoPrevista}</td>
                         <td>
+                            <%-- ✅ Mostra valor da multa --%>
+                            <c:choose>
+                                <c:when test="${not empty multasMap[emp.id]}">
+                                    <span class="badge bg-danger fs-6">
+                                        R$ <fmt:formatNumber
+                                            value="${multasValorMap[emp.id]}"
+                                            minFractionDigits="2"
+                                            maxFractionDigits="2"/>
+                                    </span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted small">Calculando...</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
                             <form action="${pageContext.request.contextPath}/admin/emprestimos"
                                   method="post" class="d-inline">
+                                <input type="hidden" name="acao" value="devolver">
                                 <input type="hidden" name="emprestimoId" value="${emp.id}">
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     ✅ Devolver
                                 </button>
                             </form>
+                            <c:if test="${not empty multasMap[emp.id]}">
+                                <form action="${pageContext.request.contextPath}/admin/emprestimos"
+                                      method="post" class="d-inline">
+                                    <input type="hidden" name="acao" value="pagar_multa">
+                                    <input type="hidden" name="multaId" value="${multasMap[emp.id]}">
+                                    <button type="submit" class="btn btn-sm btn-warning"
+                                            onclick="return confirm('Confirmar recebimento do pagamento presencial?')">
+                                        💰 Registrar Pagamento
+                                    </button>
+                                </form>
+                            </c:if>
                         </td>
                     </tr>
                 </c:forEach>
                 <c:if test="${empty emprestimosAtrasados}">
                     <tr>
-                        <td colspan="6" class="text-center text-muted py-4">
+                        <td colspan="7" class="text-center text-muted py-4">
                             Nenhum empréstimo atrasado. 🎉
                         </td>
                     </tr>

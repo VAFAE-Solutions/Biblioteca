@@ -27,9 +27,7 @@ public class UnidadeService {
     }
 
     public Unidade buscarPorId(int id) {
-        if (id <= 0) {
-            throw new IllegalArgumentException("ID inválido.");
-        }
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
         return unidadeDAO.buscarPorId(id);
     }
 
@@ -47,10 +45,14 @@ public class UnidadeService {
         return unidadeDAO.atualizar(unidade);
     }
 
+    // ✅ Desativar em vez de deletar
+    public boolean desativar(int id) {
+        if (id <= 0) throw new IllegalArgumentException("ID inválido.");
+        return unidadeDAO.desativar(id);
+    }
+
+    // ✅ Mantido para compatibilidade
     public boolean deletar(int id) {
-        if (id <= 0) {
-            throw new IllegalArgumentException("ID inválido.");
-        }
-        return unidadeDAO.deletar(id);
+        return desativar(id);
     }
 }

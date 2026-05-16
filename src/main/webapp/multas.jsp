@@ -9,28 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f4f4; margin-top: 56px; }
-        .topbar {
-            background-color: #40c4d4;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 1000;
-            height: 56px;
-        }
-        .sidebar {
-            width: 220px;
-            height: 100vh;
-            background: #fff;
-            border-right: 1px solid #ccc;
-            position: fixed;
-            top: 56px;
-            padding-top: 20px;
-            overflow-y: auto;
-        }
+        .topbar { background-color: #40c4d4; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; color: white; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; height: 56px; }
+        .sidebar { width: 220px; height: 100vh; background: #fff; border-right: 1px solid #ccc; position: fixed; top: 56px; padding-top: 20px; overflow-y: auto; }
         .sidebar a { display: block; padding: 15px; color: #333; text-decoration: none; border-bottom: 1px solid #ddd; }
         .sidebar a:hover { background-color: #f0f0f0; color: #40c4d4; font-weight: bold; }
         .sidebar a.active { background-color: #e8f7f8; color: #40c4d4; font-weight: bold; border-left: 4px solid #40c4d4; }
@@ -65,18 +45,31 @@
         <h2 class="fw-bold text-primary mb-4">💰 Minhas Multas</h2>
 
         <c:if test="${totalMulta > 0}">
-            <div class="alert alert-danger d-flex justify-content-between align-items-center shadow-sm mb-4"
+            <div class="alert alert-danger shadow-sm mb-4"
                  style="border-left: 5px solid #dc3545;">
-                <div>
-                    <h5 class="alert-heading mb-1">⚠️ Você possui multas pendentes</h5>
-                    <span>Quite suas multas para realizar novos empréstimos.</span>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="alert-heading mb-1">⚠️ Você possui multas pendentes</h5>
+                        <span>Quite suas multas para realizar novos empréstimos e reservas.</span>
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-4 fw-bold">
+                            Total: R$ <fmt:formatNumber value="${totalMulta}"
+                                minFractionDigits="2" maxFractionDigits="2"/>
+                        </span>
+                    </div>
                 </div>
-                <div class="text-end">
-                    <span class="fs-4 fw-bold">
-                        Total: R$ <fmt:formatNumber value="${totalMulta}"
-                            minFractionDigits="2" maxFractionDigits="2"/>
-                    </span>
-                </div>
+                <%-- ✅ Aviso de pagamento presencial --%>
+                <hr>
+                <p class="mb-0 small">
+                    🏛️ <strong>Como pagar:</strong>
+                    O pagamento é realizado <strong>exclusivamente de forma presencial</strong>
+                    nas unidades da biblioteca. Dirija-se ao balcão com seu documento,
+                    efetue o pagamento e o bibliotecário registrará a quitação no sistema.
+                    <a href="${pageContext.request.contextPath}/localizacao" class="alert-link">
+                        Ver endereços das unidades →
+                    </a>
+                </p>
             </div>
         </c:if>
 
@@ -101,7 +94,8 @@
                 <tr class="${multa.pago ? '' : 'table-danger'}">
                     <td><strong>${multa.emprestimo.exemplar.livro.titulo}</strong></td>
                     <td>${multa.dataGeracao}</td>
-                    <td>R$ <fmt:formatNumber value="${multa.valor}" minFractionDigits="2" maxFractionDigits="2"/></td>
+                    <td>R$ <fmt:formatNumber value="${multa.valor}"
+                            minFractionDigits="2" maxFractionDigits="2"/></td>
                     <td>
                         <c:choose>
                             <c:when test="${multa.pago}">

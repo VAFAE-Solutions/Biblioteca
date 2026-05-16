@@ -9,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-@WebServlet("/cadastrar-livro")
+@WebServlet("/admin/cadastrar-livro")
 public class CadastrarLivroServlet extends HttpServlet {
 
     private final LivroService livroService = new LivroService();

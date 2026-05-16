@@ -24,12 +24,9 @@ public class UnidadeDAO {
             ps.setString(4, unidade.getHorarioFuncionamento());
 
             int rows = ps.executeUpdate();
-
             if (rows > 0) {
                 ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    unidade.setId(keys.getInt(1));
-                }
+                if (keys.next()) unidade.setId(keys.getInt(1));
             }
             return rows > 0;
 
@@ -39,17 +36,14 @@ public class UnidadeDAO {
     }
 
     public Unidade buscarPorId(int id) {
-        String sql = "SELECT * FROM unidade WHERE id = ?";
+        String sql = "SELECT * FROM unidade WHERE id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapearUnidade(rs);
-            }
+            if (rs.next()) return mapearUnidade(rs);
             return null;
 
         } catch (SQLException e) {
@@ -57,17 +51,16 @@ public class UnidadeDAO {
         }
     }
 
+    // ✅ Só lista unidades ativas
     public List<Unidade> listarTodas() {
-        String sql = "SELECT * FROM unidade";
+        String sql = "SELECT * FROM unidade WHERE ativo = TRUE";
         List<Unidade> unidades = new ArrayList<>();
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                unidades.add(mapearUnidade(rs));
-            }
+            while (rs.next()) unidades.add(mapearUnidade(rs));
             return unidades;
 
         } catch (SQLException e) {
@@ -97,8 +90,9 @@ public class UnidadeDAO {
         }
     }
 
-    public boolean deletar(int id) {
-        String sql = "DELETE FROM unidade WHERE id = ?";
+    // ✅ Desativar em vez de deletar — preserva histórico
+    public boolean desativar(int id) {
+        String sql = "UPDATE unidade SET ativo = FALSE WHERE id = ?";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -107,9 +101,7 @@ public class UnidadeDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            // ON DELETE RESTRICT — erro se houver vínculos
-            throw new RuntimeException("Erro ao deletar unidade. Verifique se há vínculos: "
-                    + e.getMessage(), e);
+            throw new RuntimeException("Erro ao desativar unidade: " + e.getMessage(), e);
         }
     }
 

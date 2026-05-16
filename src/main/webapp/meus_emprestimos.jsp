@@ -9,12 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; padding-top: 50px; }
-        .table-container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+        .table-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .alert-multa { border-left: 5px solid #dc3545; }
         .alert-atraso { border-left: 5px solid #fd7e14; }
     </style>
@@ -49,19 +44,29 @@
 
         <%-- Alerta de multas pendentes --%>
         <c:if test="${totalMulta > 0}">
-            <div class="alert alert-danger alert-multa d-flex justify-content-between
-                        align-items-center shadow-sm mb-4">
-                <div>
-                    <h5 class="alert-heading mb-1">⚠️ Multas por Atraso</h5>
-                    <span>Você possui débitos pendentes referentes a
-                          livros não entregues no prazo.</span>
+            <div class="alert alert-danger alert-multa shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="alert-heading mb-1">⚠️ Multas por Atraso</h5>
+                        <span>Você possui débitos pendentes referentes a livros não entregues no prazo.</span>
+                    </div>
+                    <div class="text-end">
+                        <span class="fs-4 fw-bold">
+                            R$ <fmt:formatNumber value="${totalMulta}"
+                                minFractionDigits="2" maxFractionDigits="2"/>
+                        </span>
+                    </div>
                 </div>
-                <div class="text-end">
-                    <span class="fs-4 fw-bold">
-                        R$ <fmt:formatNumber value="${totalMulta}"
-                            minFractionDigits="2" maxFractionDigits="2"/>
-                    </span>
-                </div>
+                <%-- ✅ Aviso de pagamento presencial --%>
+                <hr>
+                <p class="mb-0 small">
+                    🏛️ <strong>Pagamento presencial:</strong>
+                    O pagamento de multas é realizado exclusivamente nas unidades da biblioteca.
+                    Após quitar o débito no balcão, o bibliotecário registrará a quitação no sistema.
+                    <a href="${pageContext.request.contextPath}/localizacao" class="alert-link">
+                        Ver unidades →
+                    </a>
+                </p>
             </div>
         </c:if>
 
@@ -78,12 +83,7 @@
             <tbody>
             <c:forEach var="emp" items="${emprestimos}">
                 <tr class="${emp.status == 'ATRASADO' ? 'table-danger' : ''}">
-
-                    <%-- ✅ Corrigido — mostra título do livro --%>
-                    <td>
-                        <strong>${emp.exemplar.livro.titulo}</strong>
-                    </td>
-
+                    <td><strong>${emp.exemplar.livro.titulo}</strong></td>
                     <td>${emp.dataEmprestimo}</td>
                     <td class="${emp.status == 'ATRASADO' ? 'text-danger fw-bold' : ''}">
                         ${emp.dataDevolucaoPrevista}
@@ -120,7 +120,6 @@
                     </td>
                 </tr>
             </c:forEach>
-
             <c:if test="${empty emprestimos}">
                 <tr>
                     <td colspan="5" class="text-center py-5 text-muted">

@@ -48,9 +48,6 @@ public class EmprestimoServlet extends HttpServlet {
                 emprestimoService.finalizarEmprestimo(emprestimoId);
                 response.sendRedirect(request.getContextPath()
                         + "/meus-emprestimos?devolucao=sucesso");
-            } catch (IllegalStateException e) {
-                response.sendRedirect(request.getContextPath()
-                        + "/meus-emprestimos?devolucao=erro");
             } catch (Exception e) {
                 response.sendRedirect(request.getContextPath()
                         + "/meus-emprestimos?devolucao=erro");
@@ -59,13 +56,11 @@ public class EmprestimoServlet extends HttpServlet {
         }
 
         // ✅ Empréstimo
-        String exemplarIdParam = request.getParameter("exemplarId");
-        String livroIdParam    = request.getParameter("livroId");
+        String livroIdParam = request.getParameter("livroId");
 
         try {
             int livroId = Integer.parseInt(livroIdParam);
 
-            // Busca primeiro exemplar disponível do livro
             List<Exemplar> disponiveis = exemplarService
                     .buscarDisponiveisPorLivroEUnidade(livroId, 1);
 
@@ -76,7 +71,6 @@ public class EmprestimoServlet extends HttpServlet {
             }
 
             int exemplarId = disponiveis.get(0).getId();
-
             emprestimoService.realizarEmprestimo(exemplarId, usuarioLogado.getId());
             response.sendRedirect(request.getContextPath()
                     + "/detalhes?id=" + livroId + "&reserva=sucesso");

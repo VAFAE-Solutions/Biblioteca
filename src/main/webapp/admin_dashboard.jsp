@@ -33,6 +33,7 @@
 
     <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
+        <a href="${pageContext.request.contextPath}/admin/unidades">🏛️ Unidades</a>
         <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
     </c:if>
@@ -60,7 +61,9 @@
                 </c:otherwise>
             </c:choose>
         </h2>
-        <a href="${pageContext.request.contextPath}/cadastrar-livro" class="btn btn-primary">+ Cadastrar Novo Livro</a>
+        <%-- ✅ Passo 5 — URL corrigida --%>
+        <a href="${pageContext.request.contextPath}/admin/cadastrar-livro"
+           class="btn btn-primary">+ Cadastrar Novo Livro</a>
     </div>
 
     <div class="row mb-4">
@@ -167,7 +170,9 @@
                                               method="post" class="d-inline"
                                               onsubmit="return confirm('Desativar este livro?')">
                                             <input type="hidden" name="id" value="${l.id}">
-                                            <button type="submit" class="btn btn-sm btn-danger">Desativar</button>
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                Desativar
+                                            </button>
                                         </form>
                                     </c:when>
                                     <c:otherwise>
