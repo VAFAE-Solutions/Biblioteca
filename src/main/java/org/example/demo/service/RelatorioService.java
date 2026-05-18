@@ -13,6 +13,10 @@ public class RelatorioService {
         this.relatorioDAO = new RelatorioDAO();
     }
 
+    public RelatorioService(RelatorioDAO relatorioDAO) {
+        this.relatorioDAO = relatorioDAO;
+    }
+
     public List<Map<String, Object>> livrosMaisEmprestados() {
         return relatorioDAO.livrosMaisEmprestados(10);
     }

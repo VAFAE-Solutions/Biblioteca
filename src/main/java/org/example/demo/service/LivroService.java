@@ -13,6 +13,10 @@ public class LivroService {
         this.livroDAO = new LivroDAO();
     }
 
+    public LivroService(LivroDAO livroDAO) {
+        this.livroDAO = livroDAO;
+    }
+
     public boolean cadastrar(Livro livro) {
         if (livro == null) {
             throw new IllegalArgumentException("Livro não pode ser nulo.");

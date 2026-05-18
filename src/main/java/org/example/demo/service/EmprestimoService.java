@@ -23,6 +23,16 @@ public class EmprestimoService {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    public EmprestimoService(EmprestimoDAO emprestimoDAO, ExemplarService exemplarService,
+                             UsuarioDAO usuarioDAO, MultaService multaService,
+                             ReservaService reservaService) {
+        this.emprestimoDAO = emprestimoDAO;
+        this.exemplarService = exemplarService;
+        this.usuarioDAO = usuarioDAO;
+        this.multaService = multaService;
+        this.reservaService = reservaService;
+    }
+
     public boolean realizarEmprestimo(int exemplarId, int usuarioId) {
         if (exemplarId <= 0 || usuarioId <= 0) {
             throw new IllegalArgumentException("IDs inválidos.");

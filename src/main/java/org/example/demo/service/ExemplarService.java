@@ -13,6 +13,10 @@ public class ExemplarService {
         this.exemplarDAO = new ExemplarDAO();
     }
 
+    public ExemplarService(ExemplarDAO exemplarDAO) {
+        this.exemplarDAO = exemplarDAO;
+    }
+
     public boolean cadastrar(Exemplar exemplar) {
         if (exemplar == null) {
             throw new IllegalArgumentException("Exemplar não pode ser nulo.");

@@ -22,6 +22,11 @@ public class MultaService {
         this.emprestimoDAO = new EmprestimoDAO(); // ✅ sem mais ciclo
     }
 
+    public MultaService(MultaDAO multaDAO, EmprestimoDAO emprestimoDAO) {
+        this.multaDAO = multaDAO;
+        this.emprestimoDAO = emprestimoDAO;
+    }
+
     public boolean gerarMulta(int emprestimoId) {
         if (emprestimoId <= 0) {
             throw new IllegalArgumentException("ID inválido.");

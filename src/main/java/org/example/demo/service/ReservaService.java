@@ -20,6 +20,13 @@ public class ReservaService {
         this.exemplarService = new ExemplarService();
     }
 
+    public ReservaService(ReservaDAO reservaDAO, MultaService multaService,
+                          ExemplarService exemplarService) {
+        this.reservaDAO = reservaDAO;
+        this.multaService = multaService;
+        this.exemplarService = exemplarService;
+    }
+
     public boolean realizarReserva(int livroId, int usuarioId, int unidadeId) {
         if (livroId <= 0 || usuarioId <= 0 || unidadeId <= 0) {
             throw new IllegalArgumentException("IDs inválidos.");

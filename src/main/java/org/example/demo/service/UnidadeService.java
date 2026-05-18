@@ -13,6 +13,10 @@ public class UnidadeService {
         this.unidadeDAO = new UnidadeDAO();
     }
 
+    public UnidadeService(UnidadeDAO unidadeDAO) {
+        this.unidadeDAO = unidadeDAO;
+    }
+
     public boolean cadastrar(Unidade unidade) {
         if (unidade == null) {
             throw new IllegalArgumentException("Unidade não pode ser nula.");

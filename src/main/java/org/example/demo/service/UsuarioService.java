@@ -15,6 +15,10 @@ public class UsuarioService {
         this.usuarioDAO = new UsuarioDAO();
     }
 
+    public UsuarioService(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
+    }
+
     public boolean cadastrar(Usuario usuario) {
         if (usuario == null) {
             throw new IllegalArgumentException("Usuário não pode ser nulo.");
