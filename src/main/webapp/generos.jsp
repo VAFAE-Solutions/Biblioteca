@@ -77,36 +77,16 @@
                         <div class="d-flex align-items-center gap-3">
                             <span style="font-size: 2rem;">
                             <c:choose>
-                                <c:when test="${genero == 'Aventura'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3418/3418869.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Fantasia'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/1691/1691454.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Ficção'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/1104/1104981.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Ficção Científica'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/124/124559.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Manga'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3418/3418796.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Poesia'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3145/3145765.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Romance'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/833/833472.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Tecnologia'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/2920/2920349.png" width="40">
-                                </c:when>
-                                <c:when test="${genero == 'Terror'}">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/3413/3413507.png" width="40">
-                                </c:when>
-                                <c:otherwise>
-                                    <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png" width="40">
-                                </c:otherwise>
+                                <c:when test="${genero == 'Aventura'}">&#9876;&#65039;</c:when>     <%-- ⚔️ --%>
+                                <c:when test="${genero == 'Fantasia'}">&#129503;</c:when>            <%-- 🧝 --%>
+                                <c:when test="${genero == 'Ficção'}">&#127756;</c:when>              <%-- 🌌 --%>
+                                <c:when test="${genero == 'Ficção Científica'}">&#128640;</c:when>   <%-- 🚀 --%>
+                                <c:when test="${genero == 'Manga'}">&#127945;</c:when>               <%-- 🎌 --%>
+                                <c:when test="${genero == 'Poesia'}">&#128220;</c:when>              <%-- 📜 --%>
+                                <c:when test="${genero == 'Romance'}">&#10084;&#65039;</c:when>      <%-- ❤️ --%>
+                                <c:when test="${genero == 'Tecnologia'}">&#128187;</c:when>          <%-- 💻 --%>
+                                <c:when test="${genero == 'Terror'}">&#128128;</c:when>              <%-- 💀 --%>
+                                <c:otherwise>&#128214;</c:otherwise>                                 <%-- 📖 --%>
                             </c:choose>
                             </span>
                             <div>

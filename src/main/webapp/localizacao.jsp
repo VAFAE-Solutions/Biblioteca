@@ -76,7 +76,7 @@
                     <p><strong>📍 Endereço:</strong> ${u.endereco}</p>
                     <p><strong>📞 Telefone:</strong> ${not empty u.telefone ? u.telefone : 'Não informado'}</p>
                     <p><strong>🕐 Horário:</strong> ${not empty u.horarioFuncionamento ? u.horarioFuncionamento : 'Não informado'}</p>
-                    <a href="${pageContext.request.contextPath}/home"
+                    <a href="${pageContext.request.contextPath}/generos"
                        class="btn btn-outline-info mt-2">Acessar Acervo →</a>
                 </div>
             </div>
