@@ -43,7 +43,11 @@
 
 <div class="main-content">
 
-    <h2 class="mb-4">👥 Usuários da Unidade</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>👥 Usuários da Unidade</h2>
+        <a href="${pageContext.request.contextPath}/admin/cadastrar-usuario"
+           class="btn btn-primary">➕ Cadastrar Usuário</a>
+    </div>
 
     <%-- Feedbacks --%>
     <c:if test="${param.acao == 'bloqueado'}">

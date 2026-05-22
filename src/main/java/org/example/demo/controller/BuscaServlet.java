@@ -17,9 +17,10 @@ public class BuscaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ✅ Seta usuarioLogado para o dashboard.jsp
         HttpSession session = request.getSession(false);
-        if (session != null) {
+        boolean logado = session != null && session.getAttribute("usuarioLogado") != null;
+
+        if (logado) {
             request.setAttribute("usuarioLogado", session.getAttribute("usuarioLogado"));
         }
 
@@ -41,7 +42,10 @@ public class BuscaServlet extends HttpServlet {
         request.setAttribute("termoPesquisado", termo);
         request.setAttribute("filtro", filtro);
 
-        request.getRequestDispatcher("/dashboard.jsp")
-                .forward(request, response);
+        if (logado) {
+            request.getRequestDispatcher("/dashboard.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/buscar.jsp").forward(request, response);
+        }
     }
 }

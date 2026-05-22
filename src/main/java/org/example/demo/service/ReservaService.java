@@ -78,6 +78,23 @@ public class ReservaService {
         return reservaDAO.atualizar(reserva);
     }
 
+    public boolean atenderReserva(int reservaId) {
+        if (reservaId <= 0) {
+            throw new IllegalArgumentException("ID inválido.");
+        }
+
+        Reserva reserva = reservaDAO.buscarPorId(reservaId);
+        if (reserva == null) {
+            throw new IllegalArgumentException("Reserva não encontrada.");
+        }
+        if (reserva.getStatus() != Reserva.Status.AGUARDANDO) {
+            throw new IllegalStateException("Apenas reservas aguardando podem ser atendidas.");
+        }
+
+        reserva.setStatus(Reserva.Status.ATENDIDA);
+        return reservaDAO.atualizar(reserva);
+    }
+
     public boolean atenderProximaReserva(int livroId, int unidadeId) {
         FilaReserva fila = reservaDAO.buscarFilaPorLivroEUnidade(livroId, unidadeId);
 

@@ -85,9 +85,9 @@ public class EmprestimosAtivosServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/admin/emprestimos");
             }
 
-        } catch (Exception e) {
-            response.sendRedirect(request.getContextPath()
-                    + "/admin/emprestimos?erro=" + e.getMessage());
+        }  catch (Exception e) {
+        response.sendRedirect(request.getContextPath()
+                + "/admin/emprestimos?erro=falha");
         }
     }
 }

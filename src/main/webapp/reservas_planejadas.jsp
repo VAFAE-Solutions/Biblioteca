@@ -48,6 +48,9 @@
     <c:if test="${param.acao == 'cancelado'}">
         <div class="alert alert-success">✅ Reserva cancelada com sucesso!</div>
     </c:if>
+    <c:if test="${param.acao == 'atendido'}">
+        <div class="alert alert-success">✅ Reserva atendida com sucesso!</div>
+    </c:if>
     <c:if test="${param.acao == 'erro'}">
         <div class="alert alert-danger">❌ Erro ao processar reserva. Tente novamente.</div>
     </c:if>
@@ -86,9 +89,17 @@
                             <form action="${pageContext.request.contextPath}/admin/reservas"
                                   method="post" class="d-inline">
                                 <input type="hidden" name="id" value="${r.id}">
+                                <input type="hidden" name="acao" value="atender">
+                                <button type="submit" class="btn btn-sm btn-success me-1">
+                                    ✅ Atender
+                                </button>
+                            </form>
+                            <form action="${pageContext.request.contextPath}/admin/reservas"
+                                  method="post" class="d-inline">
+                                <input type="hidden" name="id" value="${r.id}">
                                 <input type="hidden" name="acao" value="cancelar">
                                 <button type="submit" class="btn btn-sm btn-danger">
-                                    Cancelar
+                                    ❌ Cancelar
                                 </button>
                             </form>
                         </td>

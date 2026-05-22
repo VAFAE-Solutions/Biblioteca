@@ -57,8 +57,8 @@
     <c:if test="${param.pagamento == 'sucesso'}">
         <div class="alert alert-success">✅ Pagamento de multa registrado com sucesso!</div>
     </c:if>
-    <c:if test="${not empty param.erro}">
-        <div class="alert alert-danger">❌ ${param.erro}</div>
+    <c:if test="${param.erro == 'falha'}">
+        <div class="alert alert-danger">❌ Erro ao processar operação. Tente novamente.</div>
     </c:if>
 
     <c:if test="${not empty emprestimosAtrasados}">

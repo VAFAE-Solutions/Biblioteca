@@ -52,13 +52,18 @@ public class ReservasPlanejdasServlet extends HttpServlet {
                 reservaService.cancelarReserva(Integer.parseInt(reservaId));
                 response.sendRedirect(request.getContextPath()
                         + "/admin/reservas?acao=cancelado");
+            } else if ("atender".equals(acao)) {
+            reservaService.atenderReserva(Integer.parseInt(reservaId));
+            response.sendRedirect(request.getContextPath()
+                    + "/admin/reservas?acao=atendido");
             } else {
                 response.sendRedirect(request.getContextPath()
                         + "/admin/reservas");
             }
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath()
-                    + "/admin/reservas?acao=erro");
+        e.printStackTrace(); // ✅ vai aparecer no console do Tomcat
+        response.sendRedirect(request.getContextPath()
+                + "/admin/emprestimos?erro=falha");
         }
     }
 }
