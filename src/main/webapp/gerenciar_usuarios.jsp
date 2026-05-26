@@ -27,6 +27,12 @@
     <a href="${pageContext.request.contextPath}/admin/usuarios" class="active">👥 Gerenciar Usuários</a>
     <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
     <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
+    <a href="${pageContext.request.contextPath}/admin/notificacoes">
+        🔔 Notificações
+        <c:if test="${totalNaoLidas > 0}">
+            <span class="badge bg-danger ms-1">${totalNaoLidas}</span>
+        </c:if>
+    </a>
     <a href="${pageContext.request.contextPath}/logout" class="text-danger mt-5">🚪 Sair</a>
 </div>
 

@@ -23,23 +23,17 @@ public class MeusEmprestimosServlet extends HttpServlet {
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
         try {
-            // ✅ Verifica e atualiza atrasos automaticamente
             emprestimoService.verificarEAtualizarAtrasos();
 
-            // Lista empréstimos do usuário logado
-            request.setAttribute("emprestimos",
-                    emprestimoService.buscarPorUsuario(usuarioLogado.getId()));
+            var emprestimos = emprestimoService.buscarPorUsuario(usuarioLogado.getId());
 
-            // Calcula total de multas pendentes
-            request.setAttribute("totalMulta",
-                    multaService.calcularTotalMultasPendentes(usuarioLogado.getId()));
-
-            // Verifica se tem empréstimos atrasados
-            boolean temAtrasado = emprestimoService
-                    .buscarPorUsuario(usuarioLogado.getId())
-                    .stream()
+            boolean temAtrasado = emprestimos.stream()
                     .anyMatch(e -> e.getStatus().name().equals("ATRASADO"));
 
+            request.setAttribute("usuarioLogado", usuarioLogado);
+            request.setAttribute("emprestimos", emprestimos);
+            request.setAttribute("totalMulta",
+                    multaService.calcularTotalMultasPendentes(usuarioLogado.getId()));
             request.setAttribute("temAtrasado", temAtrasado);
 
             request.getRequestDispatcher("/meus_emprestimos.jsp")
@@ -48,6 +42,21 @@ public class MeusEmprestimosServlet extends HttpServlet {
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath()
                     + "/dashboard?erro=lista_falhou");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        try {
+            int emprestimoId = Integer.parseInt(request.getParameter("id"));
+            emprestimoService.finalizarEmprestimo(emprestimoId);
+            response.sendRedirect(request.getContextPath()
+                    + "/meus-emprestimos?devolucao=sucesso");
+        } catch (Exception e) {
+            response.sendRedirect(request.getContextPath()
+                    + "/meus-emprestimos?devolucao=erro");
         }
     }
 }

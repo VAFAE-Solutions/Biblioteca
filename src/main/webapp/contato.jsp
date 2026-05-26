@@ -14,6 +14,9 @@
         .info-card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 5px solid #40c4d4; }
         .btn-enviar { background: linear-gradient(135deg, #40c4d4, #27aab5); border: none; color: white; padding: 12px 40px; border-radius: 8px; font-size: 16px; }
         .btn-enviar:hover { opacity: 0.9; color: white; }
+        .email-group { display: flex; align-items: center; gap: 0; }
+        .email-prefix { flex: 1; border-radius: 8px 0 0 8px !important; }
+        .email-domain { background: #e9ecef; border: 1px solid #ced4da; border-left: none; padding: 8px 12px; border-radius: 0 8px 8px 0; color: #6c757d; white-space: nowrap; }
     </style>
 </head>
 <body>
@@ -99,31 +102,65 @@
         <div class="col-md-8">
             <div class="card contato-card p-4">
                 <h4 class="fw-bold mb-4">Envie sua mensagem</h4>
+
                 <c:if test="${param.enviado == 'sucesso'}">
                     <div class="alert alert-success">
                         ✅ Mensagem enviada com sucesso! Retornaremos em breve.
                     </div>
                 </c:if>
+                <c:if test="${not empty erro}">
+                    <div class="alert alert-danger">❌ ${erro}</div>
+                </c:if>
+
                 <form action="${pageContext.request.contextPath}/contato" method="post">
+
+                    <%-- usuarioId hidden se logado --%>
+                    <c:if test="${not empty usuarioId}">
+                        <input type="hidden" name="usuarioId" value="${usuarioId}">
+                    </c:if>
+
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Nome *</label>
-                            <input type="text" name="nome" class="form-control" placeholder="Seu nome" required>
+                            <input type="text" name="nome" class="form-control"
+                                   placeholder="Seu nome"
+                                   value="${not empty nomePreenchido ? nomePreenchido : ''}"
+                                   ${not empty nomePreenchido ? 'readonly' : ''}
+                                   required>
                         </div>
+
                         <div class="col-md-6">
                             <label class="form-label fw-bold">E-mail *</label>
-                            <input type="email" name="email" class="form-control" placeholder="seu@email.com" required>
+                            <c:choose>
+                                <%-- Usuário logado — mostra email completo readonly --%>
+                                <c:when test="${not empty emailPreenchido}">
+                                    <input type="text" class="form-control"
+                                           value="${emailPreenchido}"
+                                           readonly>
+                                    <input type="hidden" name="email" value="${emailPreenchido}">
+                                </c:when>
+                                <%-- Não logado — campo livre --%>
+                                <c:otherwise>
+                                    <input type="email" name="email" class="form-control"
+                                           placeholder="seu@email.com" required>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
+
                         <div class="col-12">
                             <label class="form-label fw-bold">Assunto *</label>
-                            <input type="text" name="assunto" class="form-control" placeholder="Assunto da mensagem" required>
+                            <input type="text" name="assunto" class="form-control"
+                                   placeholder="Assunto da mensagem" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-bold">Mensagem *</label>
-                            <textarea name="mensagem" class="form-control" rows="5" placeholder="Digite sua mensagem..." required></textarea>
+                            <textarea name="mensagem" class="form-control" rows="5"
+                                      placeholder="Digite sua mensagem..." required></textarea>
                         </div>
                         <div class="col-12">
-                            <button type="submit" class="btn btn-enviar w-100">📨 Enviar Mensagem</button>
+                            <button type="submit" class="btn btn-enviar w-100">
+                                📨 Enviar Mensagem
+                            </button>
                         </div>
                     </div>
                 </form>

@@ -40,6 +40,12 @@
         <a href="${pageContext.request.contextPath}/admin/reservas">🔖 Reservas Planejadas</a>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-usuario" class="active">➕ Cadastrar Usuário</a>
     </c:if>
+    <a href="${pageContext.request.contextPath}/admin/notificacoes">
+        🔔 Notificações
+        <c:if test="${totalNaoLidas > 0}">
+            <span class="badge bg-danger ms-1">${totalNaoLidas}</span>
+        </c:if>
+    </a>
     <a href="${pageContext.request.contextPath}/logout" class="text-danger mt-5">🚪 Sair</a>
 </div>
 
