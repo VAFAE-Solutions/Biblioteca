@@ -1,6 +1,7 @@
 package org.example.demo.controller;
 
 import org.example.demo.model.Usuario;
+import org.example.demo.service.MensagemContatoService;
 import org.example.demo.service.MultaService;
 import org.example.demo.service.UsuarioService;
 
@@ -14,6 +15,7 @@ public class GerenciarUsuariosServlet extends HttpServlet {
 
     private final UsuarioService usuarioService = new UsuarioService();
     private final MultaService multaService = new MultaService();
+    private final MensagemContatoService mensagemService = new MensagemContatoService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -44,7 +46,6 @@ public class GerenciarUsuariosServlet extends HttpServlet {
 
         request.setAttribute("usuarioLogado", usuarioLogado);
         request.setAttribute("usuarios", usuarioService.listarTodosIncluindoInativos());
-        // ✅ Lista bloqueados e com reset para o painel
         request.setAttribute("usuariosBloqueadosOuReset",
                 usuarioService.listarBloqueadosOuComReset());
 
@@ -73,8 +74,21 @@ public class GerenciarUsuariosServlet extends HttpServlet {
                 }
                 case "resetar_limite" -> usuarioService.resetarLimiteCotas(id);
                 case "aprovar_reset"  -> {
-                    // ✅ Admin aprova reset e senha temporária é exibida
                     String senhaTemp = usuarioService.aprovarReset(id);
+
+                    // ✅ Salva notificação interna para o bibliotecário
+                    Usuario usuario = usuarioService.buscarPorId(id);
+                    mensagemService.enviar(
+                            null,
+                            "Sistema — Reset de Senha",
+                            "sistema@biblioteca.com",
+                            "🔑 Senha Temporária — " + usuario.getNome(),
+                            "O usuário " + usuario.getNome() + " (" + usuario.getEmail() + ") "
+                                    + "solicitou reset de senha.\n\n"
+                                    + "Senha temporária: " + senhaTemp + "\n\n"
+                                    + "Entregue esta senha ao usuário quando ele comparecer presencialmente."
+                    );
+
                     response.sendRedirect(request.getContextPath()
                             + "/admin/usuarios?acao=reset_aprovado&senha=" + senhaTemp + "&id=" + id);
                     return;
