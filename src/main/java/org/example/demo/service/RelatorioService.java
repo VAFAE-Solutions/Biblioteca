@@ -32,4 +32,8 @@ public class RelatorioService {
     public List<Map<String, Object>> livrosAtrasados() {
         return relatorioDAO.livrosAtrasados();
     }
+
+    public Map<String, Object> resumoMultas() {
+        return relatorioDAO.resumoMultas();
+    }
 }

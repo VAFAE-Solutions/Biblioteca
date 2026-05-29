@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -69,6 +70,34 @@
                  style="border-left: 5px solid #ffc107;">
                 <h6 class="text-muted">Taxa de Atraso</h6>
                 <h3 class="text-warning">${taxaAtraso.taxaAtraso}%</h3>
+            </div>
+        </div>
+    </div>
+    <%-- Cards de multas --%>
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card p-3 text-center" style="border-left: 5px solid #6f42c1;">
+                <h6 class="text-muted">Total de Multas</h6>
+                <h3 style="color:#6f42c1;">${resumoMultas.total}</h3>
+            </div>
+
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card p-3 text-center" style="border-left: 5px solid #dc3545;">
+                <h6 class="text-muted">Multas Pendentes</h6>
+                <h3 class="text-danger">${resumoMultas.pendentes}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card p-3 text-center" style="border-left: 5px solid #28a745;">
+                <h6 class="text-muted">Total Arrecadado</h6>
+                <h3 class="text-success">R$ <fmt:formatNumber value="${resumoMultas.totalArrecadado}" minFractionDigits="2" maxFractionDigits="2"/></h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card p-3 text-center" style="border-left: 5px solid #ffc107;">
+                <h6 class="text-muted">Total Pendente</h6>
+                <h3 class="text-warning">R$ <fmt:formatNumber value="${resumoMultas.totalPendente}" minFractionDigits="2" maxFractionDigits="2"/></h3>
             </div>
         </div>
     </div>

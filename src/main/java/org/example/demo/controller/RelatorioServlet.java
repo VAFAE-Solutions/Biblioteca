@@ -34,6 +34,7 @@ public class RelatorioServlet extends HttpServlet {
                 relatorioService.emprestimosPorUsuario());
         request.setAttribute("livrosAtrasados",
                 relatorioService.livrosAtrasados());
+        request.setAttribute("resumoMultas", relatorioService.resumoMultas());
 
         request.getRequestDispatcher("/relatorios.jsp")
                 .forward(request, response);

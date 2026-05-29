@@ -148,4 +148,37 @@ public class RelatorioDAO {
             throw new RuntimeException("Erro ao buscar livros atrasados: " + e.getMessage(), e);
         }
     }
+    // ✅ Resumo de multas
+    public Map<String, Object> resumoMultas() {
+        String sql = """
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN pago = 0 THEN 1 ELSE 0 END) as pendentes,
+                SUM(CASE WHEN pago = 1 THEN 1 ELSE 0 END) as pagas,
+                SUM(CASE WHEN pago = 0 THEN valor ELSE 0 END) as total_pendente,
+                SUM(CASE WHEN pago = 1 THEN valor ELSE 0 END) as total_arrecadado
+            FROM multa
+            """;
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            Map<String, Object> resultado = new LinkedHashMap<>();
+
+            if (rs.next()) {
+                resultado.put("total", rs.getInt("total"));
+                resultado.put("pendentes", rs.getInt("pendentes"));
+                resultado.put("pagas", rs.getInt("pagas"));
+                resultado.put("totalPendente", rs.getBigDecimal("total_pendente") != null
+                        ? rs.getBigDecimal("total_pendente") : java.math.BigDecimal.ZERO);
+                resultado.put("totalArrecadado", rs.getBigDecimal("total_arrecadado") != null
+                        ? rs.getBigDecimal("total_arrecadado") : java.math.BigDecimal.ZERO);
+            }
+            return resultado;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar resumo de multas: " + e.getMessage(), e);
+        }
+    }
 }
