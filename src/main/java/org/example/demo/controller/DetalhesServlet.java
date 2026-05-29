@@ -27,16 +27,23 @@ public class DetalhesServlet extends HttpServlet {
             try {
                 int id = Integer.parseInt(idParam);
 
-                // Busca o livro
                 Livro livro = livroService.buscarPorId(id);
 
                 if (livro != null) {
                     request.setAttribute("livro", livro);
 
-                    // ✅ Verifica se há exemplar disponível
                     List<Exemplar> disponiveis = exemplarService
                             .buscarDisponiveisPorLivroEUnidade(id, 1);
                     request.setAttribute("exemplarDisponivel", !disponiveis.isEmpty());
+
+                    // ✅ Passa origem para o JSP montar o botão Voltar
+                    String origem     = request.getParameter("origem");
+                    String txtBusca   = request.getParameter("txtBusca");
+                    String filtro     = request.getParameter("filtro");
+
+                    request.setAttribute("origem", origem);
+                    request.setAttribute("txtBusca", txtBusca);
+                    request.setAttribute("filtro", filtro);
 
                     request.getRequestDispatcher("/livro.jsp")
                             .forward(request, response);

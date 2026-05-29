@@ -94,27 +94,35 @@
                 </c:choose>
             </div>
 
-            <%-- ✅ Voltar para o lugar certo conforme o perfil --%>
-            <p>
-                <c:choose>
-                    <c:when test="${not empty sessionScope.usuarioLogado &&
-                                   (sessionScope.usuarioLogado.tipo == 'ADMIN' ||
-                                    sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO')}">
-                        <a href="${pageContext.request.contextPath}/admin"
-                           class="btn btn-outline-secondary w-100">Voltar ao Painel</a>
-                    </c:when>
-                    <c:when test="${not empty sessionScope.usuarioLogado}">
-                        <a href="${pageContext.request.contextPath}/dashboard"
-                           class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
-                    </c:when>
-                    <c:otherwise>
-                        <%-- ✅ Não logado — volta para home pública --%>
-                        <a href="${pageContext.request.contextPath}/home"
-                           class="btn btn-outline-secondary w-100">Voltar ao Catálogo</a>
-                    </c:otherwise>
-                </c:choose>
-            </p>
-        </div>
+                <%-- ✅ Voltar para o lugar certo conforme o perfil --%>
+                <p>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.usuarioLogado &&
+                                       (sessionScope.usuarioLogado.tipo == 'ADMIN' ||
+                                        sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO')}">
+                            <a href="${pageContext.request.contextPath}/admin"
+                               class="btn btn-outline-secondary w-100">← Voltar ao Painel</a>
+                        </c:when>
+                        <c:when test="${not empty sessionScope.usuarioLogado}">
+                            <a href="${pageContext.request.contextPath}/dashboard"
+                               class="btn btn-outline-secondary w-100">← Voltar ao Catálogo</a>
+                        </c:when>
+                        <c:otherwise>
+                            <%-- ✅ Não logado — volta para origem correta --%>
+                            <c:choose>
+                                <c:when test="${not empty origem && origem == 'buscar'}">
+                                    <a href="${pageContext.request.contextPath}/buscar?txtBusca=${txtBusca}&filtro=${filtro}"
+                                       class="btn btn-outline-secondary w-100">← Voltar ao Catálogo</a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="${pageContext.request.contextPath}/home"
+                                       class="btn btn-outline-secondary w-100">← Voltar ao Catálogo</a>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:otherwise>
+                    </c:choose>
+                </p>
+            </div>
 
         <div class="col-md-8">
             <h1 class="display-5 fw-bold">${livro.titulo}</h1>

@@ -38,11 +38,15 @@
             <div class="erro">
                 <c:choose>
                     <c:when test="${erro == 'usuario_bloqueado'}">
-                        Usuário bloqueado após múltiplas tentativas.
+                        🔒 Sua conta foi bloqueada após 3 tentativas incorretas.
+                        <br><br>
+                        Para recuperar o acesso, solicite o reset de senha abaixo e,
+                        em seguida, dirija-se presencialmente à nossa unidade para
+                        efetuar o procedimento de desbloqueio junto ao bibliotecário.
                         <br><br>
                         <a href="${pageContext.request.contextPath}/esqueceu-senha"
                            style="color:#d32f2f; font-weight: bold;">
-                            🔑 Solicitar desbloqueio via "Esqueceu a senha?"
+                            🔑 Solicitar reset de senha →
                         </a>
                     </c:when>
                     <c:when test="${erro == 'usuario_inativo'}">

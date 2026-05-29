@@ -22,9 +22,10 @@
         <hr>
     </div>
     <a href="${pageContext.request.contextPath}/admin">📊 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/perfil">👤 Meu Perfil</a>
     <a href="${pageContext.request.contextPath}/admin/emprestimos">📅 Empréstimos Ativos</a>
     <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
-    <a href="${pageContext.request.contextPath}/admin/unidades" class="active">🏛️ Unidades</a>
+    <a href="${pageContext.request.contextPath}/admin/unidades" class="active">🏛️ Gerenciar Unidades</a>
     <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
     <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
     <a href="${pageContext.request.contextPath}/admin/notificacoes">

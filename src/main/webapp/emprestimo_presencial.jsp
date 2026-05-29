@@ -27,9 +27,11 @@
         <hr>
     </div>
     <a href="${pageContext.request.contextPath}/admin">📊 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/perfil">👤 Meu Perfil</a>
     <a href="${pageContext.request.contextPath}/admin/emprestimos">📅 Empréstimos Ativos</a>
     <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
+        <a href="${pageContext.request.contextPath}/admin/unidades">🏛️ Gerenciar Unidades</a>
         <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
     </c:if>
@@ -48,7 +50,11 @@
 </div>
 
 <div class="main-content">
-    <h2 class="mb-4">📋 Empréstimo Presencial</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📋 Empréstimo Presencial</h2>
+        <a href="${pageContext.request.contextPath}/admin/emprestimos"
+           class="btn btn-outline-secondary">← Voltar</a>
+    </div>
 
     <c:if test="${param.sucesso == 'true'}">
         <div class="alert alert-success">✅ Empréstimo registrado com sucesso!</div>

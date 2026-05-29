@@ -71,6 +71,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="accordion shadow-sm" id="faqAccordion">
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
@@ -79,10 +80,11 @@
                     </h2>
                     <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-muted">
-                            Faça login no sistema, acesse o catálogo, escolha o livro desejado e clique em "Emprestar Agora". O livro ficará disponível para retirada na unidade selecionada.
+                            Faça login no sistema, acesse o catálogo, escolha o livro desejado e clique em "Emprestar Agora". O livro ficará disponível para retirada na unidade.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
@@ -91,10 +93,11 @@
                     </h2>
                     <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-muted">
-                            O prazo varia conforme o tipo de usuário: <strong>Estudantes</strong> têm 15 dias e <strong>Usuários Comuns</strong> têm 7 dias para devolução do livro.
+                            O prazo varia conforme o tipo de usuário: <strong>Estudantes</strong> têm 15 dias e <strong>Usuários Comuns</strong> têm 7 dias para devolução.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
@@ -107,6 +110,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
@@ -115,10 +119,11 @@
                     </h2>
                     <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-muted">
-                            Será gerada uma multa de <strong>R$ 2,00 por dia de atraso</strong>. Enquanto houver multas pendentes, não será possível realizar novos empréstimos ou reservas.
+                            Será gerada uma multa de <strong>R$ 2,00 por dia de atraso</strong>. Enquanto houver multas pendentes, não será possível realizar novos empréstimos ou reservas. O pagamento é feito <strong>presencialmente</strong> na unidade.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
@@ -127,10 +132,11 @@
                     </h2>
                     <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-muted">
-                            Quando um livro estiver indisponível, você pode entrar na fila de espera clicando em "Reservar na Fila". Você será notificado quando o livro estiver disponível.
+                            Quando um livro estiver indisponível, clique em "Reservar na Fila". Você entrará na fila de espera e será atendido pelo bibliotecário quando o livro for devolvido.
                         </div>
                     </div>
                 </div>
+
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
@@ -139,10 +145,76 @@
                     </h2>
                     <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                         <div class="accordion-body text-muted">
-                            Clique em "Cadastrar-se" no menu superior, preencha seus dados básicos e complete o cadastro. Estudantes precisam informar o RA (Registro Acadêmico).
+                            Clique em "Cadastrar-se" no menu superior e preencha seus dados em dois passos. Estudantes precisam informar o RA (Registro Acadêmico).
                         </div>
                     </div>
                 </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                            Esqueci minha senha. O que faço?
+                        </button>
+                    </h2>
+                    <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            Clique em <strong>"Esqueceu a senha?"</strong> na tela de login e informe seu e-mail cadastrado. Sua solicitação será enviada ao bibliotecário. Após a aprovação, você receberá uma <strong>senha temporária</strong> que deverá ser retirada <strong>presencialmente</strong> na unidade. Na próxima vez que acessar, altere sua senha pelo perfil.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                            Minha conta foi bloqueada. O que faço?
+                        </button>
+                    </h2>
+                    <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            O bloqueio ocorre após <strong>3 tentativas de login incorretas</strong>. Para desbloquear, clique em <strong>"Solicitar reset de senha"</strong> na tela de login e compareça <strong>presencialmente</strong> à nossa unidade. O bibliotecário irá desbloquear seu acesso e entregar uma senha temporária.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq9">
+                            Como altero minha senha?
+                        </button>
+                    </h2>
+                    <div id="faq9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            Acesse <strong>Meu Perfil</strong> após o login, clique em <strong>"Trocar Senha"</strong>, informe a senha atual e a nova senha. A nova senha deve ter no mínimo 6 caracteres.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq10">
+                            Como cancelo uma reserva?
+                        </button>
+                    </h2>
+                    <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            Acesse <strong>Minhas Reservas</strong> no menu lateral e clique em <strong>"Cancelar"</strong> ao lado da reserva desejada. Apenas reservas com status <strong>AGUARDANDO</strong> podem ser canceladas.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq11">
+                            Como pago uma multa?
+                        </button>
+                    </h2>
+                    <div id="faq11" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-muted">
+                            O pagamento de multas é feito <strong>exclusivamente de forma presencial</strong> na unidade da biblioteca. Após o pagamento no balcão, o bibliotecário registrará a quitação no sistema e seu acesso será liberado para novos empréstimos.
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="text-center mt-5">

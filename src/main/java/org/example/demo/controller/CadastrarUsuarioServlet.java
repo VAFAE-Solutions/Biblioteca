@@ -47,15 +47,22 @@ public class CadastrarUsuarioServlet extends HttpServlet {
             String cpf      = request.getParameter("cpf");
             String tipo     = request.getParameter("tipo");
 
+            // ✅ Só ADMIN pode cadastrar outro ADMIN
+            if ("ADMIN".equals(tipo) && usuarioLogado.getTipo() != Usuario.Tipo.ADMIN) {
+                throw new IllegalArgumentException("Apenas administradores podem cadastrar outros administradores.");
+            }
+
             Usuario novoUsuario;
 
-            if ("ESTUDANTE".equals(tipo)) {
-                int ra = Integer.parseInt(request.getParameter("ra"));
-                UsuarioEstudante estudante = new UsuarioEstudante();
-                estudante.setRa(ra);
-                novoUsuario = estudante;
-            } else {
-                novoUsuario = new Usuario();
+            switch (tipo) {
+                case "ESTUDANTE" -> {
+                    int ra = Integer.parseInt(request.getParameter("ra"));
+                    UsuarioEstudante estudante = new UsuarioEstudante();
+                    estudante.setRa(ra);
+                    novoUsuario = estudante;
+                }
+                case "ADMIN" -> novoUsuario = new UsuarioAdministrador();
+                default -> novoUsuario = new Usuario();
             }
 
             novoUsuario.setNome(nome);

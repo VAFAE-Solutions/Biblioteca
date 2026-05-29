@@ -74,20 +74,23 @@ public class GerenciarUsuariosServlet extends HttpServlet {
                 }
                 case "resetar_limite" -> usuarioService.resetarLimiteCotas(id);
                 case "aprovar_reset"  -> {
+                    Usuario usuario = usuarioService.buscarPorId(id);
                     String senhaTemp = usuarioService.aprovarReset(id);
 
-                    // ✅ Salva notificação interna para o bibliotecário
-                    Usuario usuario = usuarioService.buscarPorId(id);
-                    mensagemService.enviar(
-                            null,
-                            "Sistema — Reset de Senha",
-                            "sistema@biblioteca.com",
-                            "🔑 Senha Temporária — " + usuario.getNome(),
-                            "O usuário " + usuario.getNome() + " (" + usuario.getEmail() + ") "
-                                    + "solicitou reset de senha.\n\n"
-                                    + "Senha temporária: " + senhaTemp + "\n\n"
-                                    + "Entregue esta senha ao usuário quando ele comparecer presencialmente."
-                    );
+                    try {
+                        mensagemService.enviar(
+                                null,
+                                "Sistema — Reset de Senha",
+                                "sistema@biblioteca.com",
+                                "Senha Temporaria — " + usuario.getNome(),
+                                "O usuario " + usuario.getNome() + " (" + usuario.getEmail() + ") "
+                                        + "solicitou reset de senha.\n\n"
+                                        + "Senha temporaria: " + senhaTemp + "\n\n"
+                                        + "Entregue esta senha ao usuario quando ele comparecer presencialmente."
+                        );
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
 
                     response.sendRedirect(request.getContextPath()
                             + "/admin/usuarios?acao=reset_aprovado&senha=" + senhaTemp + "&id=" + id);

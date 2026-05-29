@@ -27,18 +27,18 @@
         <hr>
     </div>
     <a href="${pageContext.request.contextPath}/admin">📊 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/perfil">👤 Meu Perfil</a>
     <a href="${pageContext.request.contextPath}/admin/emprestimos">📅 Empréstimos Ativos</a>
     <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
+        <a href="${pageContext.request.contextPath}/admin/unidades">🏛️ Gerenciar Unidades</a>
         <a href="${pageContext.request.contextPath}/admin/relatorios">📋 Relatórios Globais</a>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-bibliotecario">👨‍💼 Cadastrar Bibliotecário</a>
-        <a href="${pageContext.request.contextPath}/admin/cadastrar-usuario" class="active">➕ Cadastrar Usuário</a>
     </c:if>
     <c:if test="${usuarioLogado.tipo == 'BIBLIOTECARIO'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios-unidade">👥 Usuários da Unidade</a>
         <a href="${pageContext.request.contextPath}/admin/estoque">📦 Estoque da Unidade</a>
         <a href="${pageContext.request.contextPath}/admin/reservas">🔖 Reservas Planejadas</a>
-        <a href="${pageContext.request.contextPath}/admin/cadastrar-usuario" class="active">➕ Cadastrar Usuário</a>
     </c:if>
     <a href="${pageContext.request.contextPath}/admin/notificacoes">
         🔔 Notificações
@@ -50,7 +50,19 @@
 </div>
 
 <div class="main-content">
-    <h2 class="mb-4">➕ Cadastrar Usuário</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>➕ Cadastrar Usuário</h2>
+        <c:choose>
+            <c:when test="${usuarioLogado.tipo == 'ADMIN'}">
+                <a href="${pageContext.request.contextPath}/admin/usuarios"
+                   class="btn btn-outline-secondary">← Voltar</a>
+            </c:when>
+            <c:otherwise>
+                <a href="${pageContext.request.contextPath}/admin/usuarios-unidade"
+                   class="btn btn-outline-secondary">← Voltar</a>
+            </c:otherwise>
+        </c:choose>
+    </div>
 
     <c:if test="${param.cadastro == 'sucesso'}">
         <div class="alert alert-success">✅ Usuário cadastrado com sucesso!</div>
@@ -71,6 +83,9 @@
                         <option value="">Selecione...</option>
                         <option value="COMUM">Comum</option>
                         <option value="ESTUDANTE">Estudante</option>
+                        <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
+                            <option value="ADMIN">Administrador</option>
+                        </c:if>
                     </select>
                 </div>
 

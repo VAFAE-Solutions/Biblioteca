@@ -27,6 +27,7 @@
         <hr>
     </div>
     <a href="${pageContext.request.contextPath}/admin">📊 Dashboard</a>
+    <a href="${pageContext.request.contextPath}/perfil">👤 Meu Perfil</a>
     <a href="${pageContext.request.contextPath}/admin/emprestimos">📅 Empréstimos Ativos</a>
     <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
         <a href="${pageContext.request.contextPath}/admin/usuarios">👥 Gerenciar Usuários</a>
