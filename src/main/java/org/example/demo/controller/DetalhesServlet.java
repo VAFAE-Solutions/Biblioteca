@@ -33,7 +33,7 @@ public class DetalhesServlet extends HttpServlet {
                     request.setAttribute("livro", livro);
 
                     List<Exemplar> disponiveis = exemplarService
-                            .buscarDisponiveisPorLivroEUnidade(id, 1);
+                            .buscarDisponiveisPorLivroEUnidade(id, 2);
                     request.setAttribute("exemplarDisponivel", !disponiveis.isEmpty());
 
                     // ✅ Passa origem para o JSP montar o botão Voltar

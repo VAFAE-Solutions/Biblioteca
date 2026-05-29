@@ -54,42 +54,54 @@
         <div class="alert alert-danger">❌ ${param.erro}</div>
     </c:if>
 
-    <%-- Formulário cadastro --%>
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-white">
-            <strong>+ Adicionar Unidade</strong>
-        </div>
-        <div class="card-body">
-            <form action="${pageContext.request.contextPath}/admin/unidades" method="post">
-                <input type="hidden" name="acao" value="cadastrar">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Nome *</label>
-                        <input type="text" name="nome" class="form-control"
-                               placeholder="Ex: Unidade Central" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Endereço *</label>
-                        <input type="text" name="endereco" class="form-control"
-                               placeholder="Rua, número" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label fw-bold">Telefone</label>
-                        <input type="tel" name="telefone" class="form-control"
-                               placeholder="(11) 99999-9999">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label fw-bold">Horário</label>
-                        <input type="text" name="horario" class="form-control"
-                               placeholder="Seg-Sex 8h-20h">
-                    </div>
-                    <div class="col-md-1 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Salvar</button>
-                    </div>
+    <%-- Formulário cadastro — só aparece se não há unidade ativa --%>
+    <c:choose>
+        <c:when test="${unidades.size() == 0}">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <strong>+ Adicionar Unidade</strong>
                 </div>
-            </form>
-        </div>
-    </div>
+                <div class="card-body">
+                    <form action="${pageContext.request.contextPath}/admin/unidades" method="post">
+                        <input type="hidden" name="acao" value="cadastrar">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Nome *</label>
+                                <input type="text" name="nome" class="form-control"
+                                       placeholder="Ex: Unidade Central" required>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Endereço *</label>
+                                <input type="text" name="endereco" class="form-control"
+                                       placeholder="Rua, número" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">Telefone</label>
+                                <input type="tel" name="telefone" class="form-control"
+                                       placeholder="(11) 99999-9999">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">Horário</label>
+                                <input type="text" name="horario" class="form-control"
+                                       placeholder="Seg-Sex 8h-20h">
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="alert alert-info mb-4">
+                🏛️ <strong>Sistema opera com uma unidade.</strong>
+                O sistema está configurado para funcionar com uma única unidade física.
+                Para adicionar uma nova unidade, desative a unidade atual primeiro ou
+                entre em contato com o suporte.
+            </div>
+        </c:otherwise>
+    </c:choose>
 
     <%-- Lista de unidades --%>
     <div class="card shadow-sm">

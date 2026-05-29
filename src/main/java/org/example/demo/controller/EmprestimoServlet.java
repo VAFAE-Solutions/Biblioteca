@@ -62,7 +62,7 @@ public class EmprestimoServlet extends HttpServlet {
             int livroId = Integer.parseInt(livroIdParam);
 
             List<Exemplar> disponiveis = exemplarService
-                    .buscarDisponiveisPorLivroEUnidade(livroId, 1);
+                    .buscarDisponiveisPorLivroEUnidade(livroId, 2);
 
             if (disponiveis.isEmpty()) {
                 response.sendRedirect(request.getContextPath()

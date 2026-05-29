@@ -41,6 +41,16 @@ public class GerenciarUnidadesServlet extends HttpServlet {
         try {
             switch (acao) {
                 case "cadastrar" -> {
+                    // ✅ Verifica se já existe uma unidade ativa
+                    long totalAtivas = unidadeService.listarTodas().size();
+                    if (totalAtivas >= 1) {
+                        boolean confirmado = "true".equals(request.getParameter("confirmado"));
+                        if (!confirmado) {
+                            response.sendRedirect(request.getContextPath()
+                                    + "/admin/unidades?aviso=uma_unidade");
+                            return;
+                        }
+                    }
                     Unidade unidade = new Unidade(
                             request.getParameter("nome"),
                             request.getParameter("endereco"),
