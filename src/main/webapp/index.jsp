@@ -18,51 +18,36 @@
 
 <header class="main-header">
     <div class="header-top">
-
         <div class="logo-box">
             <a href="${pageContext.request.contextPath}/home">
                 <img src="https://cdn-icons-png.flaticon.com/512/29/29302.png">
             </a>
         </div>
-
         <div class="search-box">
-            <form action="${pageContext.request.contextPath}/home"
-                  method="get" class="search-wrapper">
-                <input type="text" name="txtBusca"
-                       value="${termoPesquisado}"
-                       placeholder="Procurar Livro ou Autor">
+            <form action="${pageContext.request.contextPath}/home" method="get" class="search-wrapper">
+                <input type="text" name="txtBusca" value="${termoPesquisado}" placeholder="Procurar Livro ou Autor">
                 <button type="submit">🔍</button>
             </form>
         </div>
-
         <div class="user-box">
-            <%-- ✅ Logado — mostra botão voltar conforme tipo --%>
             <c:choose>
                 <c:when test="${not empty sessionScope.usuarioLogado}">
                     <c:choose>
-                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' ||
-                                       sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
+                        <c:when test="${sessionScope.usuarioLogado.tipo == 'ADMIN' || sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO'}">
                             <a href="${pageContext.request.contextPath}/admin"
-                               style="padding: 8px 16px; background: #fff;
-                                      color: #39c3cf; border-radius: 8px;
-                                      text-decoration: none; font-weight: bold;
-                                      border: 1px solid #39c3cf;">
+                               style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">
                                 ← Voltar ao Painel
                             </a>
                         </c:when>
                         <c:otherwise>
                             <a href="${pageContext.request.contextPath}/dashboard"
-                               style="padding: 8px 16px; background: #fff;
-                                      color: #39c3cf; border-radius: 8px;
-                                      text-decoration: none; font-weight: bold;
-                                      border: 1px solid #39c3cf;">
+                               style="padding: 8px 16px; background: #fff; color: #39c3cf; border-radius: 8px; text-decoration: none; font-weight: bold; border: 1px solid #39c3cf;">
                                 ← Voltar ao Catálogo
                             </a>
                         </c:otherwise>
                     </c:choose>
                 </c:when>
                 <c:otherwise>
-                    <%-- Não logado — mostra entrar/cadastrar --%>
                     <div class="auth-links">
                         <a href="${pageContext.request.contextPath}/login">Entrar</a>
                         <a href="${pageContext.request.contextPath}/cadastro">Cadastrar-se</a>
@@ -71,7 +56,6 @@
                 </c:otherwise>
             </c:choose>
         </div>
-
     </div>
 
     <nav class="nav-bar">
@@ -93,9 +77,8 @@
             <h2>Resultados para: "${termoPesquisado}"</h2>
             <div class="books-grid">
                 <c:forEach var="livro" items="${livros}">
-                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}"
-                       class="book-card">
-                        <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
+                    <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : (not empty livro.capaUrl ? livro.capaUrl : '')}"
                              onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
@@ -115,7 +98,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 4}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -123,7 +107,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 2}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -131,7 +116,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 5}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -139,7 +125,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 6}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -147,7 +134,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 7}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -162,7 +150,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 8}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -170,7 +159,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 9}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -178,7 +168,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 10}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -186,7 +177,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 11}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -194,7 +186,8 @@
             <c:forEach var="livro" items="${todosLivros}">
                 <c:if test="${livro.id == 12}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
-                        <img src="${livro.capaUrl}" onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                        <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
+                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -203,6 +196,5 @@
     </div>
 
 </main>
-
 </body>
 </html>

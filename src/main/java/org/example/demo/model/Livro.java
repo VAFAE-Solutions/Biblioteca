@@ -13,7 +13,9 @@ public class Livro {
     private String descricao;
     private String sumario;
     private String capaUrl;
-    private boolean ativo = true; // ✅ novo campo
+    private byte[] capaImagem;
+    private boolean temCapaNobanco = false; // ✅ flag sem carregar bytes
+    private boolean ativo = true;
     private LocalDateTime createdAt;
 
     public Livro() {}
@@ -67,7 +69,21 @@ public class Livro {
     public String getCapaUrl() { return capaUrl; }
     public void setCapaUrl(String capaUrl) { this.capaUrl = capaUrl; }
 
-    // ✅ getter/setter ativo
+    public byte[] getCapaImagem() { return capaImagem; }
+    public void setCapaImagem(byte[] capaImagem) {
+        this.capaImagem = capaImagem;
+        if (capaImagem != null && capaImagem.length > 0) {
+            this.temCapaNobanco = true;
+        }
+    }
+
+    // ✅ Flag para JSPs — verdadeiro se há imagem no banco
+    public boolean isTemCapaNobanco() { return temCapaNobanco; }
+    public void setTemCapaNobanco(boolean temCapaNobanco) { this.temCapaNobanco = temCapaNobanco; }
+
+    // ✅ Método para JSPs — usa flag OU bytes
+    public boolean temCapaImagem() { return temCapaNobanco || (capaImagem != null && capaImagem.length > 0); }
+
     public boolean isAtivo() { return ativo; }
     public void setAtivo(boolean ativo) { this.ativo = ativo; }
 
@@ -76,6 +92,6 @@ public class Livro {
 
     @Override
     public String toString() {
-        return "Livro{id=" + id + ", titulo=" + titulo + ", autor=" + autor + ", ativo=" + ativo + "}";
+        return "Livro{id=" + id + ", titulo=" + titulo + ", ativo=" + ativo + "}";
     }
 }

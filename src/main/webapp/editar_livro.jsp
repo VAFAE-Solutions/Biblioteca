@@ -12,29 +12,14 @@
         .sidebar-admin a:hover { background: #343a40; color: white; }
         .main-content { margin-left: 260px; padding: 20px; }
         .preview-capa { max-width: 150px; border-radius: 8px; margin-top: 10px; }
-
-        @media (max-width: 1024px) {
-            .sidebar-admin { width: 200px; }
-            .main-content { margin-left: 210px; }
-        }
+        @media (max-width: 1024px) { .sidebar-admin { width: 200px; } .main-content { margin-left: 210px; } }
         @media (max-width: 768px) {
-            .sidebar-admin {
-                width: 100%;
-                min-height: auto;
-                position: relative;
-                display: flex;
-                flex-wrap: wrap;
-                padding: 10px;
-            }
+            .sidebar-admin { width: 100%; min-height: auto; position: relative; display: flex; flex-wrap: wrap; padding: 10px; }
             .sidebar-admin .p-4 { width: 100%; padding: 10px !important; }
             .sidebar-admin a { padding: 8px 12px; font-size: 13px; }
             .main-content { margin-left: 0; padding: 15px; }
         }
-        @media (max-width: 480px) {
-            .sidebar-admin a { width: 100%; font-size: 12px; }
-            table { min-width: 500px; }
-            .table-responsive { overflow-x: auto; }
-        }
+        @media (max-width: 480px) { .sidebar-admin a { width: 100%; font-size: 12px; } }
     </style>
 </head>
 <body class="bg-light">
@@ -65,9 +50,7 @@
     </c:if>
     <a href="${pageContext.request.contextPath}/admin/notificacoes">
         🔔 Notificações
-        <c:if test="${totalNaoLidas > 0}">
-            <span class="badge bg-danger ms-1">${totalNaoLidas}</span>
-        </c:if>
+        <c:if test="${totalNaoLidas > 0}"><span class="badge bg-danger ms-1">${totalNaoLidas}</span></c:if>
     </a>
     <a href="${pageContext.request.contextPath}/logout" class="text-danger mt-5">🚪 Sair</a>
 </div>
@@ -75,8 +58,7 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>✏️ Editar Livro</h2>
-        <a href="${pageContext.request.contextPath}/admin"
-           class="btn btn-outline-secondary">← Voltar</a>
+        <a href="${pageContext.request.contextPath}/admin" class="btn btn-outline-secondary">← Voltar</a>
     </div>
 
     <c:if test="${not empty erro}">
@@ -87,22 +69,18 @@
         <div class="card-body">
             <form action="${pageContext.request.contextPath}/admin/editar-livro" method="post">
                 <input type="hidden" name="id" value="${livro.id}">
-
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Título *</label>
-                        <input type="text" name="titulo" class="form-control"
-                               value="${livro.titulo}" required>
+                        <input type="text" name="titulo" class="form-control" value="${livro.titulo}" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Autor *</label>
-                        <input type="text" name="autor" class="form-control"
-                               value="${livro.autor}" required>
+                        <input type="text" name="autor" class="form-control" value="${livro.autor}" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Editora</label>
-                        <input type="text" name="editora" class="form-control"
-                               value="${livro.editora}">
+                        <input type="text" name="editora" class="form-control" value="${livro.editora}">
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label fw-bold">Ano de Publicação</label>
@@ -111,43 +89,30 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label fw-bold">Gênero</label>
-                        <input type="text" name="genero" class="form-control"
-                               value="${livro.genero}">
+                        <input type="text" name="genero" class="form-control" value="${livro.genero}">
                     </div>
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold">URL da Capa</label>
-                        <input type="text" name="capaUrl" id="capaUrl"
-                               class="form-control"
-                               value="${livro.capaUrl}"
-                               oninput="previewCapa(this.value)">
-                        <c:if test="${not empty livro.capaUrl}">
-                            <img id="previewImg" class="preview-capa"
-                                 src="${livro.capaUrl}"
-                                 onerror="this.style.display='none'">
-                        </c:if>
-                        <c:if test="${empty livro.capaUrl}">
-                            <img id="previewImg" class="preview-capa"
-                                 src="" style="display:none">
-                        </c:if>
+                        <input type="text" name="capaUrl" id="capaUrl" class="form-control"
+                               value="${livro.capaUrl}" oninput="previewCapa(this.value)">
+                        <%-- ✅ Preview: usa imagem do banco se disponível --%>
+                        <img id="previewImg" class="preview-capa"
+                             src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : (not empty livro.capaUrl ? livro.capaUrl : '')}"
+                             onerror="this.style.display='none'"
+                             style="${empty livro.capaUrl && !livro.temCapaImagem() ? 'display:none' : ''}">
                     </div>
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold">Descrição</label>
-                        <textarea name="descricao" class="form-control"
-                                  rows="3">${livro.descricao}</textarea>
+                        <textarea name="descricao" class="form-control" rows="3">${livro.descricao}</textarea>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label class="form-label fw-bold">Sumário</label>
-                        <textarea name="sumario" class="form-control"
-                                  rows="3">${livro.sumario}</textarea>
+                        <textarea name="sumario" class="form-control" rows="3">${livro.sumario}</textarea>
                     </div>
                 </div>
-
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-warning px-4">
-                        💾 Salvar Alterações
-                    </button>
-                    <a href="${pageContext.request.contextPath}/admin"
-                       class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-warning px-4">💾 Salvar Alterações</button>
+                    <a href="${pageContext.request.contextPath}/admin" class="btn btn-outline-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

@@ -8,6 +8,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
 
 @WebServlet("/admin/cadastrar-livro")
 public class CadastrarLivroServlet extends HttpServlet {
@@ -28,8 +31,7 @@ public class CadastrarLivroServlet extends HttpServlet {
         }
 
         request.setAttribute("usuarioLogado", usuarioLogado);
-        request.getRequestDispatcher("/cadastrar_livro.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/cadastrar_livro.jsp").forward(request, response);
     }
 
     @Override
@@ -47,7 +49,13 @@ public class CadastrarLivroServlet extends HttpServlet {
             livro.setGenero(request.getParameter("genero"));
             livro.setDescricao(request.getParameter("descricao"));
             livro.setSumario(request.getParameter("sumario"));
-            livro.setCapaUrl(request.getParameter("capaUrl"));
+
+            String capaUrl = request.getParameter("capaUrl");
+            livro.setCapaUrl(capaUrl);
+
+            // ✅ Baixa e salva imagem automaticamente
+            byte[] imagem = baixarImagem(capaUrl);
+            livro.setCapaImagem(imagem);
 
             String anoParam = request.getParameter("anoPublicacao");
             if (anoParam != null && !anoParam.isBlank()) {
@@ -55,20 +63,42 @@ public class CadastrarLivroServlet extends HttpServlet {
             }
 
             livroService.cadastrar(livro);
-
-            response.sendRedirect(request.getContextPath()
-                    + "/admin?cadastro=sucesso");
+            response.sendRedirect(request.getContextPath() + "/admin?cadastro=sucesso");
 
         } catch (IllegalArgumentException e) {
             request.setAttribute("erro", e.getMessage());
             request.setAttribute("usuarioLogado", usuarioLogado);
-            request.getRequestDispatcher("/cadastrar_livro.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/cadastrar_livro.jsp").forward(request, response);
         } catch (Exception e) {
             request.setAttribute("erro", "Erro ao cadastrar livro. Tente novamente.");
             request.setAttribute("usuarioLogado", usuarioLogado);
-            request.getRequestDispatcher("/cadastrar_livro.jsp")
-                    .forward(request, response);
+            request.getRequestDispatcher("/cadastrar_livro.jsp").forward(request, response);
         }
+    }
+
+    // ✅ Baixa imagem da URL e retorna os bytes
+    private byte[] baixarImagem(String capaUrl) {
+        if (capaUrl == null || capaUrl.isBlank()) return null;
+
+        try {
+            URI uri = new URI(capaUrl);
+            HttpURLConnection conn = (HttpURLConnection) uri.toURL().openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+            conn.connect();
+
+            if (conn.getResponseCode() == 200) {
+                String contentType = conn.getContentType();
+                if (contentType != null && contentType.startsWith("image/")) {
+                    try (InputStream is = conn.getInputStream()) {
+                        return is.readAllBytes();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Link inválido ou inacessível — ignora
+        }
+        return null;
     }
 }

@@ -79,9 +79,18 @@
     <div class="row">
         <div class="col-md-4 text-center">
 
-            <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
-                 class="book-cover mb-3"
-                 onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
+            <c:choose>
+                <c:when test="${livro.temCapaImagem()}">
+                    <img src="${pageContext.request.contextPath}/capa?id=${livro.id}"
+                         class="book-cover mb-3"
+                         onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
+                </c:when>
+                <c:otherwise>
+                    <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
+                         class="book-cover mb-3"
+                         onerror="this.src='https://via.placeholder.com/300x450?text=Sem+Capa'">
+                </c:otherwise>
+            </c:choose>
 
             <div class="mb-3">
                 <c:choose>

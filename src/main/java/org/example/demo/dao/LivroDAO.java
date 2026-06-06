@@ -12,8 +12,8 @@ public class LivroDAO {
     public boolean inserir(Livro livro) {
         String sql = """
                 INSERT INTO livros (titulo, autor, editora, ano_publicacao,
-                genero, descricao, sumario, capa_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                genero, descricao, sumario, capa_url, capa_imagem)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (Connection con = Database.getConnection();
@@ -27,14 +27,16 @@ public class LivroDAO {
             ps.setString(6, livro.getDescricao());
             ps.setString(7, livro.getSumario());
             ps.setString(8, livro.getCapaUrl());
+            if (livro.getCapaImagem() != null) {
+                ps.setBytes(9, livro.getCapaImagem());
+            } else {
+                ps.setNull(9, Types.BLOB);
+            }
 
             int rows = ps.executeUpdate();
-
             if (rows > 0) {
                 ResultSet keys = ps.getGeneratedKeys();
-                if (keys.next()) {
-                    livro.setId(keys.getInt(1));
-                }
+                if (keys.next()) livro.setId(keys.getInt(1));
             }
             return rows > 0;
 
@@ -43,19 +45,16 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Busca só livros ativos
     public Livro buscarPorId(int id) {
-        String sql = "SELECT * FROM livros WHERE id = ? AND ativo = TRUE";
+        // ✅ Não carrega capa_imagem na listagem — só metadados
+        String sql = "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE id = ? AND ativo = TRUE";
 
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return mapearLivro(rs);
-            }
+            if (rs.next()) return mapearLivroSemImagem(rs);
             return null;
 
         } catch (SQLException e) {
@@ -63,19 +62,29 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Busca inteligente — separa termos por vírgula ou espaço
-    public List<Livro> buscarGeral(String termo) {
-        if (termo == null || termo.trim().isEmpty()) {
-            return listarTodos();
+    // ✅ Busca só os bytes da imagem — rápido para o CapaServlet
+    public byte[] buscarCapaImagem(int id) {
+        String sql = "SELECT capa_imagem FROM livros WHERE id = ?";
+
+        try (Connection con = Database.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getBytes("capa_imagem");
+            return null;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar capa: " + e.getMessage(), e);
         }
+    }
 
-        // Separa os termos por vírgula ou espaço
+    public List<Livro> buscarGeral(String termo) {
+        if (termo == null || termo.trim().isEmpty()) return listarTodos();
+
         String[] termos = termo.trim().split("[,\\s]+");
-
-        StringBuilder sql = new StringBuilder("""
-            SELECT * FROM livros
-            WHERE ativo = TRUE AND (
-            """);
+        StringBuilder sql = new StringBuilder(
+                "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE ativo = TRUE AND (");
 
         for (int i = 0; i < termos.length; i++) {
             if (i > 0) sql.append(" OR ");
@@ -96,10 +105,7 @@ public class LivroDAO {
 
             ResultSet rs = ps.executeQuery();
             List<Livro> livros = new ArrayList<>();
-
-            while (rs.next()) {
-                livros.add(mapearLivro(rs));
-            }
+            while (rs.next()) livros.add(mapearLivroSemImagem(rs));
             return livros;
 
         } catch (SQLException e) {
@@ -107,83 +113,57 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Busca só livros ativos
     public List<Livro> buscarPorTitulo(String titulo) {
-        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND titulo LIKE ? ORDER BY titulo ASC";
-
+        String sql = "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE ativo = TRUE AND titulo LIKE ? ORDER BY titulo ASC";
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, "%" + titulo.trim() + "%");
             ResultSet rs = ps.executeQuery();
             List<Livro> livros = new ArrayList<>();
-
-            while (rs.next()) {
-                livros.add(mapearLivro(rs));
-            }
+            while (rs.next()) livros.add(mapearLivroSemImagem(rs));
             return livros;
-
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar livro por título: " + e.getMessage(), e);
         }
     }
 
-    // ✅ Busca só livros ativos
     public List<Livro> buscarPorAutor(String autor) {
-        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND autor LIKE ? ORDER BY autor ASC";
-
+        String sql = "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE ativo = TRUE AND autor LIKE ? ORDER BY autor ASC";
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, "%" + autor.trim() + "%");
             ResultSet rs = ps.executeQuery();
             List<Livro> livros = new ArrayList<>();
-
-            while (rs.next()) {
-                livros.add(mapearLivro(rs));
-            }
+            while (rs.next()) livros.add(mapearLivroSemImagem(rs));
             return livros;
-
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar livro por autor: " + e.getMessage(), e);
         }
     }
 
-    // ✅ Busca só livros ativos
     public List<Livro> buscarPorGenero(String genero) {
-        String sql = "SELECT * FROM livros WHERE ativo = TRUE AND genero LIKE ? ORDER BY titulo ASC";
-
+        String sql = "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE ativo = TRUE AND genero LIKE ? ORDER BY titulo ASC";
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setString(1, "%" + genero.trim() + "%");
             ResultSet rs = ps.executeQuery();
             List<Livro> livros = new ArrayList<>();
-
-            while (rs.next()) {
-                livros.add(mapearLivro(rs));
-            }
+            while (rs.next()) livros.add(mapearLivroSemImagem(rs));
             return livros;
-
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao buscar livro por gênero: " + e.getMessage(), e);
         }
     }
 
-    // ✅ Lista só livros ativos
     public List<Livro> listarTodos() {
-        String sql = "SELECT * FROM livros WHERE ativo = TRUE ORDER BY created_at DESC";
+        // ✅ Não carrega bytes da imagem — só flag se tem capa
+        String sql = "SELECT id, titulo, autor, editora, ano_publicacao, genero, descricao, sumario, capa_url, ativo, created_at, (capa_imagem IS NOT NULL AND LENGTH(capa_imagem) > 0) as tem_capa FROM livros WHERE ativo = TRUE ORDER BY created_at DESC";
         List<Livro> livros = new ArrayList<>();
-
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                livros.add(mapearLivro(rs));
-            }
+            while (rs.next()) livros.add(mapearLivroSemImagem(rs));
             return livros;
-
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao listar livros: " + e.getMessage(), e);
         }
@@ -193,7 +173,7 @@ public class LivroDAO {
         String sql = """
                 UPDATE livros SET titulo = ?, autor = ?, editora = ?,
                 ano_publicacao = ?, genero = ?, descricao = ?,
-                sumario = ?, capa_url = ?
+                sumario = ?, capa_url = ?, capa_imagem = ?
                 WHERE id = ?
                 """;
 
@@ -208,8 +188,12 @@ public class LivroDAO {
             ps.setString(6, livro.getDescricao());
             ps.setString(7, livro.getSumario());
             ps.setString(8, livro.getCapaUrl());
-            ps.setInt(9, livro.getId());
-
+            if (livro.getCapaImagem() != null) {
+                ps.setBytes(9, livro.getCapaImagem());
+            } else {
+                ps.setNull(9, Types.BLOB);
+            }
+            ps.setInt(10, livro.getId());
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -217,28 +201,22 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Desativar em vez de deletar
     public boolean desativar(int id) {
         String sql = "UPDATE livros SET ativo = FALSE WHERE id = ?";
-
         try (Connection con = Database.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao desativar livro: " + e.getMessage(), e);
         }
     }
 
-    // ✅ Mantido para compatibilidade
-    public boolean deletar(int id) {
-        return desativar(id);
-    }
+    public boolean deletar(int id) { return desativar(id); }
 
-    private Livro mapearLivro(ResultSet rs) throws SQLException {
-        return new Livro(
+    // ✅ Mapeia livro SEM carregar bytes da imagem — usa flag tem_capa
+    private Livro mapearLivroSemImagem(ResultSet rs) throws SQLException {
+        Livro livro = new Livro(
                 rs.getInt("id"),
                 rs.getString("titulo"),
                 rs.getString("autor"),
@@ -248,9 +226,14 @@ public class LivroDAO {
                 rs.getString("descricao"),
                 rs.getString("sumario"),
                 rs.getString("capa_url"),
-                rs.getBoolean("ativo"), // ✅ novo campo
+                rs.getBoolean("ativo"),
                 rs.getTimestamp("created_at") != null
                         ? rs.getTimestamp("created_at").toLocalDateTime() : null
         );
+        // ✅ Marca se tem imagem sem carregar os bytes
+        if (rs.getBoolean("tem_capa")) {
+            livro.setTemCapaNobanco(true);
+        }
+        return livro;
     }
 }
