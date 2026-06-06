@@ -63,25 +63,36 @@ public class LivroDAO {
         }
     }
 
-    // ✅ Busca só livros ativos
+    // ✅ Busca inteligente — separa termos por vírgula ou espaço
     public List<Livro> buscarGeral(String termo) {
         if (termo == null || termo.trim().isEmpty()) {
             return listarTodos();
         }
 
-        String sql = """
-                SELECT * FROM livros
-                WHERE ativo = TRUE AND (titulo LIKE ? OR autor LIKE ? OR genero LIKE ?)
-                ORDER BY titulo ASC
-                """;
+        // Separa os termos por vírgula ou espaço
+        String[] termos = termo.trim().split("[,\\s]+");
+
+        StringBuilder sql = new StringBuilder("""
+            SELECT * FROM livros
+            WHERE ativo = TRUE AND (
+            """);
+
+        for (int i = 0; i < termos.length; i++) {
+            if (i > 0) sql.append(" OR ");
+            sql.append("(titulo LIKE ? OR autor LIKE ? OR genero LIKE ?)");
+        }
+        sql.append(") ORDER BY titulo ASC");
 
         try (Connection con = Database.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
 
-            String busca = "%" + termo.trim() + "%";
-            ps.setString(1, busca);
-            ps.setString(2, busca);
-            ps.setString(3, busca);
+            int idx = 1;
+            for (String t : termos) {
+                String busca = "%" + t.trim() + "%";
+                ps.setString(idx++, busca);
+                ps.setString(idx++, busca);
+                ps.setString(idx++, busca);
+            }
 
             ResultSet rs = ps.executeQuery();
             List<Livro> livros = new ArrayList<>();

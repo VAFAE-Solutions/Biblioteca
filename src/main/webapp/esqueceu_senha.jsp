@@ -13,8 +13,6 @@
         .subtitulo { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        .form-group input { width: 100%; padding: 14px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-        .form-group input:focus { outline: none; border-color: #39c3cf; }
         .btn-enviar { width: 100%; padding: 15px; border: none; background: #39c3cf; color: white; font-size: 18px; border-radius: 8px; cursor: pointer; }
         .btn-enviar:hover { background: #27aab5; }
         .mensagem { padding: 12px; border-radius: 6px; margin-bottom: 20px; text-align: center; }
@@ -22,36 +20,38 @@
         .erro { background: #ffdede; color: #c40000; }
         .link-voltar { text-align: center; margin-top: 20px; }
         .link-voltar a { color: #39c3cf; text-decoration: none; font-weight: bold; }
+        .email-input-group { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+        .email-input-group input { border: none; flex: 1; padding: 14px; font-size: 16px; outline: none; }
+        .email-input-group span { background: #f0f2f5; padding: 14px; color: #666; white-space: nowrap; font-size: 14px; border-left: 1px solid #ccc; }
     </style>
 </head>
 <body>
 <div class="login-wrapper">
     <div class="login-container">
         <h2>🔑 Esqueceu a Senha?</h2>
-        <p class="subtitulo">
-            Informe seu e-mail para solicitar o desbloqueio ao administrador.
-        </p>
+        <p class="subtitulo">Informe seu e-mail para solicitar o desbloqueio ao administrador.</p>
 
         <c:if test="${param.sucesso == 'true'}">
             <div class="mensagem sucesso">
                 ✅ Solicitação enviada! O administrador irá analisar e fornecer uma senha temporária em breve.
             </div>
         </c:if>
-
         <c:if test="${not empty erro}">
             <div class="mensagem erro">❌ ${erro}</div>
         </c:if>
 
         <c:if test="${param.sucesso != 'true'}">
-            <form action="${pageContext.request.contextPath}/esqueceu-senha" method="post">
+            <form action="${pageContext.request.contextPath}/esqueceu-senha" method="post"
+                  onsubmit="montarEmail()">
                 <div class="form-group">
                     <label>E-mail cadastrado</label>
-                    <input type="email" name="email"
-                           placeholder="seu@email.com" required>
+                    <div class="email-input-group">
+                        <input type="text" id="emailPrefix" placeholder="seunome" required>
+                        <span>@biblioteca.com</span>
+                    </div>
+                    <input type="hidden" name="email" id="emailCompleto">
                 </div>
-                <button type="submit" class="btn-enviar">
-                    📨 Solicitar Desbloqueio
-                </button>
+                <button type="submit" class="btn-enviar">📨 Solicitar Desbloqueio</button>
             </form>
         </c:if>
 
@@ -60,5 +60,11 @@
         </div>
     </div>
 </div>
+<script>
+    function montarEmail() {
+        const prefix = document.getElementById('emailPrefix').value.trim();
+        document.getElementById('emailCompleto').value = prefix + '@biblioteca.com';
+    }
+</script>
 </body>
 </html>

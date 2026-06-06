@@ -2,6 +2,7 @@ package org.example.demo.controller;
 
 import org.example.demo.model.Usuario;
 import org.example.demo.model.UsuarioBibliotecario;
+import org.example.demo.model.UsuarioEstudante;
 import org.example.demo.service.UsuarioService;
 
 import jakarta.servlet.ServletException;
@@ -35,8 +36,6 @@ public class UsuariosUnidadeServlet extends HttpServlet {
         }
 
         final int unidadeFinal = unidadeId;
-
-        // ✅ Lista só usuários ativos
         List<Usuario> todosUsuarios = usuarioService.listarTodos();
 
         List<Usuario> usuariosDaUnidade = unidadeFinal > 0
@@ -50,8 +49,7 @@ public class UsuariosUnidadeServlet extends HttpServlet {
         request.setAttribute("usuarios", usuariosDaUnidade);
         request.setAttribute("unidadeId", unidadeId);
 
-        request.getRequestDispatcher("/usuarios_unidade.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/usuarios_unidade.jsp").forward(request, response);
     }
 
     @Override
@@ -74,16 +72,38 @@ public class UsuariosUnidadeServlet extends HttpServlet {
                             + "/admin/usuarios-unidade?acao=desbloqueado");
                 }
                 case "desativar" -> {
-                    // ✅ Desativar em vez de deletar
                     usuarioService.desativar(id);
                     response.sendRedirect(request.getContextPath()
                             + "/admin/usuarios-unidade?acao=desativado");
                 }
                 case "reativar" -> {
-                    // ✅ Reativar usuário
                     usuarioService.reativar(id);
                     response.sendRedirect(request.getContextPath()
                             + "/admin/usuarios-unidade?acao=reativado");
+                }
+                case "editar" -> {
+                    // ✅ Editar dados do usuário
+                    Usuario usuario = usuarioService.buscarPorId(id);
+                    if (usuario != null) {
+                        String nome     = request.getParameter("nome");
+                        String telefone = request.getParameter("telefone");
+                        String cpf      = request.getParameter("cpf");
+                        String raParam  = request.getParameter("ra");
+
+                        if (nome != null && !nome.isBlank()) usuario.setNome(nome.trim());
+                        usuario.setTelefone(telefone);
+                        usuario.setCpf(cpf);
+
+                        if (usuario instanceof UsuarioEstudante estudante
+                                && raParam != null && !raParam.isBlank()) {
+                            estudante.setRa(Integer.parseInt(raParam));
+                        }
+
+                        usuarioService.atualizar(usuario);
+                    }
+                    // ✅ Reabre o modal do usuário editado
+                    response.sendRedirect(request.getContextPath()
+                            + "/admin/usuarios-unidade?acao=editado&usuarioId=" + id);
                 }
                 default -> response.sendRedirect(request.getContextPath()
                         + "/admin/usuarios-unidade");

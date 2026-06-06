@@ -90,7 +90,6 @@
                 </c:otherwise>
             </c:choose>
         </h2>
-        <%-- ✅ Passo 5 — URL corrigida --%>
         <a href="${pageContext.request.contextPath}/admin/cadastrar-livro"
            class="btn btn-primary">+ Cadastrar Novo Livro</a>
     </div>
@@ -145,6 +144,36 @@
         <div class="alert alert-danger">❌ Erro ao desativar livro.</div>
     </c:if>
 
+    <%-- ✅ Filtro de busca --%>
+    <div class="card shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form action="${pageContext.request.contextPath}/admin" method="get"
+                  class="d-flex gap-2 align-items-center flex-wrap">
+                <input type="text" name="txtBusca" class="form-control"
+                       style="max-width: 300px;"
+                       placeholder="Buscar livro, autor ou gênero..."
+                       value="${termoPesquisado}">
+                <select name="filtro" class="form-select" style="max-width: 150px;">
+                    <option value="">Todos</option>
+                    <option value="titulo" ${filtroAtivo == 'titulo' ? 'selected' : ''}>Título</option>
+                    <option value="autor"  ${filtroAtivo == 'autor'  ? 'selected' : ''}>Autor</option>
+                    <option value="genero" ${filtroAtivo == 'genero' ? 'selected' : ''}>Gênero</option>
+                </select>
+                <button type="submit" class="btn btn-info text-white">🔍 Buscar</button>
+                <c:if test="${not empty termoPesquisado}">
+                    <a href="${pageContext.request.contextPath}/admin"
+                       class="btn btn-outline-secondary">✕ Limpar</a>
+                </c:if>
+            </form>
+            <c:if test="${not empty termoPesquisado}">
+                <small class="text-muted mt-1 d-block">
+                    Resultados para: <strong>"${termoPesquisado}"</strong>
+                    (${livros.size()} livro(s) encontrado(s))
+                </small>
+            </c:if>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <strong>Gerenciamento de Acervo</strong>
@@ -192,23 +221,21 @@
                                class="btn btn-sm btn-info text-white">Ver</a>
                             <a href="${pageContext.request.contextPath}/admin/editar-livro?id=${l.id}"
                                class="btn btn-sm btn-warning">Editar</a>
-                            <c:if test="${usuarioLogado.tipo == 'ADMIN'}">
-                                <c:choose>
-                                    <c:when test="${l.ativo}">
-                                        <form action="${pageContext.request.contextPath}/admin/excluir-livro"
-                                              method="post" class="d-inline"
-                                              onsubmit="return confirm('Desativar este livro?')">
-                                            <input type="hidden" name="id" value="${l.id}">
-                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                Desativar
-                                            </button>
-                                        </form>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="text-muted small">Inativo</span>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:if>
+                            <c:choose>
+                                <c:when test="${l.ativo}">
+                                    <form action="${pageContext.request.contextPath}/admin/excluir-livro"
+                                          method="post" class="d-inline"
+                                          onsubmit="return confirm('Desativar este livro?')">
+                                        <input type="hidden" name="id" value="${l.id}">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            Desativar
+                                        </button>
+                                    </form>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted small">Inativo</span>
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                     </tr>
                 </c:forEach>

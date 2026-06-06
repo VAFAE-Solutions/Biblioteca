@@ -1,6 +1,7 @@
 package org.example.demo.controller;
 
 import org.example.demo.model.Usuario;
+import org.example.demo.model.UsuarioEstudante;
 import org.example.demo.service.MensagemContatoService;
 import org.example.demo.service.MultaService;
 import org.example.demo.service.UsuarioService;
@@ -36,21 +37,17 @@ public class GerenciarUsuariosServlet extends HttpServlet {
                 Usuario usuarioDetalhe = usuarioService.buscarPorId(id);
                 if (usuarioDetalhe != null) {
                     request.setAttribute("usuarioDetalhe", usuarioDetalhe);
-                    request.setAttribute("multasUsuario",
-                            multaService.buscarPorUsuario(id));
-                    request.setAttribute("totalMulta",
-                            multaService.calcularTotalMultasPendentes(id));
+                    request.setAttribute("multasUsuario", multaService.buscarPorUsuario(id));
+                    request.setAttribute("totalMulta", multaService.calcularTotalMultasPendentes(id));
                 }
             } catch (NumberFormatException ignored) {}
         }
 
         request.setAttribute("usuarioLogado", usuarioLogado);
         request.setAttribute("usuarios", usuarioService.listarTodosIncluindoInativos());
-        request.setAttribute("usuariosBloqueadosOuReset",
-                usuarioService.listarBloqueadosOuComReset());
+        request.setAttribute("usuariosBloqueadosOuReset", usuarioService.listarBloqueadosOuComReset());
 
-        request.getRequestDispatcher("/gerenciar_usuarios.jsp")
-                .forward(request, response);
+        request.getRequestDispatcher("/gerenciar_usuarios.jsp").forward(request, response);
     }
 
     @Override
@@ -73,7 +70,31 @@ public class GerenciarUsuariosServlet extends HttpServlet {
                     }
                 }
                 case "resetar_limite" -> usuarioService.resetarLimiteCotas(id);
-                case "aprovar_reset"  -> {
+                case "editar" -> {
+                    // ✅ Editar dados do usuário
+                    Usuario usuario = usuarioService.buscarPorId(id);
+                    if (usuario != null) {
+                        String nome     = request.getParameter("nome");
+                        String telefone = request.getParameter("telefone");
+                        String cpf      = request.getParameter("cpf");
+                        String raParam  = request.getParameter("ra");
+
+                        if (nome != null && !nome.isBlank()) usuario.setNome(nome.trim());
+                        usuario.setTelefone(telefone);
+                        usuario.setCpf(cpf);
+
+                        // ✅ Admin pode editar RA de estudante
+                        if (usuario instanceof UsuarioEstudante estudante && raParam != null && !raParam.isBlank()) {
+                            estudante.setRa(Integer.parseInt(raParam));
+                        }
+
+                        usuarioService.atualizar(usuario);
+                    }
+                    response.sendRedirect(request.getContextPath()
+                            + "/admin/usuarios?acao=editado&detalhe=" + id);
+                    return;
+                }
+                case "aprovar_reset" -> {
                     Usuario usuario = usuarioService.buscarPorId(id);
                     String senhaTemp = usuarioService.aprovarReset(id);
 
@@ -97,14 +118,12 @@ public class GerenciarUsuariosServlet extends HttpServlet {
                     return;
                 }
             }
-            response.sendRedirect(request.getContextPath()
-                    + "/admin/usuarios?acao=" + acao);
+            response.sendRedirect(request.getContextPath() + "/admin/usuarios?acao=" + acao);
         } catch (IllegalArgumentException e) {
             response.sendRedirect(request.getContextPath()
                     + "/admin/usuarios?acao=erro&msg=" + e.getMessage());
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath()
-                    + "/admin/usuarios?acao=erro");
+            response.sendRedirect(request.getContextPath() + "/admin/usuarios?acao=erro");
         }
     }
 }

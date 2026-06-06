@@ -22,7 +22,7 @@
             z-index: 1000;
             height: 56px;
         }
-        .search-box { width: 300px; }
+        .search-box { width: 220px; }
         .sidebar {
             width: 220px;
             height: 100vh;
@@ -102,12 +102,18 @@
 <div class="topbar">
     <div><strong>📚 Library Digital</strong></div>
 
-    <form class="d-flex" action="${pageContext.request.contextPath}/buscar" method="get">
-        <input class="form-control me-2 search-box"
+    <form class="d-flex gap-2" action="${pageContext.request.contextPath}/dashboard" method="get">
+        <input class="form-control search-box"
                type="search"
                name="txtBusca"
                value="${termoPesquisado}"
-               placeholder="Procurar Livro, Autor ou Gênero">
+               placeholder="Buscar livro, autor...">
+        <select name="filtro" class="form-select" style="width: 120px;">
+            <option value="">Todos</option>
+            <option value="titulo"  ${filtroAtivo == 'titulo'  ? 'selected' : ''}>Título</option>
+            <option value="autor"   ${filtroAtivo == 'autor'   ? 'selected' : ''}>Autor</option>
+            <option value="genero"  ${filtroAtivo == 'genero'  ? 'selected' : ''}>Gênero</option>
+        </select>
         <button class="btn btn-light" type="submit">🔍</button>
     </form>
 
@@ -140,16 +146,23 @@
         </div>
     </div>
 
-    <h4 class="mb-4">
-        <c:choose>
-            <c:when test="${not empty termoPesquisado}">
-                🔎 Resultados para: "${termoPesquisado}"
-            </c:when>
-            <c:otherwise>
-                📖 Catálogo de Livros
-            </c:otherwise>
-        </c:choose>
-    </h4>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">
+            <c:choose>
+                <c:when test="${not empty termoPesquisado}">
+                    🔎 Resultados para: "${termoPesquisado}"
+                    <small class="text-muted fs-6">(${livros.size()} livro(s))</small>
+                </c:when>
+                <c:otherwise>
+                    📖 Catálogo de Livros
+                </c:otherwise>
+            </c:choose>
+        </h4>
+        <c:if test="${not empty termoPesquisado}">
+            <a href="${pageContext.request.contextPath}/dashboard"
+               class="btn btn-outline-secondary btn-sm">✕ Limpar busca</a>
+        </c:if>
+    </div>
 
     <div class="row">
         <c:forEach var="livro" items="${livros}">

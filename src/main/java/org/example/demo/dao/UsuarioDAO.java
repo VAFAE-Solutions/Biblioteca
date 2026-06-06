@@ -174,22 +174,39 @@ public class UsuarioDAO {
     }
 
     public boolean atualizar(Usuario usuario) {
-        String sql = """
-                UPDATE usuario SET nome = ?, email = ?, telefone = ?,
-                cpf = ?, updated_at = NOW()
-                WHERE id = ?
-                """;
+        try (Connection con = Database.getConnection()) {
 
-        try (Connection con = Database.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, usuario.getNome());
-            ps.setString(2, usuario.getEmail());
-            ps.setString(3, usuario.getTelefone());
-            ps.setString(4, usuario.getCpf());
-            ps.setInt(5, usuario.getId());
-
-            return ps.executeUpdate() > 0;
+            if (usuario instanceof UsuarioEstudante estudante) {
+                // ✅ Atualiza também o RA para estudantes
+                String sql = """
+                    UPDATE usuario SET nome = ?, email = ?, telefone = ?,
+                    cpf = ?, ra = ?, updated_at = NOW()
+                    WHERE id = ?
+                    """;
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setString(1, usuario.getNome());
+                    ps.setString(2, usuario.getEmail());
+                    ps.setString(3, usuario.getTelefone());
+                    ps.setString(4, usuario.getCpf());
+                    ps.setInt(5, estudante.getRa());
+                    ps.setInt(6, usuario.getId());
+                    return ps.executeUpdate() > 0;
+                }
+            } else {
+                String sql = """
+                    UPDATE usuario SET nome = ?, email = ?, telefone = ?,
+                    cpf = ?, updated_at = NOW()
+                    WHERE id = ?
+                    """;
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    ps.setString(1, usuario.getNome());
+                    ps.setString(2, usuario.getEmail());
+                    ps.setString(3, usuario.getTelefone());
+                    ps.setString(4, usuario.getCpf());
+                    ps.setInt(5, usuario.getId());
+                    return ps.executeUpdate() > 0;
+                }
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao atualizar usuário: " + e.getMessage(), e);

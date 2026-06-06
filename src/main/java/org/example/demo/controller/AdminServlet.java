@@ -24,29 +24,39 @@ public class AdminServlet extends HttpServlet {
         HttpSession session = request.getSession(false);
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
 
-        // Proteção por perfil — só ADMIN e BIBLIOTECARIO
         if (usuarioLogado.getTipo() != Usuario.Tipo.ADMIN &&
                 usuarioLogado.getTipo() != Usuario.Tipo.BIBLIOTECARIO) {
             response.sendRedirect(request.getContextPath() + "/dashboard");
             return;
         }
 
-        // Livros
-        request.setAttribute("livros", livroService.listarTodos());
-        request.setAttribute("usuarioLogado", usuarioLogado);
+        // ✅ Filtro de busca
+        String txtBusca = request.getParameter("txtBusca");
+        String filtro   = request.getParameter("filtro");
 
-        // ✅ Cards extras para Admin
-        if (usuarioLogado.getTipo() == Usuario.Tipo.ADMIN) {
-            request.setAttribute("totalUsuarios",
-                    usuarioService.listarTodos().size());
-            request.setAttribute("totalAtrasados",
-                    emprestimoService.buscarAtrasados().size());
+        if (txtBusca != null && !txtBusca.trim().isEmpty()) {
+            if ("autor".equals(filtro)) {
+                request.setAttribute("livros", livroService.buscarPorAutor(txtBusca));
+            } else if ("genero".equals(filtro)) {
+                request.setAttribute("livros", livroService.buscarPorGenero(txtBusca));
+            } else {
+                request.setAttribute("livros", livroService.buscarGeral(txtBusca));
+            }
+        } else {
+            request.setAttribute("livros", livroService.listarTodos());
         }
 
-        // ✅ Cards extras para Bibliotecário
+        request.setAttribute("termoPesquisado", txtBusca);
+        request.setAttribute("filtroAtivo", filtro);
+        request.setAttribute("usuarioLogado", usuarioLogado);
+
+        if (usuarioLogado.getTipo() == Usuario.Tipo.ADMIN) {
+            request.setAttribute("totalUsuarios", usuarioService.listarTodos().size());
+            request.setAttribute("totalAtrasados", emprestimoService.buscarAtrasados().size());
+        }
+
         if (usuarioLogado.getTipo() == Usuario.Tipo.BIBLIOTECARIO) {
-            request.setAttribute("totalAtivos",
-                    emprestimoService.buscarAtivos().size());
+            request.setAttribute("totalAtivos", emprestimoService.buscarAtivos().size());
         }
 
         request.getRequestDispatcher("/admin_dashboard.jsp")

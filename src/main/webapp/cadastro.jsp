@@ -27,6 +27,9 @@
         .erro { background: #ffdede; color: #c40000; }
         .link-login { text-align: center; margin-top: 25px; }
         .link-login a { text-decoration: none; color: #39c3cf; font-weight: bold; }
+        .email-input-group { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+        .email-input-group input { border: none; flex: 1; padding: 14px; font-size: 16px; outline: none; }
+        .email-input-group span { background: #f0f2f5; padding: 14px; color: #666; white-space: nowrap; font-size: 14px; border-left: 1px solid #ccc; }
     </style>
 </head>
 <body>
@@ -38,25 +41,26 @@
         <c:if test="${not empty erro}">
             <div class="mensagem erro">${erro}</div>
         </c:if>
-
         <div id="mensagemErro" class="mensagem erro" style="display:none;"></div>
 
-        <form id="formCadastro" action="${pageContext.request.contextPath}/cadastro" method="post">
+        <form id="formCadastro" action="${pageContext.request.contextPath}/cadastro"
+              method="post" onsubmit="return validarEMontar(event)">
             <div class="form-group">
                 <label>Nome Completo</label>
-                <input type="text" name="nome" id="nome"
-                       placeholder="Digite seu nome completo" required>
+                <input type="text" name="nome" id="nome" placeholder="Digite seu nome completo" required>
             </div>
             <div class="form-group">
                 <label>E-mail</label>
-                <input type="email" name="email" id="email"
-                       placeholder="seu@email.com" required>
+                <div class="email-input-group">
+                    <input type="text" id="emailPrefix" placeholder="seunome" required>
+                    <span>@biblioteca.com</span>
+                </div>
+                <input type="hidden" name="email" id="emailCompleto">
             </div>
             <div class="form-group">
                 <label>Senha</label>
                 <div class="senha-wrapper">
-                    <input type="password" name="senha" id="senha"
-                           placeholder="Mínimo 6 caracteres" required>
+                    <input type="password" name="senha" id="senha" placeholder="Mínimo 6 caracteres" required>
                     <span class="toggle-senha" onclick="toggleSenha('senha', this)">
                         <i class="bi bi-eye-slash"></i>
                     </span>
@@ -65,8 +69,7 @@
             <div class="form-group">
                 <label>Confirmar Senha</label>
                 <div class="senha-wrapper">
-                    <input type="password" id="confirmarSenha"
-                           placeholder="Digite novamente" required>
+                    <input type="password" id="confirmarSenha" placeholder="Digite novamente" required>
                     <span class="toggle-senha" onclick="toggleSenha('confirmarSenha', this)">
                         <i class="bi bi-eye-slash"></i>
                     </span>
@@ -83,29 +86,23 @@
 </div>
 
 <script>
-    function toggleSenha(inputId, btn) {
-        const input = document.getElementById(inputId);
-        const icon = btn.querySelector('i');
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.className = 'bi bi-eye';
-        } else {
-            input.type = 'password';
-            icon.className = 'bi bi-eye-slash';
-        }
-    }
-
-    document.getElementById('formCadastro').addEventListener('submit', function(event) {
+    function validarEMontar(event) {
         const nome = document.getElementById('nome').value;
+        const prefix = document.getElementById('emailPrefix').value.trim();
         const senha = document.getElementById('senha').value;
         const confirmarSenha = document.getElementById('confirmarSenha').value;
         const erro = document.getElementById('mensagemErro');
-
         erro.style.display = 'none';
 
         if (nome.trim().length < 3) {
             event.preventDefault();
             erro.textContent = 'Nome deve ter ao menos 3 caracteres.';
+            erro.style.display = 'block';
+            return false;
+        }
+        if (!prefix) {
+            event.preventDefault();
+            erro.textContent = 'E-mail é obrigatório.';
             erro.style.display = 'block';
             return false;
         }
@@ -121,7 +118,15 @@
             erro.style.display = 'block';
             return false;
         }
-    });
+        document.getElementById('emailCompleto').value = prefix + '@biblioteca.com';
+        return true;
+    }
+    function toggleSenha(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') { input.type = 'text'; icon.className = 'bi bi-eye'; }
+        else { input.type = 'password'; icon.className = 'bi bi-eye-slash'; }
+    }
 </script>
 </body>
 </html>

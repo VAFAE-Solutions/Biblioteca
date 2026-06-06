@@ -28,14 +28,22 @@ public class DashboardServlet extends HttpServlet {
         }
 
         String txtBusca = request.getParameter("txtBusca");
+        String filtro   = request.getParameter("filtro");
 
         if (txtBusca != null && !txtBusca.trim().isEmpty()) {
-            request.setAttribute("livros", livroService.buscarGeral(txtBusca));
+            if ("autor".equals(filtro)) {
+                request.setAttribute("livros", livroService.buscarPorAutor(txtBusca));
+            } else if ("genero".equals(filtro)) {
+                request.setAttribute("livros", livroService.buscarPorGenero(txtBusca));
+            } else {
+                request.setAttribute("livros", livroService.buscarGeral(txtBusca));
+            }
         } else {
             request.setAttribute("livros", livroService.listarTodos());
         }
 
         request.setAttribute("termoPesquisado", txtBusca);
+        request.setAttribute("filtroAtivo", filtro);
         request.setAttribute("usuarioLogado", usuarioLogado);
 
         request.getRequestDispatcher("/dashboard.jsp")
