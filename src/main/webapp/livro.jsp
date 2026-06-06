@@ -144,7 +144,6 @@
             </div>
 
             <c:choose>
-
                 <c:when test="${param.reserva == 'sucesso'}">
                     <button class="btn btn-secondary btn-lg px-5 fw-bold" disabled>
                         Já Emprestado
@@ -165,6 +164,17 @@
                     </a>
                 </c:when>
 
+                <%-- ✅ Admin e Bibliotecário não podem emprestar/reservar --%>
+                <c:when test="${not empty sessionScope.usuarioLogado &&
+                               (sessionScope.usuarioLogado.tipo == 'ADMIN' ||
+                                sessionScope.usuarioLogado.tipo == 'BIBLIOTECARIO')}">
+                    <div class="alert alert-info">
+                        ℹ️ Administradores e Bibliotecários não realizam empréstimos pelo sistema.
+                        Use o <a href="${pageContext.request.contextPath}/admin/emprestimo-presencial"
+                                 class="alert-link">Empréstimo Presencial</a> para registrar empréstimos.
+                    </div>
+                </c:when>
+
                 <c:when test="${empty sessionScope.usuarioLogado}">
                     <a href="${pageContext.request.contextPath}/login"
                        class="btn btn-warning btn-lg px-5 fw-bold">
@@ -173,22 +183,18 @@
                 </c:when>
 
                 <c:when test="${exemplarDisponivel}">
-                    <form action="${pageContext.request.contextPath}/reservar"
-                          method="post">
+                    <form action="${pageContext.request.contextPath}/reservar" method="post">
                         <input type="hidden" name="livroId" value="${livro.id}">
-                        <button type="submit"
-                                class="btn btn-warning btn-lg px-5 fw-bold">
+                        <button type="submit" class="btn btn-warning btn-lg px-5 fw-bold">
                             Emprestar Agora!
                         </button>
                     </form>
                 </c:when>
 
                 <c:otherwise>
-                    <form action="${pageContext.request.contextPath}/reservar-livro"
-                          method="post">
+                    <form action="${pageContext.request.contextPath}/reservar-livro" method="post">
                         <input type="hidden" name="livroId" value="${livro.id}">
-                        <button type="submit"
-                                class="btn btn-primary btn-lg px-5 fw-bold">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold">
                             🔖 Reservar na Fila
                         </button>
                     </form>
@@ -197,7 +203,6 @@
                         Reserve seu lugar na fila de espera!
                     </small>
                 </c:otherwise>
-
             </c:choose>
 
         </div>

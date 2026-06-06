@@ -239,13 +239,14 @@
     });
 
     // Máscara CPF
-    document.getElementById('cpf').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length <= 11) {
-            value = value.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-            e.target.value = value;
-        }
-    });
+   // Máscara CPF
+   document.getElementById('cpf').addEventListener('input', function(e) {
+       let v = e.target.value.replace(/\D/g, '');
+       v = v.replace(/(\d{3})(\d)/, '$1.$2');
+       v = v.replace(/(\d{3})(\d)/, '$1.$2');
+       v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+       e.target.value = v;
+   });
 </script>
 </body>
 </html>

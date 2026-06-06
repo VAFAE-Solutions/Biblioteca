@@ -39,6 +39,32 @@
         .content { margin-left: 240px; padding: 30px; }
         .perfil-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background-color: #40c4d4; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: bold; }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 180px; top: 56px; }
+            .content { margin-left: 195px; }
+        }
+        @media (max-width: 768px) {
+            body { margin-top: 0 !important; }
+            .topbar { flex-wrap: wrap !important; height: auto !important; gap: 8px; padding: 8px !important; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                display: flex;
+                flex-wrap: wrap;
+                border-right: none;
+                border-bottom: 1px solid #ccc;
+            }
+            .sidebar a { padding: 8px 12px; font-size: 13px; border-bottom: none; border-right: 1px solid #ddd; }
+            .content { margin-left: 0; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar a { width: 100%; font-size: 12px; }
+            table { min-width: 500px; }
+            .table-responsive { overflow-x: auto; }
+        }
     </style>
 </head>
 <body>

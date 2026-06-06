@@ -69,6 +69,32 @@
         .card-img-top { height: 200px; object-fit: cover; }
         .book-card { transition: transform 0.2s; border: none; }
         .book-card:hover { transform: scale(1.03); }
+
+        @media (max-width: 1024px) {
+            .sidebar { width: 180px; top: 56px; }
+            .content { margin-left: 195px; }
+        }
+        @media (max-width: 768px) {
+            body { margin-top: 0 !important; }
+            .topbar { flex-wrap: wrap !important; height: auto !important; gap: 8px; padding: 8px !important; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                top: 0;
+                display: flex;
+                flex-wrap: wrap;
+                border-right: none;
+                border-bottom: 1px solid #ccc;
+            }
+            .sidebar a { padding: 8px 12px; font-size: 13px; border-bottom: none; border-right: 1px solid #ddd; }
+            .content { margin-left: 0; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar a { width: 100%; font-size: 12px; }
+            table { min-width: 500px; }
+            .table-responsive { overflow-x: auto; }
+        }
     </style>
 </head>
 <body>

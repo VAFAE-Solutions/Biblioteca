@@ -47,6 +47,11 @@ public class CadastroServlet extends HttpServlet {
             processarPasso1(request, response);
         }
     }
+    private boolean cpfValido(String cpf) {
+        if (cpf == null || cpf.isBlank()) return true; // CPF é opcional
+        String limpo = cpf.replaceAll("[^0-9]", "");
+        return limpo.length() == 11;
+    }
 
     private void processarPasso1(HttpServletRequest request,
                                  HttpServletResponse response)
@@ -97,6 +102,13 @@ public class CadastroServlet extends HttpServlet {
         String telefone = request.getParameter("telefone");
         String cpf      = request.getParameter("cpf");
         String raParam  = request.getParameter("ra");
+
+        if (!cpfValido(cpf)) {
+            request.setAttribute("erro", "CPF inválido. Informe 11 dígitos.");
+            request.getRequestDispatcher("/cadastro_completo.jsp")
+                    .forward(request, response);
+            return;
+        }
 
         try {
             Usuario usuario;

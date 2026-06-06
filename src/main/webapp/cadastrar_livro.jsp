@@ -12,6 +12,29 @@
         .sidebar-admin a:hover { background: #343a40; color: white; }
         .main-content { margin-left: 260px; padding: 20px; }
         .preview-capa { max-width: 150px; border-radius: 8px; display: none; margin-top: 10px; }
+
+        @media (max-width: 1024px) {
+            .sidebar-admin { width: 200px; }
+            .main-content { margin-left: 210px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar-admin {
+                width: 100%;
+                min-height: auto;
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 10px;
+            }
+            .sidebar-admin .p-4 { width: 100%; padding: 10px !important; }
+            .sidebar-admin a { padding: 8px 12px; font-size: 13px; }
+            .main-content { margin-left: 0; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar-admin a { width: 100%; font-size: 12px; }
+            table { min-width: 500px; }
+            .table-responsive { overflow-x: auto; }
+        }
     </style>
 </head>
 <body class="bg-light">
@@ -62,7 +85,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form action="${pageContext.request.contextPath}/cadastrar-livro" method="post">
+            <form action="${pageContext.request.contextPath}/admin/cadastrar-livro" method="post">
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-bold">Título *</label>

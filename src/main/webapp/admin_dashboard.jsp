@@ -13,6 +13,29 @@
         .sidebar-admin a.text-danger:hover { background: #343a40; }
         .main-content { margin-left: 260px; padding: 20px; }
         .stats-card { border-left: 5px solid #40c4d4; }
+
+        @media (max-width: 1024px) {
+            .sidebar-admin { width: 200px; }
+            .main-content { margin-left: 210px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar-admin {
+                width: 100%;
+                min-height: auto;
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 10px;
+            }
+            .sidebar-admin .p-4 { width: 100%; padding: 10px !important; }
+            .sidebar-admin a { padding: 8px 12px; font-size: 13px; }
+            .main-content { margin-left: 0; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar-admin a { width: 100%; font-size: 12px; }
+            table { min-width: 500px; }
+            .table-responsive { overflow-x: auto; }
+        }
     </style>
 </head>
 <body class="bg-light">

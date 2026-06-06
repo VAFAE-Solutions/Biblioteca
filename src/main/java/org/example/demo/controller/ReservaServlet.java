@@ -28,7 +28,7 @@ public class ReservaServlet extends HttpServlet {
             reservaService.realizarReserva(
                     livroId,
                     usuarioLogado.getId(),
-                    1 // unidade padrão por enquanto
+                    2 // unidade padrão por enquanto
             );
 
             response.sendRedirect(request.getContextPath()

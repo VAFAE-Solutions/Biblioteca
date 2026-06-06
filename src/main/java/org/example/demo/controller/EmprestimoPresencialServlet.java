@@ -37,9 +37,9 @@ public class EmprestimoPresencialServlet extends HttpServlet {
             if (usuarioBuscado != null) {
                 request.setAttribute("usuarioBuscado", usuarioBuscado);
 
-                // Busca exemplares disponíveis
-                int unidadeId = 0;
-                if (usuarioLogado instanceof UsuarioBibliotecario bib) {
+
+                int unidadeId = 2; // Unidade Central
+                if (usuarioLogado instanceof UsuarioBibliotecario bib && bib.getUnidadeId() > 0) {
                     unidadeId = bib.getUnidadeId();
                 }
 
@@ -70,8 +70,8 @@ public class EmprestimoPresencialServlet extends HttpServlet {
                 int usuarioId  = Integer.parseInt(request.getParameter("usuarioId"));
                 int livroId    = Integer.parseInt(request.getParameter("livroId"));
 
-                int unidadeId = 0;
-                if (usuarioLogado instanceof UsuarioBibliotecario bib) {
+                int unidadeId = 2; // Unidade Central
+                if (usuarioLogado instanceof UsuarioBibliotecario bib && bib.getUnidadeId() > 0) {
                     unidadeId = bib.getUnidadeId();
                 }
 
@@ -88,6 +88,7 @@ public class EmprestimoPresencialServlet extends HttpServlet {
                 int exemplarId = exemplares.get(0).getId();
                 emprestimoService.realizarEmprestimo(exemplarId, usuarioId);
 
+
                 response.sendRedirect(request.getContextPath()
                         + "/admin/emprestimo-presencial?sucesso=true");
 
@@ -101,10 +102,12 @@ public class EmprestimoPresencialServlet extends HttpServlet {
 
         } catch (IllegalStateException | IllegalArgumentException e) {
             response.sendRedirect(request.getContextPath()
-                    + "/admin/emprestimo-presencial?erro=" + e.getMessage());
+                    + "/admin/emprestimo-presencial?erro="
+                    + java.net.URLEncoder.encode(e.getMessage(), "UTF-8"));
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath()
-                    + "/admin/emprestimo-presencial?erro=Erro ao processar. Tente novamente.");
+                    + "/admin/emprestimo-presencial?erro="
+                    + java.net.URLEncoder.encode("Erro ao processar. Tente novamente.", "UTF-8"));
         }
     }
 }

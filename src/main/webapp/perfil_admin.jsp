@@ -15,6 +15,29 @@
         .main-content { margin-left: 260px; padding: 30px; }
         .perfil-card { background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background-color: #40c4d4; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: bold; }
+
+        @media (max-width: 1024px) {
+            .sidebar-admin { width: 200px; }
+            .main-content { margin-left: 210px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar-admin {
+                width: 100%;
+                min-height: auto;
+                position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 10px;
+            }
+            .sidebar-admin .p-4 { width: 100%; padding: 10px !important; }
+            .sidebar-admin a { padding: 8px 12px; font-size: 13px; }
+            .main-content { margin-left: 0; padding: 15px; }
+        }
+        @media (max-width: 480px) {
+            .sidebar-admin a { width: 100%; font-size: 12px; }
+            table { min-width: 500px; }
+            .table-responsive { overflow-x: auto; }
+        }
     </style>
 </head>
 <body class="bg-light">

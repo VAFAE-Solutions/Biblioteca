@@ -592,67 +592,212 @@ body {
     cursor: pointer;
 }
 
-/* ===== RESPONSIVIDADE ===== */
+/* ===== RESPONSIVIDADE COMPLETA ===== */
 
-@media (max-width: 768px) {
+/* Tablets e telas médias (768px - 1024px) */
+@media (max-width: 1024px) {
+
+    /* Header */
     .search-wrapper {
-        width: 200px;
+        width: 250px;
     }
 
+    /* Sidebar admin — reduz largura */
+    .sidebar-admin {
+        width: 200px !important;
+    }
+    .main-content {
+        margin-left: 210px !important;
+    }
+
+    /* Sidebar usuário */
+    .sidebar {
+        width: 180px !important;
+    }
+    .content {
+        margin-left: 200px !important;
+    }
+}
+
+/* Tablets pequenos (600px - 768px) */
+@media (max-width: 768px) {
+
+    /* Header público */
+    .header-top {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .search-wrapper {
+        width: 100%;
+        order: 3;
+    }
+
+    .logo-box {
+        width: 80px;
+        height: 60px;
+    }
+
+    /* Nav bar */
+    .nav-bar ul {
+        flex-wrap: wrap;
+    }
+
+    .nav-bar li {
+        flex: none;
+        width: 50%;
+    }
+
+    /* Sidebar admin — vira top bar */
+    .sidebar-admin {
+        width: 100% !important;
+        min-height: auto !important;
+        position: relative !important;
+        display: flex;
+        flex-wrap: wrap;
+        padding: 10px !important;
+    }
+
+    .sidebar-admin .p-4 {
+        width: 100%;
+        padding: 10px !important;
+    }
+
+    .sidebar-admin a {
+        padding: 8px 12px !important;
+        font-size: 13px;
+        flex: none;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+    }
+
+    /* Sidebar usuário */
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        top: 0 !important;
+        display: flex;
+        flex-wrap: wrap;
+        border-right: none !important;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .sidebar a {
+        padding: 8px 12px !important;
+        font-size: 13px;
+        border-bottom: none !important;
+        border-right: 1px solid #ddd;
+    }
+
+    .content {
+        margin-left: 0 !important;
+        padding: 15px !important;
+    }
+
+    /* Topbar usuário */
+    .topbar {
+        flex-wrap: wrap !important;
+        height: auto !important;
+        gap: 8px;
+        padding: 8px !important;
+    }
+
+    body {
+        margin-top: 0 !important;
+    }
+
+    /* Home */
     .home-wrapper {
-        padding: 20px;
+        padding: 15px;
     }
 
     .books-grid {
         gap: 15px;
+        justify-content: center;
     }
 
+    .book-card {
+        width: 120px;
+    }
+
+    /* Login e cadastro */
+    .login-container {
+        width: 90%;
+        padding: 25px;
+    }
+
+    .cadastro-container {
+        width: 95%;
+        padding: 25px;
+    }
+
+    /* Detalhe livro */
     .detalhe-box {
         flex-direction: column;
     }
 
     .detalhe-esquerda {
         width: 100%;
+        text-align: center;
+    }
+
+    .detalhe-esquerda img {
+        max-width: 200px;
     }
 }
 
-@media (max-width: 600px) {
-    .pesquisa-cabecalho {
-        flex-direction: column;
-        height: auto;
+/* Mobile (até 480px) */
+@media (max-width: 480px) {
+
+    .header-top {
+        padding: 8px;
     }
 
-    .pesquisa-logo {
+    .logo-box {
+        width: 60px;
+        height: 50px;
+    }
+
+    .logo-box img {
+        width: 35px;
+    }
+
+    .nav-bar li {
         width: 100%;
-        height: 120px;
+        border-right: none;
+        border-bottom: 1px solid #aaa;
     }
 
-    .pesquisa-barra-azul {
-        height: auto;
-        flex-direction: column;
-        padding: 15px;
-        gap: 10px;
-    }
-
-    .pesquisa-login {
-        margin: 0;
-    }
-
-    .pesquisa-circulo {
-        margin: 0;
-    }
-
-    .pesquisa-menu {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .pesquisa-menu a {
+    .sidebar-admin a {
         width: 100%;
+        font-size: 12px;
     }
 
-    .pesquisa-livros {
-        justify-content: center;
-        gap: 25px;
+    .book-card {
+        width: 100px;
+    }
+
+    .book-card img {
+        height: 150px;
+    }
+
+    .login-container {
+        width: 95%;
+        padding: 20px;
+    }
+
+    /* Tabelas — scroll horizontal */
+    .table-responsive-force {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 500px;
     }
 }
