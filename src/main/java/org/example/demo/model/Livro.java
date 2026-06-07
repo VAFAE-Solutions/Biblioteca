@@ -18,7 +18,8 @@ public class Livro {
     private boolean ativo = true;
     private LocalDateTime createdAt;
 
-    public Livro() {}
+    public Livro() {
+    }
 
     public Livro(String titulo, String autor, String editora,
                  int anoPublicacao, String genero, String descricao, String sumario) {
@@ -42,34 +43,82 @@ public class Livro {
         this.createdAt = createdAt;
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public String getTitulo() { return titulo; }
-    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getAutor() { return autor; }
-    public void setAutor(String autor) { this.autor = autor; }
+    public String getTitulo() {
+        return titulo;
+    }
 
-    public String getEditora() { return editora; }
-    public void setEditora(String editora) { this.editora = editora; }
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
-    public int getAnoPublicacao() { return anoPublicacao; }
-    public void setAnoPublicacao(int anoPublicacao) { this.anoPublicacao = anoPublicacao; }
+    public String getAutor() {
+        return autor;
+    }
 
-    public String getGenero() { return genero; }
-    public void setGenero(String genero) { this.genero = genero; }
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
 
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
+    public String getEditora() {
+        return editora;
+    }
 
-    public String getSumario() { return sumario; }
-    public void setSumario(String sumario) { this.sumario = sumario; }
+    public void setEditora(String editora) {
+        this.editora = editora;
+    }
 
-    public String getCapaUrl() { return capaUrl; }
-    public void setCapaUrl(String capaUrl) { this.capaUrl = capaUrl; }
+    public int getAnoPublicacao() {
+        return anoPublicacao;
+    }
 
-    public byte[] getCapaImagem() { return capaImagem; }
+    public void setAnoPublicacao(int anoPublicacao) {
+        this.anoPublicacao = anoPublicacao;
+    }
+
+    public String getGenero() {
+        return genero;
+    }
+
+    public void setGenero(String genero) {
+        this.genero = genero;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public String getSumario() {
+        return sumario;
+    }
+
+    public void setSumario(String sumario) {
+        this.sumario = sumario;
+    }
+
+    public String getCapaUrl() {
+        return capaUrl;
+    }
+
+    public void setCapaUrl(String capaUrl) {
+        this.capaUrl = capaUrl;
+    }
+
+    public byte[] getCapaImagem() {
+        return capaImagem;
+    }
+
     public void setCapaImagem(byte[] capaImagem) {
         this.capaImagem = capaImagem;
         if (capaImagem != null && capaImagem.length > 0) {
@@ -78,20 +127,38 @@ public class Livro {
     }
 
     // ✅ Flag para JSPs — verdadeiro se há imagem no banco
-    public boolean isTemCapaNobanco() { return temCapaNobanco; }
-    public void setTemCapaNobanco(boolean temCapaNobanco) { this.temCapaNobanco = temCapaNobanco; }
+    public boolean isTemCapaNobanco() {
+        return temCapaNobanco;
+    }
+
+    public void setTemCapaNobanco(boolean temCapaNobanco) {
+        this.temCapaNobanco = temCapaNobanco;
+    }
 
     // ✅ Método para JSPs — usa flag OU bytes
-    public boolean temCapaImagem() { return temCapaNobanco || (capaImagem != null && capaImagem.length > 0); }
+    public boolean temCapaImagem() {
+        return temCapaNobanco || (capaImagem != null && capaImagem.length > 0);
+    }
 
-    public boolean isAtivo() { return ativo; }
-    public void setAtivo(boolean ativo) { this.ativo = ativo; }
+    public boolean isAtivo() {
+        return ativo;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
-        return "Livro{id=" + id + ", titulo=" + titulo + ", ativo=" + ativo + "}";
+        return "Livro{id=" + id + ", titulo=" + titulo +
+                ", autor=" + autor + ", ativo=" + ativo + "}";
     }
 }

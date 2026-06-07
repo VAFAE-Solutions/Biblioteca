@@ -7,21 +7,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class DatabaseConfigTest {
 
     @Test
-    void getUrl_deveConterJdbcEBiblioteca() {
-        String url = DatabaseConfig.getUrl();
+    void getUrlRailway_deveEstarPreenchida() {
+        String url = DatabaseConfig.getUrlRailway();
+        assertNotNull(url);
+    }
+
+    @Test
+    void getUrlLocal_deveConterJdbcEBiblioteca() {
+        String url = DatabaseConfig.getUrlLocal();
         assertNotNull(url);
         assertTrue(url.startsWith("jdbc:"));
         assertTrue(url.contains("biblioteca"));
     }
 
     @Test
-    void getUsuario_naoDeveSerVazio() {
-        assertFalse(DatabaseConfig.getUsuario().isBlank());
+    void getUsuarioLocal_naoDeveSerVazio() {
+        assertFalse(DatabaseConfig.getUsuarioLocal().isBlank());
     }
 
     @Test
-    void getSenha_naoDeveSerNula() {
-        assertNotNull(DatabaseConfig.getSenha());
+    void getSenhaLocal_naoDeveSerNula() {
+        assertNotNull(DatabaseConfig.getSenhaLocal());
     }
 
     @Test

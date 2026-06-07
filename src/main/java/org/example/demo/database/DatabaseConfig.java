@@ -21,11 +21,19 @@ public class DatabaseConfig {
         }
     }
 
-    public static String getUrl()            { return props.getProperty("db.url"); }
-    public static String getUsuario()        { return props.getProperty("db.usuario"); }
-    public static String getSenha()          { return props.getProperty("db.senha"); }
-    public static int getMaxConnections()    { return Integer.parseInt(props.getProperty("db.maxConnections", "10")); }
-    public static int getMinIdle()           { return Integer.parseInt(props.getProperty("db.minIdle", "2")); }
-    public static long getConnectionTimeout(){ return Long.parseLong(props.getProperty("db.connectionTimeout", "30000")); }
-    public static long getIdleTimeout()      { return Long.parseLong(props.getProperty("db.idleTimeout", "600000")); }
+    // ✅ Railway
+    public static String getUrlRailway()      { return props.getProperty("railway.db.url", ""); }
+    public static String getUsuarioRailway()  { return props.getProperty("railway.db.usuario", ""); }
+    public static String getSenhaRailway()    { return props.getProperty("railway.db.senha", ""); }
+
+    // ✅ Local
+    public static String getUrlLocal()        { return props.getProperty("local.db.url"); }
+    public static String getUsuarioLocal()    { return props.getProperty("local.db.usuario"); }
+    public static String getSenhaLocal()      { return props.getProperty("local.db.senha"); }
+
+    // ✅ Pool
+    public static int getMaxConnections()     { return Integer.parseInt(props.getProperty("db.maxConnections", "10")); }
+    public static int getMinIdle()            { return Integer.parseInt(props.getProperty("db.minIdle", "2")); }
+    public static long getConnectionTimeout() { return Long.parseLong(props.getProperty("db.connectionTimeout", "30000")); }
+    public static long getIdleTimeout()       { return Long.parseLong(props.getProperty("db.idleTimeout", "600000")); }
 }

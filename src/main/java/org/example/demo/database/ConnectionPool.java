@@ -12,28 +12,65 @@ public class ConnectionPool {
 
     static {
         try {
-            // ✅ Registra o driver MySQL explicitamente
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(DatabaseConfig.getUrl());
-            config.setUsername(DatabaseConfig.getUsuario());
-            config.setPassword(DatabaseConfig.getSenha());
-            config.setMaximumPoolSize(DatabaseConfig.getMaxConnections());
-            config.setMinimumIdle(DatabaseConfig.getMinIdle());
-            config.setConnectionTimeout(DatabaseConfig.getConnectionTimeout());
-            config.setIdleTimeout(DatabaseConfig.getIdleTimeout());
-            config.setConnectionTestQuery("SELECT 1");
-            config.setDriverClassName("com.mysql.cj.jdbc.Driver"); // ✅ força o driver
-            config.setPoolName("BibliotecaPool");
+            // ✅ Tenta Railway primeiro
+            String urlRailway = DatabaseConfig.getUrlRailway();
+            if (urlRailway != null && !urlRailway.isBlank()) {
+                try {
+                    dataSource = criarPool(
+                            urlRailway,
+                            DatabaseConfig.getUsuarioRailway(),
+                            DatabaseConfig.getSenhaRailway(),
+                            "PoolRailway"
+                    );
+                    // Testa a conexão de fato
+                    try (Connection c = dataSource.getConnection()) {
+                        System.out.println("✅ Conectado ao Railway: " + urlRailway);
+                    }
+                } catch (Exception e) {
+                    System.out.println("⚠️ Railway indisponível, usando banco local: " + e.getMessage());
+                    if (dataSource != null) {
+                        dataSource.close();
+                        dataSource = null;
+                    }
+                }
+            }
 
-            dataSource = new HikariDataSource(config);
+            // ✅ Fallback para banco local
+            if (dataSource == null) {
+                dataSource = criarPool(
+                        DatabaseConfig.getUrlLocal(),
+                        DatabaseConfig.getUsuarioLocal(),
+                        DatabaseConfig.getSenhaLocal(),
+                        "PoolLocal"
+                );
+                try (Connection c = dataSource.getConnection()) {
+                    System.out.println("✅ Conectado ao banco local: " + DatabaseConfig.getUrlLocal());
+                }
+            }
 
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Driver MySQL não encontrado: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao inicializar pool: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao inicializar pool de conexões: " + e.getMessage(), e);
         }
+    }
+
+    private static HikariDataSource criarPool(String url, String usuario,
+                                              String senha, String nome) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(usuario);
+        config.setPassword(senha);
+        config.setMaximumPoolSize(DatabaseConfig.getMaxConnections());
+        config.setMinimumIdle(DatabaseConfig.getMinIdle());
+        config.setConnectionTimeout(DatabaseConfig.getConnectionTimeout());
+        config.setIdleTimeout(DatabaseConfig.getIdleTimeout());
+        config.setConnectionTestQuery("SELECT 1");
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        config.setPoolName(nome);
+        return new HikariDataSource(config);
     }
 
     public static Connection getConnection() throws SQLException {
