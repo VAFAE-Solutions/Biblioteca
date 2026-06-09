@@ -10,7 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MultaDAO {
+public class MultaDAO implements Persistivel<Multa> {
 
     public boolean inserir(Multa multa) {
         String sql = """

@@ -95,12 +95,12 @@
                         <c:when test="${livro.temCapaImagem()}">
                             <img src="${pageContext.request.contextPath}/capa?id=${livro.id}"
                                  class="card-img-top" alt="${livro.titulo}"
-                                 onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                                 onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         </c:when>
                         <c:otherwise>
                             <img src="${not empty livro.capaUrl ? livro.capaUrl : ''}"
                                  class="card-img-top" alt="${livro.titulo}"
-                                 onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                                 onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         </c:otherwise>
                     </c:choose>
                     <div class="card-body">

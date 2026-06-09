@@ -54,7 +54,7 @@
                 <div class="card h-100 book-card shadow-sm">
                     <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : (not empty livro.capaUrl ? livro.capaUrl : '')}"
                          class="card-img-top" alt="${livro.titulo}"
-                         onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                         onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                     <div class="card-body">
                         <h6 class="card-title text-truncate">${livro.titulo}</h6>
                         <p class="card-text small text-muted">${livro.autor}</p>

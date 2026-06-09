@@ -22,7 +22,7 @@ public class FiltroAutenticacao implements Filter {
             "/cadastro-completo",
             "/css",
             "/js",
-            "/imagens",
+            "/images",
             "/index.jsp",
             "/sobre",        // ✅
             "/generos",      // ✅

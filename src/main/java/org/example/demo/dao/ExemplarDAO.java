@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExemplarDAO {
+public class ExemplarDAO implements Persistivel<Exemplar> {
 
     public boolean inserir(Exemplar exemplar) {
         String sql = """

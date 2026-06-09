@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReservaDAO {
+public class ReservaDAO implements Persistivel<Reserva> {
 
     public boolean inserir(Reserva reserva) {
         String sql = """

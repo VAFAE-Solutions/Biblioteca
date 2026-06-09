@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UsuarioDAO {
+public class UsuarioDAO implements Persistivel<Usuario> {
 
     public String[] executarLoginProcedure(String email, String senhaHash) {
         String sql = "{call sp_autenticar_usuario(?, ?, ?, ?, ?)}";

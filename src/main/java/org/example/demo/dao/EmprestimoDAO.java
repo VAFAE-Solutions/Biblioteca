@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmprestimoDAO {
+public class EmprestimoDAO implements Persistivel<Emprestimo> {
 
     public boolean inserir(Emprestimo emprestimo) {
         String sqlEmprestimo = """

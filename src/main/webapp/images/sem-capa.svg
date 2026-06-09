@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+  <!-- Fundo -->
+  <rect width="200" height="300" fill="#F3F4F6" rx="8"/>
+  
+  <!-- Borda -->
+  <rect x="1" y="1" width="198" height="298" fill="none" stroke="#E5E7EB" stroke-width="2" rx="8"/>
+  
+  <!-- Ícone de livro -->
+  <g transform="translate(60, 80)">
+    <!-- Corpo do livro -->
+    <rect x="10" y="0" width="60" height="75" fill="#D1D5DB" rx="3"/>
+    <!-- Lombada -->
+    <rect x="0" y="0" width="14" height="75" fill="#9CA3AF" rx="3"/>
+    <!-- Linhas simulando páginas -->
+    <line x1="20" y1="20" x2="62" y2="20" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="20" y1="30" x2="62" y2="30" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="20" y1="40" x2="62" y2="40" stroke="#E5E7EB" stroke-width="2"/>
+    <line x1="20" y1="50" x2="50" y2="50" stroke="#E5E7EB" stroke-width="2"/>
+  </g>
+
+  <!-- Ícone de imagem (câmera) -->
+  <g transform="translate(88, 175)">
+    <circle cx="12" cy="12" r="11" fill="none" stroke="#9CA3AF" stroke-width="2"/>
+    <line x1="12" y1="1" x2="12" y2="23" stroke="#9CA3AF" stroke-width="1.5"/>
+    <line x1="1" y1="12" x2="23" y2="12" stroke="#9CA3AF" stroke-width="1.5"/>
+  </g>
+
+  <!-- Texto -->
+  <text x="100" y="230" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="13" fill="#6B7280" font-weight="bold">Capa não</text>
+  <text x="100" y="248" text-anchor="middle" font-family="Arial, sans-serif" 
+        font-size="13" fill="#6B7280" font-weight="bold">disponível</text>
+</svg>

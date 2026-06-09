@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LivroDAO {
+public class LivroDAO implements Persistivel<Livro> {
 
     public boolean inserir(Livro livro) {
         String sql = """

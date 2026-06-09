@@ -79,7 +79,7 @@
                 <c:forEach var="livro" items="${livros}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : (not empty livro.capaUrl ? livro.capaUrl : '')}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:forEach>
@@ -99,7 +99,7 @@
                 <c:if test="${livro.id == 4}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -108,7 +108,7 @@
                 <c:if test="${livro.id == 2}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -117,7 +117,7 @@
                 <c:if test="${livro.id == 5}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -126,7 +126,7 @@
                 <c:if test="${livro.id == 6}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -135,7 +135,7 @@
                 <c:if test="${livro.id == 7}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -151,7 +151,7 @@
                 <c:if test="${livro.id == 8}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -160,7 +160,7 @@
                 <c:if test="${livro.id == 9}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -169,7 +169,7 @@
                 <c:if test="${livro.id == 10}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -178,7 +178,7 @@
                 <c:if test="${livro.id == 11}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
@@ -187,7 +187,7 @@
                 <c:if test="${livro.id == 12}">
                     <a href="${pageContext.request.contextPath}/detalhes?id=${livro.id}" class="book-card">
                         <img src="${livro.temCapaImagem() ? pageContext.request.contextPath.concat('/capa?id=').concat(String.valueOf(livro.id)) : livro.capaUrl}"
-                             onerror="this.src='https://via.placeholder.com/200x300?text=Sem+Capa'">
+                             onerror="this.src='${pageContext.request.contextPath}/images/sem-capa.svg'">
                         <p>${livro.titulo}</p>
                     </a>
                 </c:if>
