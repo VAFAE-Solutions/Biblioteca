@@ -5,6 +5,11 @@ echo   Library Digital -- Deploy Local
 echo ========================================
 
 echo.
+echo [0/4] Configurando Java...
+set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot
+set PATH=%JAVA_HOME%\bin;%PATH%
+
+echo.
 echo [1/4] Gerando WAR...
 "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.2.1\plugins\maven\lib\maven3\bin\mvn.cmd" clean package -f pom.xml
 
