@@ -22,8 +22,9 @@ if errorlevel 1 (
 
 echo.
 echo [2/4] Parando Tomcat (se estiver rodando)...
-"C:\Users\milar\Downloads\apache-tomcat-10.1.54\bin\shutdown.bat" 2>nul
-timeout /t 3 /nobreak >nul
+taskkill /F /IM "tomcat*.exe" >nul 2>&1
+taskkill /F /FI "WINDOWTITLE eq Tomcat*" >nul 2>&1
+timeout /t 2 /nobreak >nul
 
 echo.
 echo [3/4] Copiando WAR...
@@ -31,7 +32,7 @@ copy /Y "C:\Users\milar\Downloads\Projeto\target\demo-1.0-SNAPSHOT.war" "C:\User
 
 echo.
 echo [4/4] Iniciando Tomcat...
-start "Tomcat" "C:\Users\milar\Downloads\apache-tomcat-10.1.54\bin\startup.bat"
+start "Tomcat" /B cmd /c "set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-21.0.5.11-hotspot && C:\Users\milar\Downloads\apache-tomcat-10.1.54\bin\startup.bat"
 
 timeout /t 5 /nobreak >nul
 
